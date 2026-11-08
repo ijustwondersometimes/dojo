@@ -157,6 +157,12 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
 .dev[open] summary::before{content:"▾ "}
 .dev summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .dev ul{margin:8px 0 0;padding:10px 12px 10px 26px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--ink)}
+.rate{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.rate-btn{text-decoration:none;display:inline-block}
+.rate-btn:focus-visible,.bug:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bug{font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
+.bug:hover{color:var(--rot)}
+.bug-hint{font-size:12px;color:var(--ok)}
 section.notes{display:flex;flex-direction:column;gap:12px}
 .fix{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
 .fix p{margin:0;color:var(--muted);font-size:15px;max-width:65ch}
@@ -257,6 +263,11 @@ section.notes{display:flex;flex-direction:column;gap:12px}
       <p><b>Alt-Wienerisch:</b> Viele alte Wörter kamen aus dem Französischen, Tschechischen, Italienischen und Jiddischen in die Stadt. Viele davon sind in Österreich bis heute normal, andere hört man nur noch selten. Etiketten und Herkunft geprüft mit Duden online und Wikipedia, Stand November 2026.</p>
       <p><b>Vorsicht mit „derb“:</b> Wörter mit diesem Etikett nur unter Freunden. Beim Heurigen geht's, beim Chef besser ned.</p>
     </div>
+  </section>
+  <section class="rate" id="feedback">
+    <h2>⭐ Bewerten &amp; Feedback</h2>
+    <p class="hint">Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.</p>
+    <a class="btn rate-btn" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener">Bewertung &amp; Feedback abgeben ↗</a>
   </section>
   <div class="gate-bg" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateT">
     <div class="gate-box">
@@ -505,6 +516,13 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   }
   const sayHtml=c=>`<div class="sayrow"><button class="say" type="button" data-say="${esc(W(c))}">🔊 Anhören</button><span class="hint">Die Computerstimme spricht Hochdeutsch, der Dialekt klingt nur ungefähr.</span></div>`;
   card.addEventListener("click",e=>{const b=e.target.closest(".say");if(b)speak(b.dataset.say,b);});
+  // Fehler melden: Karte in die Zwischenablage, dann Formular öffnen
+  const FORM="https://forms.gle/J5YVc7wGqwLjL6ny5";
+  const bugHtml=c=>`<div class="sayrow"><a class="bug" href="${FORM}" target="_blank" rel="noopener" data-card="${esc(c.wi+" = "+c.hd+(c.noe?" (NÖ: "+c.noe+")":""))}">🐞 Fehler bei dieser Karte melden</a><span class="bug-hint" hidden>Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.</span></div>`;
+  card.addEventListener("click",e=>{const a=e.target.closest(".bug");if(!a)return;
+    const h=a.nextElementSibling;
+    try{navigator.clipboard.writeText(a.dataset.card).then(()=>{if(h)h.hidden=false;}).catch(()=>{});}catch(err){}
+  });
 
   // Stapel-Prinzip: jede Karte kommt einmal dran, bevor neu gemischt wird
   const bags={};
@@ -651,6 +669,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       ${cmpHtml(c)}
       ${sayHtml(c)}
       ${c.note?`<div class="calc">${esc(c.note)}</div>`:""}
+      ${bugHtml(c)}
     </div>`;
   const bonusTag=()=>bonus?"⭐ Bonusfrage · ":"";
 
@@ -715,6 +734,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       let html=`<div>${esc((ok?"Richtig! ":"Leider falsch. ")+`${W(cur)} = ${cur.hd}`)}${regHtml(cur)}</div>`+cmpHtml(cur);
       if(f==="hd")html+=sayHtml(cur);
       if(cur.note)html+=`<div class="calc">${esc(cur.note)}</div>`;
+      html+=bugHtml(cur);
       if(!ok&&picked)html+=`<div class="calc picked">Du hast gewählt: ${esc(W(picked))} = ${esc(picked.hd)}</div>`;
       fb.innerHTML=html;
       const nx=$("#next");nx.hidden=false;nx.focus();nx.onclick=showQuiz;
