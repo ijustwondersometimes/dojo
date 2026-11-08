@@ -1,4 +1,4 @@
-# Wien / Niederösterreich Dojo
+# Wien / NÖ Dojo
 
 **Zum Dojo:** https://ijustwondersometimes.github.io/dojo/
 

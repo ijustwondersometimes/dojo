@@ -1,5 +1,5 @@
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">
-<title>Wien / Niederösterreich Dojo</title>
+<title>Wien / NÖ Dojo</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Layout: eine Lernspalte – Themen, Richtung, große Karte (Quiz oder Karteikarte), Serie, Highscore, Notizen */
@@ -23,7 +23,9 @@
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
 .wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;display:flex;flex-direction:column;gap:22px}
 header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
-h1{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,7vw,46px);margin:0;line-height:1.05;letter-spacing:.02em;text-wrap:balance}
+h1{font-family:var(--f-word);font-weight:700;font-size:clamp(28px,6vw,42px);margin:0;line-height:1.08;letter-spacing:-.005em;text-wrap:balance}
+.h-crests{display:inline-flex;gap:4px;vertical-align:middle;margin-right:12px;transform:translateY(-3px)}
+.h-crests svg{width:22px;height:27px}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.03em;margin-top:8px}
 .schild{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;white-space:nowrap}
 .schild .lin{background:var(--rot);color:#fff;border-radius:6px;padding:3px 9px;font-family:var(--f-mono);letter-spacing:.04em}
@@ -35,7 +37,9 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .sp-lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .sp-wi{font-family:var(--f-word);font-weight:700;font-size:18px;line-height:1.25}
 .sp-hd{font-size:13px;color:var(--muted)}
-.spruch.neu{animation:glow 1.2s ease 2}
+.witz-btn{font:inherit;font-weight:700;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.witz-btn:hover{border-color:var(--gold)}
+.witz-btn.neu{animation:glow 1.2s ease 2;border-color:var(--gold)}
 .side-bug{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
 .gate-box.album-box{max-width:560px;max-height:85vh;overflow:auto;border-color:var(--line)}
 .album-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -61,6 +65,9 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .gate-box input[type=number]{font:inherit;width:9em;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
 .gate input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+[data-tip]{position:relative}
+[data-tip]:hover::after,[data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:12px;font-weight:500;line-height:1.4;padding:7px 10px;border-radius:8px;width:max-content;max-width:240px;white-space:normal;text-align:left;z-index:30;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+@media (hover:none){[data-tip]:hover::after{display:none}}
 .dia-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .dia{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0;opacity:.6}
 .dia svg{width:34px;height:42px;flex:none}
@@ -77,8 +84,11 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 button{font:inherit;cursor:pointer;color:inherit}
 .tab{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;font-weight:600}
 .tab[aria-pressed="true"]{background:var(--rot);border-color:var(--rot);color:var(--surface)}
-.mode{border:none;background:none;padding:6px 2px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent}
-.mode[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+.bar .modes{gap:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:3px}
+.mode{border:none;background:none;padding:6px 12px;color:var(--muted);font-weight:600;border-radius:7px;font-size:14px;white-space:nowrap}
+.mode:hover{color:var(--ink)}
+.mode[aria-pressed="true"]{color:var(--ink);background:var(--sign1);box-shadow:0 1px 0 rgba(0,0,0,.25),0 0 0 1px var(--signline)}
+.bar{justify-content:flex-start !important}
 button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);align-self:center}
@@ -251,19 +261,20 @@ section.notes{display:flex;flex-direction:column;gap:12px}
 
 <div class="wrap">
   <header>
-    <h1>Wien / Niederösterreich Dojo<small>Hochdeutsch ↔ Wienerisch · Alltag · Beisl · Schmäh · Unterwegs · Alt-Wien · Wien ↔ NÖ</small></h1>
+    <h1><span class="h-crests" aria-hidden="true" id="hCrests"></span>Wien / NÖ Dojo<small>Wienerisch &amp; Niederösterreichisch lernen</small></h1>
     <div class="head-r">
-      <button class="spruch" id="spruch" type="button" aria-label="Spruch des Tages, öffnet die Spruch-Sammlung"><span class="sp-lab">📜 Spruch des Tages <span id="spCount"></span></span><span class="sp-wi" id="spWi">…</span><span class="sp-hd" id="spHd"></span></button>
+      <button class="spruch" id="spruch" type="button" aria-label="Wiener Spruch, Klick zeigt den nächsten" data-tip="Klick für den nächsten Spruch"><span class="sp-lab">📜 Wiener Spruch</span><span class="sp-wi" id="spWi">…</span><span class="sp-hd" id="spHd"></span></button>
+      <button class="witz-btn" id="witzBtn" type="button" data-tip="Deine Witze-Sammlung. Neue Witze gibt's für jeden gebrochenen Themen-Rekord.">😂 <span id="spCount">0/0</span></button>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
 
   <div class="dia-switch" role="group" aria-label="Dialekt">
-    <button class="dia wien" id="v-wien" data-dia="wien" aria-pressed="true">
+    <button class="dia wien" id="v-wien" data-tip="Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa." data-dia="wien" aria-pressed="true">
       <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#c8102e"/><path d="M17 4 H23 V45.3 C21.9 45.6 20.9 46 20 46 C19.1 46 18.1 45.6 17 45.3 Z M4 18 H36 V24 H4 Z" fill="#fff"/><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
       <span class="dia-txt"><b>Wien</b><small>haaß · dahaam · Staa</small></span>
     </button>
-    <button class="dia noe" id="v-noe" data-dia="noe" aria-pressed="false">
+    <button class="dia noe" id="v-noe" data-tip="Niederösterreichisch: altes ei wird zu oa, z. B. hoaß, dahoam, Stoa. Wo es keinen Unterschied gibt, steht „wie in Wien“." data-dia="noe" aria-pressed="false">
       <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#1d4f9c"/><g fill="#f2c230"><g transform="translate(14 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(14 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(20 35)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g></g><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
       <span class="dia-txt"><b><span class="lang">Niederösterreich</span><span class="kurz">NÖ</span></b><small>hoaß · dahoam · Stoa</small></span>
     </button>
@@ -281,16 +292,14 @@ section.notes{display:flex;flex-direction:column;gap:12px}
 
   <div class="bar">
     <div class="modes" role="group" aria-label="Lernmodus">
-      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true">Quiz</button>
-      <button class="mode" id="m-card" data-mode="card" aria-pressed="false">Karteikarten</button>
+      <button class="mode" id="m-quiz" data-tip="Vier Antworten zur Auswahl, eine davon ist richtig." data-mode="quiz" aria-pressed="true">Quiz</button>
+      <button class="mode" id="m-card" data-tip="Karte umdrehen und selbst einschätzen, ob du es gewusst hast." data-mode="card" aria-pressed="false">Karteikarten</button>
     </div>
     <div class="modes" role="group" aria-label="Richtung">
-      <span class="lbl">Richtung</span>
-      <button class="mode" id="d-wi" data-dir="wi" aria-pressed="false">Dialekt → Hd.</button>
-      <button class="mode" id="d-mix" data-dir="mix" aria-pressed="true">Gemischt</button>
-      <button class="mode" id="d-hd" data-dir="hd" aria-pressed="false">Hd. → Dialekt</button>
+      <button class="mode" id="d-wi" data-tip="Du siehst das Dialekt-Wort und suchst das Hochdeutsche." data-dir="wi" aria-pressed="false">Dialekt → Hd.</button>
+      <button class="mode" id="d-mix" data-tip="Mal vom Dialekt ins Hochdeutsche, mal umgekehrt." data-dir="mix" aria-pressed="true">Gemischt</button>
+      <button class="mode" id="d-hd" data-tip="Du siehst das Hochdeutsche und suchst das Dialekt-Wort." data-dir="hd" aria-pressed="false">Hd. → Dialekt</button>
     </div>
-    <div class="score" id="score">Richtig 0 · Falsch 0</div>
   </div>
 
   <div class="play" id="streak">
@@ -299,6 +308,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
       <div class="ring" id="stRing" title="Fortschritt im Thema"><span><span id="stNum">0</span>/20</span></div>
       <div class="serie" id="stSerie" title="Serie über alle Themen"><div class="lab">🔥 Serie</div><div class="big"><b>0</b></div></div>
       <div><div class="lab">Rekord</div><div class="val" id="stMeta">0</div></div>
+      <div><div class="lab">Heute</div><div class="val score-side" id="score">Richtig 0 · Falsch 0</div></div>
       <div class="st-life" id="stLife"></div>
       <div class="side-bug"><a class="bug" id="sideBug" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener" data-card="">⚑ Diese Karte melden</a><span class="bug-hint" hidden>Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.</span></div>
     </aside>
@@ -347,10 +357,10 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   </section>
   <div class="gate-bg" id="album" hidden role="dialog" aria-modal="true" aria-labelledby="albumT">
     <div class="gate-box album-box">
-      <div class="album-head"><h2 id="albumT">📜 Deine Spruch-Sammlung</h2><button class="btn ghost" id="albumX" type="button">Schließen</button></div>
-      <p class="hint">Jeden Tag gibt's einen Spruch für alle. Extra-Sprüche schaltest du frei, indem du in einem Thema deinen <b>Rekord brichst</b> (mindestens 5 richtig in Folge, mehr als dein bisheriger Bestwert im Thema).</p>
+      <div class="album-head"><h2 id="albumT">😂 Deine Witze-Sammlung</h2><button class="btn ghost" id="albumX" type="button">Schließen</button></div>
+      <p class="hint">Für jeden gebrochenen <b>Themen-Rekord</b> (mindestens 5 richtig in Folge und mehr als dein bisheriger Bestwert in diesem Thema) gibt's einen Wiener Witz aus diesem Thema.</p>
       <div id="albumList" class="album-list"></div>
-      <p class="hint album-src">Quellen: 1000things.at, Babbel Magazin, Vienna Würstelstand, vienna.at. Wienerische Schreibweise teils angepasst.</p>
+      <p class="hint album-src">Witze: nacherzählte Volkswitze und eigene, im Wiener Stil. Sprüche oben: 1000things.at, Babbel Magazin, Vienna Würstelstand.</p>
     </div>
   </div>
   <div class="gate-bg" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateT">
@@ -366,7 +376,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     </div>
   </div>
   <footer class="copy">
-    <span>© 2026 miab · Wien / Niederösterreich Dojo</span>
+    <span>© 2026 miab · Wien / NÖ Dojo</span>
   </footer>
 </div>
 
@@ -586,6 +596,27 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     ["s25","schimpf","Heast, du Beidl, schleich di!","Hey, du Idiot, hau ab!"],
     ["s26","schimpf","Jetzt is ois im Oasch.","Jetzt ist alles kaputt."]
   ].map(r=>({id:r[0],cat:r[1],wi:r[2],hd:r[3]}));
+  // [id, Thema, Witz auf Wienerisch, kurze Erklärung]
+  const WITZE=[
+    ["w1","greet","Tourist: „Grüß Gott!“ – Wiener: „Wenn S' eam seng, sogn S' eam an schenen Gruaß vo mir.“","„Grüß Gott“ wörtlich genommen."],
+    ["w2","greet","Fragt da Bua: „Papa, wos haßt eigentlich Oida?“ – „Des haßt Papa, Oida.“","Oida ist die Allzweck-Anrede."],
+    ["w3","greet","Wiener sagt „Baba!“ – Deutscher: „Ach, Sie haben Kinder?“ – „Na, i geh nur ham.“","Baba heißt Tschüss, nicht Papa."],
+    ["w4","food","Gast: „Herr Ober, in meiner Suppn schwimmt a Fliagn!“ – Ober: „Kane Sorge, de trinkt Ihna ned vü weg.“","Wiener Kellner-Schmäh."],
+    ["w5","food","„I trink nur an Gspritztn, i muass no foahrn.“ – „Mit wos?“ – „Mit da Bim.“","Gspritzter = Weinschorle, Bim = Straßenbahn."],
+    ["w6","food","Am Würstlstand: „Is de Eitrige frisch?“ – „Frischer als Sie um de Uhrzeit.“","Eitrige = Käsekrainer."],
+    ["w7","schm","Doktor: „Rauchen Sie?“ – „Na.“ – „Trinken Sie?“ – „Na.“ – „Ja wos mochn S' dann den ganzn Tog?“ – „Raunzn.“","Raunzen = jammern, Wiener Volkssport."],
+    ["w8","schm","Sogt da Pessimist: „Schlimmer kann's nimmer wern.“ Sogt da Wiener: „Oh ja. Wart nur.“","Der Wiener Grant schlägt jeden Pessimisten."],
+    ["w9","schm","„Warum is da Wiener so grantig?“ – „Damit eam a jeda glaubt, dass a a Wiener is.“","Grant als Ausweis."],
+    ["w10","way","In da Bim: „Is der Platz frei?“ – „Na, für den zoit ma.“","„Frei“ wie kostenlos."],
+    ["w11","way","Tourist: „Wo ist hier die U-Bahn?“ – Wiener: „Unten.“","Kurze Wege, kurze Antworten."],
+    ["w12","way","Schwarzkappler: „Fahrschein, bitte!“ – „I foahr ned, i sitz nur.“","Schwarzkappler = Kontrolleur."],
+    ["w13","alt","Da Opa: „Früher woar ois besser.“ – Da Enkel: „A des Wetter?“ – „Na. Oba mia woarn jünger.“","Alt-Wiener Weisheit."],
+    ["w14","alt","„Oma, wos is a Gspusi?“ – „Des, wovon da Opa glaubt, dass i nia ans ghobt hob.“","Gspusi = Liebschaft."],
+    ["w15","alt","Früher hot ma bei da Bassena tratscht. Heit gibt's dafür an Gruppenchat. Funktioniert genauso, nur ohne Wossa.","Bassena = altes Wasserbecken am Gang, Treffpunkt zum Tratschen."],
+    ["w16","schimpf","Zwa Autofahrer am Gürtl. Da ane schreit: „Du Koffer!“ Da andere: „Und du Reisetaschn!“","Koffer = Idiot."],
+    ["w17","schimpf","„Heast, schleich di!“ – „Geht ned, i hob a Hüftn.“","Schleich di = hau ab."],
+    ["w18","schimpf","„Du bist so deppat, dass da Watschenbaum Mitleid hot.“","Watschenbaum = da fallen Ohrfeigen runter."]
+  ].map(r=>({id:r[0],cat:r[1],t:r[2],hd:r[3]}));
   const DECKS={greet:GREET,food:FOOD,schm:SCHM,way:WAY,alt:ALT,schimpf:SCHIMPF,all:[...GREET,...FOOD,...SCHM,...WAY,...ALT]};
   const CAMP=["greet","food","schm","way","alt"];
   const NAMES={greet:"Begrüßen & Alltag",food:"Essen & Beisl",schm:"Schmäh & Grant",way:"Unterwegs in Wien",alt:"Alt-Wienerisch",schimpf:"🔞 Schimpfen",all:"Alles gemischt"};
@@ -596,7 +627,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   let score={ok:0,no:0,streak:0};
   let run=0, best=0, goals=0, pendingReset=false, done={}, bonus=false, finale=false, hist={};
   let tBest={}, unlocked=[], tRun=0, tAwarded=false;
-  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;tBest=s.tBest||{};unlocked=s.unlocked||[];}}catch(e){}}
+  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;tBest=s.tBest||{};unlocked=(s.unlocked||[]).filter(x=>/^w/.test(x));}}catch(e){}}
   function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak,tBest,unlocked}))}catch(e){}}
   const pad=n=>String(n).padStart(2,"0");
   const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
@@ -668,33 +699,25 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     const prev=tBest[deck]||0;
     if(tRun>prev){tBest[deck]=tRun;
       if(tRun>=5&&!tAwarded){tAwarded=true;
-        const s=SPRUECHE.find(x=>x.cat===deck&&!unlocked.includes(x.id)&&x.id!==dailySpruch().id);
-        if(s){unlocked.push(s.id);renderSpruch();const sp=$("#spruch");sp.classList.remove("neu");void sp.offsetWidth;sp.classList.add("neu");
-          return `📜 Neuer Rekord in ${NAMES[deck]} (${tRun})! Spruch freigeschaltet: „${s.wi}“`;}
+        const s=WITZE.find(x=>x.cat===deck&&!unlocked.includes(x.id));
+        if(s){unlocked.push(s.id);renderSpruch();const wb=$("#witzBtn");wb.classList.remove("neu");void wb.offsetWidth;wb.classList.add("neu");
+          return `😂 Neuer Rekord in ${NAMES[deck]} (${tRun})! Ein Witz ist freigeschaltet. Klick oben auf 😂.`;}
       }}
     return "";
   }
   const topicReset=()=>{tRun=0;tAwarded=false;};
-  function dailySpruch(){
-    const pool=SPRUECHE.filter(x=>x.cat!=="schimpf");
-    const t=new Date();const day=Math.floor(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/864e5);
-    return pool[day%pool.length];
-  }
-  function renderSpruch(){
-    const s=dailySpruch();$("#spWi").textContent=s.wi;$("#spHd").textContent=s.hd;
-    const vis=SPRUECHE.filter(x=>x.cat!=="schimpf"||adult());
-    const have=vis.filter(x=>unlocked.includes(x.id)||x.id===s.id).length;
-    $("#spCount").textContent=`· ${have}/${vis.length}`;
-  }
+  let spIdx=-1;
+  const spPool=()=>SPRUECHE.filter(x=>x.cat!=="schimpf"||adult());
+  function nextSpruch(){const pool=spPool();let i;do{i=Math.floor(Math.random()*pool.length);}while(pool.length>1&&i===spIdx);spIdx=i;const s=pool[i];$("#spWi").textContent=s.wi;$("#spHd").textContent=s.hd;}
+  const witzPool=()=>WITZE.filter(x=>x.cat!=="schimpf"||adult());
+  function renderSpruch(){const pool=witzPool();$("#spCount").textContent=`${pool.filter(x=>unlocked.includes(x.id)).length}/${pool.length}`;}
   function openAlbum(){
-    const d=dailySpruch();
     const cats=["greet","food","schm","way","alt"].concat(adult()?["schimpf"]:[]);
     $("#albumList").innerHTML=cats.map(c=>{
-      const items=SPRUECHE.filter(x=>x.cat===c);
-      return `<div class="album-cat"><h3>${esc(NAMES[c])} · Rekord ${tBest[c]||0}</h3>${items.map(x=>{
-        const open=unlocked.includes(x.id)||x.id===d.id;
-        return open?`<div class="album-item">${x.id===d.id?`<div class="tag">Heute</div>`:""}<div class="wi">${esc(x.wi)}</div><div class="hd">${esc(x.hd)}</div></div>`
-          :`<div class="album-item lock"><div class="wi">🔒 ???</div><div class="hd">Brich deinen Rekord in „${esc(NAMES[c])}“, um diesen Spruch freizuschalten.</div></div>`;}).join("")}</div>`;}).join("");
+      const items=WITZE.filter(x=>x.cat===c);
+      return `<div class="album-cat"><h3>${esc(NAMES[c])} · Rekord ${tBest[c]||0}</h3>${items.map(x=>unlocked.includes(x.id)
+        ?`<div class="album-item"><div class="wi">${esc(x.t)}</div><div class="hd">${esc(x.hd)}</div></div>`
+        :`<div class="album-item lock"><div class="wi">🔒 ???</div><div class="hd">Brich deinen Rekord in „${esc(NAMES[c])}“, um diesen Witz freizuschalten.</div></div>`).join("")}</div>`;}).join("");
     $("#album").hidden=false;$("#albumX").focus();
   }
   function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
@@ -940,11 +963,13 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;save();render();});
   document.querySelectorAll("[data-dia]").forEach(b=>b.onclick=()=>{dia=b.dataset.dia;save();render();});
 
-  $("#spruch").onclick=openAlbum;
+  $("#spruch").onclick=nextSpruch;
+  $("#witzBtn").onclick=openAlbum;
   $("#albumX").onclick=()=>{$("#album").hidden=true;$("#spruch").focus();};
   $("#album").addEventListener("click",e=>{if(e.target.id==="album")$("#album").hidden=true;});
   $("#album").addEventListener("keydown",e=>{if(e.key==="Escape")$("#album").hidden=true;});
-  load();if(deck==="schimpf"&&!adult())deck="greet";renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();
+  (function(){const h=$("#hCrests");["#v-wien svg","#v-noe svg"].forEach(q=>{const v=document.querySelector(q);if(v)h.appendChild(v.cloneNode(true));});})();
+  load();if(deck==="schimpf"&&!adult())deck="greet";nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();
 })();
 </script>
 
