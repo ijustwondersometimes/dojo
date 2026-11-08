@@ -245,6 +245,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
 .bonus-pill{font-size:12px;font-weight:700;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:2px 10px}
 /* ---- Antworten ---- */
 .choices{grid-template-columns:1fr;max-width:560px}
+.card-hint{margin:2px 0 0;text-align:center}
 .choice{display:flex;align-items:center;gap:14px;text-align:left;background:var(--sign2);padding:12px 16px}
 .choice .k{width:30px;height:30px;border-radius:50%;border:1px solid var(--signline);color:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
 .choice .t{flex:1;min-width:0}
@@ -764,7 +765,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     const wasBonus=bonus;bonus=false;
     const lostSerie=score.streak;score.streak=0;
     const serieTxt=lostSerie>0?` 🔥 Serie bei ${lostSerie} gerissen.`:"";
-    if(pendingReset){pendingReset=false;run=0;resetCP();setMsg("Falsch."+serieTxt,"bad");if(lostSerie)flash("lost");save();renderScore();renderDays();renderLife();return;}
+    if(pendingReset){pendingReset=false;run=0;resetCP();setMsg((mode==="card"?"Nicht gewusst, kein Problem. Die Karte kommt später wieder.":"Falsch.")+serieTxt,"bad");if(lostSerie)flash("lost");save();renderScore();renderDays();renderLife();return;}
     const lost=run;
     if(life&&checkpoint>0){
       life=false;run=checkpoint;
@@ -773,7 +774,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
       run=0;resetCP();
       if(wasBonus)setMsg(`Bonusfrage verpasst, ka Joker mehr. Thema ${NAMES[deck]} zurück auf 0.${serieTxt}`,"bad");
       else if(lost>0)setMsg(`Thema zurück auf 0. Geh bitte!${serieTxt}`,"bad");
-      else setMsg("Falsch."+serieTxt,"bad");
+      else setMsg((mode==="card"?"Nicht gewusst, kein Problem. Die Karte kommt später wieder.":"Falsch.")+serieTxt,"bad");
       if(lost>0||lostSerie>0)flash("lost");
     }
     save();renderScore();renderDays();renderLife();
@@ -869,8 +870,9 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     cur=pick();setBug(cur);const f=front();
     card.innerHTML=`${signHtml(f==="wi"?W(cur):cur.hd,f)}
       ${f==="wi"?sayHtml(cur):""}
-      <div class="actions"><button class="btn" id="flip">Umdrehen</button></div>`;
-    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">Nochmal üben</button><button class="btn" id="next">Gewusst · Weiter</button></div>`+askHtml();wireAsk(cur);
+      <p class="hint card-hint">Überleg dir die Antwort im Kopf, dann dreh die Karte um und schau, ob du richtig lagst.</p>
+      <div class="actions"><button class="btn" id="flip">Karte umdrehen</button></div>`;
+    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><p class="hint card-hint" style="flex-basis:100%;text-align:center;margin:0">Hast du es gewusst?</p><button class="btn ghost" id="again">✗ Nicht gewusst</button><button class="btn" id="next">✓ Gewusst</button></div>`+askHtml();wireAsk(cur);
       $("#next").onclick=()=>{hit();showCard();};
       $("#again").onclick=()=>{miss();showCard();};
     };
