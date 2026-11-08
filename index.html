@@ -1,0 +1,776 @@
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0">
+<title>Wien / Niederösterreich Dojo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Federo&family=Source+Sans+3:wght@400;500;600;700&family=Source+Code+Pro:wght@500&display=swap">
+<style>
+/* Layout: eine Lernspalte – Themen, Richtung, große Karte (Quiz oder Karteikarte), Serie, Highscore, Notizen */
+:root{
+  --paper:#eceeee; --surface:#ffffff; --ink:#1c1f23; --muted:#5c646c;
+  --rot:#c8102e; --rot-soft:#f6dfe2; --gold:#9a7a2e; --ok:#2e7a4c; --line:#d5d9dc; --blau:#1d4f9c;
+  --f-display:"Federo","Josefin Sans",Georgia,serif;
+  --f-body:"Source Sans 3",system-ui,-apple-system,sans-serif;
+  --f-mono:"Source Code Pro",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#131517; --surface:#1c1f22; --ink:#ebeeef; --muted:#9aa2a9;
+  --rot:#ef5b6e; --rot-soft:#3a2026; --gold:#d6b35c; --ok:#6cc08f; --line:#2e3338; --blau:#7fa6ea; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#131517; --surface:#1c1f22; --ink:#ebeeef; --muted:#9aa2a9;
+  --rot:#ef5b6e; --rot-soft:#3a2026; --gold:#d6b35c; --ok:#6cc08f; --line:#2e3338; --blau:#7fa6ea; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+.wrap{max-width:720px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 48px;display:flex;flex-direction:column;gap:22px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,7vw,46px);margin:0;line-height:1.05;letter-spacing:.02em;text-wrap:balance}
+h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.03em;margin-top:8px}
+.schild{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;white-space:nowrap}
+.schild .lin{background:var(--rot);color:#fff;border-radius:6px;padding:3px 9px;font-family:var(--f-mono);letter-spacing:.04em}
+.schild .ziel{color:var(--muted);font-weight:600}
+.tabs,.modes{display:flex;gap:8px;flex-wrap:wrap}
+.head-r{display:flex;align-items:center;gap:12px}
+.theme-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;display:grid;place-items:center;padding:0}
+.theme-btn:hover{border-color:var(--gold)}
+.tab18[aria-pressed="false"]{border-style:dashed}
+.gate-bg{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,#000 60%,transparent);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.gate-box{background:var(--surface);color:var(--ink);border:2px solid var(--rot);border-radius:16px;padding:22px 20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.gate-icon{font-size:40px;line-height:1}
+.gate-box .lbl{align-self:flex-start}
+.gate-box h2{color:var(--rot)}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:15px;cursor:pointer}
+.chk input{width:20px;height:20px;margin-top:2px;accent-color:var(--rot);flex:none}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.gate-box input[type=number]{font:inherit;width:9em;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.gate input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.dia-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dia{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0;opacity:.6}
+.dia svg{width:34px;height:42px;flex:none}
+.dia-txt{display:flex;flex-direction:column;min-width:0}
+.dia-txt b{font-family:var(--f-display);font-weight:400;font-size:clamp(17px,4.5vw,22px);line-height:1.15;overflow-wrap:anywhere}
+.dia-txt small{font-size:13px;color:var(--muted)}
+.dia:hover{opacity:.85}
+.dia .kurz{display:none}
+@media (max-width:480px){.dia .lang{display:none}.dia .kurz{display:inline}.dia{padding:10px;gap:10px}}
+.dia[aria-pressed="true"]{opacity:1}
+.dia.wien[aria-pressed="true"]{border-color:var(--rot);background:color-mix(in srgb,var(--rot) 8%,var(--surface))}
+.dia.noe[aria-pressed="true"]{border-color:var(--blau);background:color-mix(in srgb,var(--blau) 10%,var(--surface))}
+@media (prefers-reduced-motion:no-preference){.dia{transition:opacity .15s ease,border-color .15s ease}}
+button{font:inherit;cursor:pointer;color:inherit}
+.tab{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;font-weight:600}
+.tab[aria-pressed="true"]{background:var(--rot);border-color:var(--rot);color:var(--surface)}
+.mode{border:none;background:none;padding:6px 2px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent}
+.mode[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--gold)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.lbl{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);align-self:center}
+.score{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--rot);border-radius:14px;padding:28px 20px;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.prompt-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.big{font-family:var(--f-display);font-size:clamp(34px,9vw,58px);line-height:1.15;overflow-wrap:anywhere;text-wrap:balance}
+.big.hd{font-family:var(--f-body);font-weight:700;font-size:clamp(26px,6.5vw,40px)}
+.sub{font-size:20px;color:var(--rot);font-weight:600}
+.meaning{font-size:18px}
+.hint{font-size:14px;color:var(--muted);max-width:52ch}
+.reg{display:inline-block;font-size:12px;letter-spacing:.06em;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);vertical-align:middle;margin-left:6px;font-weight:600}
+.reg.derb,.reg.ordinär{border-color:var(--rot);color:var(--rot)}
+.reg.ordinär{background:var(--rot);color:var(--surface)}
+.back{display:flex;flex-direction:column;gap:6px;align-items:center}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;max-width:540px;margin-top:8px}
+.choice{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:12px 10px;font-size:17px;min-height:56px;min-width:0;overflow-wrap:anywhere}
+.choice:hover{border-color:var(--rot)}
+.choice.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+.choice.wrong{border-color:var(--rot);background:color-mix(in srgb,var(--rot) 14%,var(--surface))}
+.choice:disabled{cursor:default}
+.actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{border:1px solid var(--rot);background:var(--rot);color:var(--surface);padding:10px 18px;border-radius:10px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--rot)}
+.feedback{min-height:24px;font-weight:600;display:flex;flex-direction:column;gap:6px;align-items:center;max-width:560px}
+.feedback.ok{color:var(--ok)} .feedback.no{color:var(--rot)}
+.calc{font-size:14px;color:var(--ink);background:var(--rot-soft);border-radius:8px;padding:8px 12px;font-weight:500;line-height:1.55}
+.calc.picked{background:transparent;border:1px dashed var(--line);color:var(--muted)}
+.streak{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 18px 12px;display:flex;flex-direction:column;gap:10px}
+.st-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.st-num{font-size:15px;color:var(--muted)}
+.st-num b{font-family:var(--f-display);font-weight:400;font-size:30px;color:var(--ink);font-variant-numeric:tabular-nums;margin-right:2px}
+.st-meta{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{position:relative;height:12px;border-radius:999px;background:var(--rot-soft);margin:6px 14px 18px 0}
+.fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:999px;background:linear-gradient(90deg,var(--rot),var(--gold))}
+.ms{position:absolute;top:50%;transform:translate(-50%,-50%);width:26px;height:26px;border-radius:50%;background:var(--surface);border:2px solid var(--line);font-size:11px;font-weight:700;display:grid;place-items:center;color:var(--muted);font-variant-numeric:tabular-nums}
+.ms.hit{border-color:var(--gold);color:var(--surface);background:var(--gold)}
+.ms.goal{width:30px;height:30px}
+.st-msg{font-size:14px;color:var(--muted);min-height:21px}
+.st-msg.good{color:var(--ok);font-weight:700}
+.st-msg.bad{color:var(--rot);font-weight:700}
+.st-life{font-size:13px;color:var(--gold);font-weight:700}
+.st-life:empty{display:none}
+.streak.win{border-color:var(--gold)}
+.serie{font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-variant-numeric:tabular-nums}
+.serie b{font-family:var(--f-display);font-weight:400;font-size:20px;color:var(--ink)}
+.serie.hot{border-color:var(--gold)}
+.serie.hot b{color:var(--gold)}
+@media (prefers-reduced-motion:no-preference){
+  .fill{transition:width .35s ease}
+  .ms.hit{animation:pop .4s ease}
+  .streak.win{animation:glow 1.2s ease 2}
+  .streak.lost{animation:shake .35s ease}
+  .card{transition:transform .15s ease}.card.pop{transform:scale(1.01)}
+}
+@keyframes pop{50%{transform:translate(-50%,-50%) scale(1.35)}}
+@keyframes glow{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--gold) 30%,transparent)}}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.ask{display:none;width:100%;max-width:560px;margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);text-align:left;flex-direction:column;gap:8px}
+.has-sensei .ask{display:flex}
+.ask-l{font-weight:700;font-size:14px}
+.ask-row{display:flex;gap:8px}
+.ask-row input{flex:1;min-width:0;font:inherit;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.ask-row input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.ask-log{display:flex;flex-direction:column;gap:6px}
+.ask-log .q{align-self:flex-end;background:var(--rot);color:var(--surface);padding:6px 12px;border-radius:12px 12px 2px 12px;max-width:85%;font-size:14px}
+.ask-log .a{align-self:flex-start;background:var(--rot-soft);padding:8px 12px;border-radius:12px 12px 12px 2px;max-width:92%;font-size:14px;white-space:pre-wrap;line-height:1.6}
+.ask-log .a.err{background:transparent;border:1px dashed var(--rot);color:var(--rot)}
+.sayrow{display:flex;flex-direction:column;align-items:center;gap:4px}
+.say{border:1px solid var(--gold);background:transparent;color:var(--gold);border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px}
+.say:hover{background:var(--gold);color:var(--surface)}
+h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-spacing:.02em}
+.days{display:flex;flex-direction:column;gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.tv{font-family:var(--f-display);font-size:28px;font-variant-numeric:tabular-nums;line-height:1.1}
+.tl{font-size:12px;color:var(--muted)}
+.week{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 12px 10px;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end}
+.bcol{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.wbar{width:100%;max-width:34px;height:90px;background:var(--rot-soft);border-radius:6px;display:flex;align-items:flex-end;overflow:hidden}
+.wbar>div{width:100%;background:var(--muted);border-radius:6px 6px 0 0;min-height:2px}
+.bcol.now .wbar>div{background:var(--rot)}
+.bv{font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.bwd{font-weight:700;font-size:14px}
+.bcol.now .bwd{color:var(--rot)}
+.bd,.bs{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+@media (max-width:520px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.copy{font-size:13px;color:var(--muted);padding-top:8px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.dev{margin-left:auto;text-align:right;font-size:12px;max-width:100%}
+.dev summary{cursor:pointer;list-style:none;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 10px;display:inline-block}
+.dev summary::-webkit-details-marker{display:none}
+.dev summary::before{content:"▸ "}
+.dev[open] summary::before{content:"▾ "}
+.dev summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.dev ul{margin:8px 0 0;padding:10px 12px 10px 26px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--ink)}
+section.notes{display:flex;flex-direction:column;gap:12px}
+.fix{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.fix p{margin:0;color:var(--muted);font-size:15px;max-width:65ch}
+.fix b{color:var(--ink)}
+@media (max-width:420px){.choice{font-size:16px}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Wien / Niederösterreich Dojo<small>Hochdeutsch ↔ Wienerisch · Alltag · Beisl · Schmäh · Unterwegs · Alt-Wien · Wien ↔ NÖ</small></h1>
+    <div class="head-r">
+      <div class="schild" aria-hidden="true"><span class="lin">D</span><span class="ziel">Richtung Schmäh</span></div>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
+    </div>
+  </header>
+
+  <div class="dia-switch" role="group" aria-label="Dialekt">
+    <button class="dia wien" id="v-wien" data-dia="wien" aria-pressed="true">
+      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#c8102e"/><path d="M17 4 H23 V45.3 C21.9 45.6 20.9 46 20 46 C19.1 46 18.1 45.6 17 45.3 Z M4 18 H36 V24 H4 Z" fill="#fff"/><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
+      <span class="dia-txt"><b>Wien</b><small>haaß · dahaam · Staa</small></span>
+    </button>
+    <button class="dia noe" id="v-noe" data-dia="noe" aria-pressed="false">
+      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#1d4f9c"/><g fill="#f2c230"><g transform="translate(14 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(14 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(20 35)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g></g><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
+      <span class="dia-txt"><b><span class="lang">Niederösterreich</span><span class="kurz">NÖ</span></b><small>hoaß · dahoam · Stoa</small></span>
+    </button>
+  </div>
+
+  <div class="tabs" role="group" aria-label="Thema">
+    <button class="tab" id="t-greet" data-deck="greet" aria-pressed="true">Begrüßen &amp; Alltag</button>
+    <button class="tab" id="t-food" data-deck="food" aria-pressed="false">Essen &amp; Beisl</button>
+    <button class="tab" id="t-schm" data-deck="schm" aria-pressed="false">Schmäh &amp; Grant</button>
+    <button class="tab" id="t-way" data-deck="way" aria-pressed="false">Unterwegs in Wien</button>
+    <button class="tab" id="t-alt" data-deck="alt" aria-pressed="false">Alt-Wienerisch</button>
+    <button class="tab tab18" id="t-schimpf" data-deck="schimpf" aria-pressed="false">🔞 Schimpfen</button>
+    <button class="tab" id="t-all" data-deck="all" aria-pressed="false">Alles gemischt</button>
+  </div>
+
+  <div class="bar">
+    <div class="modes" role="group" aria-label="Lernmodus">
+      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true">Quiz</button>
+      <button class="mode" id="m-card" data-mode="card" aria-pressed="false">Karteikarten</button>
+    </div>
+    <div class="modes" role="group" aria-label="Richtung">
+      <span class="lbl">Richtung</span>
+      <button class="mode" id="d-wi" data-dir="wi" aria-pressed="false">Dialekt → Hd.</button>
+      <button class="mode" id="d-mix" data-dir="mix" aria-pressed="true">Gemischt</button>
+      <button class="mode" id="d-hd" data-dir="hd" aria-pressed="false">Hd. → Dialekt</button>
+    </div>
+    <div class="score" id="score">Richtig 0 · Falsch 0</div>
+  </div>
+
+  <div class="streak" id="streak">
+    <div class="st-top">
+      <span class="st-num"><b id="stNum">0</b> / 20 im Thema</span>
+      <span class="serie" id="stSerie" title="Serie über alle Themen">🔥 <b>0</b> Serie</span>
+      <span class="st-meta" id="stMeta">Rekord 0 · Themen 0/5</span>
+    </div>
+    <div class="track" aria-hidden="true">
+      <div class="fill" id="stFill"></div>
+      <span class="ms" data-at="5" style="left:25%">5</span>
+      <span class="ms" data-at="10" style="left:50%">10</span>
+      <span class="ms" data-at="15" style="left:75%">15</span>
+      <span class="ms goal" data-at="20" style="left:100%">20</span>
+    </div>
+    <div class="st-life" id="stLife"></div>
+    <div class="st-msg" id="stMsg" aria-live="polite">Schaff 20 in Folge im Thema, dann kommt a Bonusfrage aus allen Themen. Die 🔥 Serie läuft über alle Themen weiter, bis zum ersten Fehler. Bei 5, 10 und 15 kriagst an 🛡️ Joker für den Themen-Fortschritt.</div>
+  </div>
+
+  <div class="card" id="card" aria-live="polite"></div>
+
+  <section class="days">
+    <h2>Tageshighscore</h2>
+    <div class="tiles" id="today"></div>
+    <div class="week" id="week" aria-label="Richtige Antworten der letzten 7 Tage"></div>
+    <p class="hint" id="bestday"></p>
+  </section>
+
+  <section class="notes">
+    <h2>Kleine Wiener Grammatik</h2>
+    <div class="fix">
+      <p><b>ned, net = nicht.</b> „I hob ned gwusst“ = Ich habe es nicht gewusst.</p>
+      <p><b>a, an = ein, einen.</b> „A Krügerl, bitte“ und „I hob an Hunger“.</p>
+      <p><b>Verkleinerung mit -erl statt -chen:</b> Sackerl, Kipferl, Stamperl, Beserlpark.</p>
+      <p><b>Vergangenheit fast nur mit Perfekt:</b> „I bin gestan gfoahn“ statt „Ich fuhr gestern“. Die Vorsilbe ge- schrumpft zu g- (gsogt, gmocht).</p>
+      <p><b>Laute:</b> ei wird oft zu aa oder a (heiß → haaß), ü wird zu i (grüß → griaß), l nach Vokal wird weich (viel → vü, Geld → Göd).</p>
+    </div>
+    <h2>Wien gegen Niederösterreich</h2>
+    <div class="fix">
+      <p><b>Fast gleich:</b> Wienerisch und Niederösterreichisch sind beide Mittelbairisch. Wortschatz und die meisten Laute teilen sie. Mit dem Schalter <b>NÖ</b> siehst du die NÖ-Form, wo es einen belegten Unterschied gibt. Sonst steht da „wie in Wien“.</p>
+      <p><b>Der Hauptunterschied – ei wird aa oder oa:</b> Wo Hochdeutsch ein altes <i>ei</i> hat, sagt Wien <b>aa</b>, große Teile von NÖ noch <b>oa</b>. Heiß = haaß / hoaß, daheim = dahaam / dahoam, Stein = Staa / Stoa. Rund um Wien setzt sich das aa immer mehr durch.</p>
+      <p><b>Weinviertel – ui statt ua:</b> In der alten ui-Mundart heißt es guit statt guat und Bruida statt Bruada. Das ist auf dem Rückzug.</p>
+      <p><b>Wald- und Mostviertel – -a statt -n:</b> måcha und låcha statt måchn und låchn.</p>
+      <p><b>Quellen:</b> Wikipedia-Artikel „Mittelbairisch“ und „Wienerisch“, Stand November 2026. Die NÖ-Formen der Karten sind nach der ei-Regel gebildet.</p>
+    </div>
+    <h2>Wien gegen Deutschland</h2>
+    <div class="fix">
+      <p><b>Das sagt man nur in Österreich:</b> Jänner, Feber, Paradeiser, Erdäpfel, Topfen, Schlagobers, Sackerl. Viele davon sind offizielles österreichisches Deutsch, kein Dialekt.</p>
+      <p><b>Alt-Wienerisch:</b> Viele alte Wörter kamen aus dem Französischen, Tschechischen, Italienischen und Jiddischen in die Stadt. Viele davon sind in Österreich bis heute normal, andere hört man nur noch selten. Etiketten und Herkunft geprüft mit Duden online und Wikipedia, Stand November 2026.</p>
+      <p><b>Vorsicht mit „derb“:</b> Wörter mit diesem Etikett nur unter Freunden. Beim Heurigen geht's, beim Chef besser ned.</p>
+    </div>
+  </section>
+  <div class="gate-bg" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateT">
+    <div class="gate-box">
+      <div class="gate-icon" aria-hidden="true">🔞</div>
+      <h2 id="gateT">Nichts für Kinder</h2>
+      <p class="hint">Das Deck „Schimpfen“ enthält ordinäre und derbe Ausdrücke. Es ist nur für Erwachsene.</p>
+      <label for="ageYear" class="lbl">Geburtsjahr</label>
+      <input id="ageYear" type="number" inputmode="numeric" min="1900" placeholder="z. B. 1990">
+      <label class="chk" for="ageChk"><input type="checkbox" id="ageChk"> Ich bestätige, dass ich mindestens 18 Jahre alt bin.</label>
+      <div class="feedback no" id="ageMsg" aria-live="polite"></div>
+      <div class="actions"><button class="btn ghost" id="ageNo" type="button">Abbrechen</button><button class="btn" id="ageOk" type="button" disabled>Freischalten</button></div>
+    </div>
+  </div>
+  <footer class="copy">
+    <span>© 2026 miab · Wien / Niederösterreich Dojo</span>
+    <details class="dev" id="devNotes">
+      <summary>Dev-Notes</summary>
+      <ul>
+        <li>Stimme muss noch verbessert werden (Wienerisch)</li>
+        <li>Idee: Deck mit Vokabeln aus den Ostbahn-Kurti-Asterix-Bänden (Da grosse Grobn, Da Woasaga). Quelle fehlt noch: Uni-Graz-Arbeit „Asterix in Wien“ als PDF oder Fotos aus den Bänden</li>
+      </ul>
+    </details>
+  </footer>
+</div>
+
+<script>
+(function(){
+  const root=document.documentElement,tb=document.getElementById("themeBtn");
+  const isDark=()=>root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
+  const paintBtn=()=>{const d=isDark();tb.textContent=d?"☀️":"🌙";tb.title=d?"Hell":"Dunkel";};
+  try{const t=localStorage.getItem("weanerdojo-theme");if(t)root.dataset.theme=t;}catch(e){}
+  paintBtn();
+  tb.onclick=()=>{const t=isDark()?"light":"dark";root.dataset.theme=t;try{localStorage.setItem("weanerdojo-theme",t);}catch(e){}paintBtn();};
+})();
+(function(){
+  // ---- Daten: [Wienerisch, Hochdeutsch, Stil, Hinweis] ----
+  const mk=(deck,rows)=>rows.map((p,i)=>({id:deck+i,deck,wi:p[0],hd:p[1],reg:p[2]||"",note:p[3]||"",noe:p[4]||""}));
+  const GREET=mk("g",[
+    ["Servas!","Servus! (Hallo / Tschüss)","locker","Geht zur Begrüßung und zum Abschied."],
+    ["Griaß di!","Grüß dich!","locker","Mehrzahl: Griaß eich!"],
+    ["Griaß Gott!","Guten Tag!","höflich","Die Standardbegrüßung im Geschäft oder beim Amt."],
+    ["Baba!","Tschüss!","locker","Auch doppelt: Baba und foi ned! = Tschüss und fall nicht hin!"],
+    ["Oida","Alter (Kumpel)","locker","Allzweckwort: Erstaunen, Ärger, Freude. Hängt am Ende jedes Satzes."],
+    ["Heast!","Hörst du! / Hey!","locker","Ruft Aufmerksamkeit, oft leicht empört."],
+    ["leiwand","toll, super","locker","Steigerung: ur leiwand."],
+    ["ur","sehr, total","locker","Ur guat = sehr gut."],
+    ["Bassd scho.","Passt schon. / Ist in Ordnung.","neutral","Die Wiener Antwort auf fast alles."],
+    ["Na eh.","Na klar.","locker","Zustimmung mit einem Hauch Selbstverständlichkeit."],
+    ["Geh bitte!","Ach komm! / Hör auf!","locker","Je länger das „geeeh“, desto genervter."],
+    ["Wos is?","Was ist los?","locker",""],
+    ["I hob kan Tau.","Ich habe keine Ahnung.","locker","Tau = Ahnung, Schimmer.","I hob koan Tau."],
+    ["dahaam","daheim, zu Hause","neutral","","dahoam"],
+    ["I waaß ned.","Ich weiß nicht.","neutral","","I woaß ned."],
+    ["zwaa","zwei","neutral","","zwoa"],
+    ["haaß","heiß","neutral","","hoaß"],
+    ["Des is ma wuascht.","Das ist mir egal.","locker","Wuascht = Wurst."],
+    ["hackln","arbeiten","locker","I geh hackln = Ich gehe arbeiten. Die Hackn = der Job."],
+    ["der Hawara","der Kumpel, Freund","locker",""],
+    ["a bissl","ein bisschen","neutral",""],
+    ["heit / gestan","heute / gestern","neutral",""],
+    ["Jänner","Januar","österr. Standard","Steht so auch im Kalender und in Zeitungen."],
+    ["Feber","Februar","österr. Standard","Im Alltag häufig, offiziell meist Februar."],
+    ["as Sackerl","die Tüte","österr. Standard","Brauchst a Sackerl? fragt die Kassa."],
+    ["da Kastn","der Schrank","neutral",""],
+    ["Gemma!","Gehen wir! / Los!","locker","Gemma, gemma! = Beeil dich!"],
+    ["Schau ma moi.","Schauen wir mal.","locker","Oft mit: dann seng ma scho (dann sehen wir schon)."]
+  ]);
+  const FOOD=mk("f",[
+    ["da Paradeiser","die Tomate","österr. Standard",""],
+    ["de Erdäpfel","die Kartoffeln","österr. Standard","Erdäpfelsalat ist Pflicht zum Schnitzel."],
+    ["da Karfiol","der Blumenkohl","österr. Standard",""],
+    ["da Kren","der Meerrettich","österr. Standard","Zum Tafelspitz und zur Wurst."],
+    ["de Fisolen","die grünen Bohnen","österr. Standard",""],
+    ["de Marün","die Aprikosen (Marillen)","neutral","Marillenknödel sind ein Klassiker."],
+    ["de Ribisl","die Johannisbeeren","österr. Standard",""],
+    ["da Topfn","der Quark (Topfen)","österr. Standard","Topfenstrudel, Topfengolatsche."],
+    ["as Schlagobers","die Schlagsahne","österr. Standard","Kurz: Obers. A Melange mit Schlag."],
+    ["as Faschierte","das Hackfleisch","österr. Standard","Faschierte Laibchen = Frikadellen."],
+    ["de Semmel","das Brötchen","österr. Standard","Kaisersemmel mit dem Sternmuster."],
+    ["as Kipferl","das Hörnchen","österr. Standard","Vanillekipferl zu Weihnachten."],
+    ["de Palatschinken","die dünnen Pfannkuchen","österr. Standard","Mit Marmelade oder Topfen gefüllt."],
+    ["a Eitrige","eine Käsekrainer","derb","Würstel mit Käsefüllung. Der Name ist liebevoll eklig."],
+    ["a Haße","eine heiße Wurst","locker","Bestellung am Würstelstand.","a Hoaße"],
+    ["as Flaasch","das Fleisch","neutral","","as Floasch"],
+    ["a Krügerl","ein halber Liter Bier","neutral","Die Standardgröße im Beisl."],
+    ["a Seidl","0,3 Liter Bier","neutral",""],
+    ["a Pfiff","0,2 Liter Bier","neutral","Der Kleinste."],
+    ["a Gspritzter","eine Weinschorle","neutral","Weißwein mit Soda. Sommergetränk Nummer eins."],
+    ["a Melange","ein Milchkaffee (Wiener Art)","österr. Standard","Mit Milchschaum. Am besten im Kaffeehaus."],
+    ["as Häferl","die große Tasse","österr. Standard",""],
+    ["de Jausn","die Zwischenmahlzeit, Brotzeit","neutral","Brettljausn beim Heurigen."],
+    ["an Gusto hobn","Lust auf etwas haben","neutral","I hätt an Gusto auf a Schnitzl."],
+    ["Zoin, bitte!","Die Rechnung, bitte!","neutral","Ganz korrekt: Zahlen, bitte!"],
+    ["as Stamperl","das Schnapsglas","neutral",""],
+    ["as Beisl","die Kneipe, das einfache Gasthaus","neutral",""],
+    ["da Heurige","das Weinlokal mit eigenem Wein","neutral","Auch der junge Wein selbst heißt so."]
+  ]);
+  const SCHM=mk("s",[
+    ["da Schmäh","Witz, Charme, auch Flunkerei","neutral","Ohne Schmäh = ganz ehrlich."],
+    ["an Schmäh führn","Witze machen","locker",""],
+    ["da Grant","die schlechte Laune","neutral","Der Wiener Grant ist fast ein Kulturgut."],
+    ["grantig","schlecht gelaunt","neutral",""],
+    ["raunzn","jammern, nörgeln","locker","A Raunzer = jemand, der ständig jammert."],
+    ["sudern","dauernd jammern","locker","Noch eine Stufe über raunzen."],
+    ["zwider","unsympathisch, lästig","locker","Der is ma zwider."],
+    ["as Gschisti-Gschasti","das Getue, unnötiger Aufwand","locker","Mach ka Gschisti-Gschasti!"],
+    ["da Wappler","der Trottel","derb",""],
+    ["da Koffer","der Idiot","derb","So a Koffer!"],
+    ["da Pülcher","der Gauner, Halunke","locker",""],
+    ["as Gfrastsackl","der Fiesling, Lausbub","derb",""],
+    ["Schleich di!","Hau ab!","derb",""],
+    ["Bist deppat?","Bist du verrückt?","locker","Oft eher erstaunt als beleidigt."],
+    ["Heast, wia redst denn du mit mir?","Hey, wie redest du mit mir?","grantig",""],
+    ["Des geht si ned aus.","Das reicht nicht. / Das klappt nicht.","neutral","Zeitlich oder mit dem Geld."],
+    ["Nix is fix.","Nichts ist sicher.","neutral",""],
+    ["Da legst di nieder!","Da staunst du! / Wahnsinn!","locker","Wörtlich: Da legst du dich hin."],
+    ["Bledsinn!","Blödsinn!","locker",""],
+    ["wurscht","egal","locker",""],
+    ["Küss die Hand","Höfliche alte Begrüßung (für Damen)","höflich","Heute meist charmant-ironisch."],
+    ["Gschamster Diener!","Ergebenster Diener!","höflich","Alt. Heute ironisch, wenn jemand schleimt."],
+    ["Nur ned hudln.","Nur nicht hetzen.","neutral","Die Wiener Gemütlichkeit in drei Wörtern."]
+  ]);
+  const WAY=mk("w",[
+    ["de Bim","die Straßenbahn","locker","Nach dem Klingeln: bim bim."],
+    ["da Staa","der Stein","neutral","","da Stoa"],
+    ["hamgeh","heimgehen, nach Hause gehen","neutral","","hoamgeh"],
+    ["de Öffis","die öffentlichen Verkehrsmittel","neutral","Bim, Bus und U-Bahn zusammen."],
+    ["da Schwarzkappler","der Fahrscheinkontrolleur","locker",""],
+    ["as Grätzl","das Viertel, die Nachbarschaft","neutral","Mei Grätzl = meine Ecke."],
+    ["da Beserlpark","der kleine Park","neutral","Beserl = kleiner Besen. Ein Park, so klein wie ein Besen."],
+    ["da Würstlstand","die Imbissbude für Würste","neutral","Nach Mitternacht der beste Ort der Stadt."],
+    ["de Trafik","der Kiosk (Zeitung, Tabak, Tickets)","österr. Standard",""],
+    ["da Greißler","der kleine Lebensmittelladen","neutral",""],
+    ["da Fiaker","die Pferdekutsche","neutral","Auch der Kutscher selbst."],
+    ["da Steffl","der Stephansdom","locker","Wahrzeichen im 1. Bezirk."],
+    ["da Prater","der Vergnügungspark (mit Riesenrad)","neutral","Wurstelprater = der Rummel-Teil."],
+    ["im Zehnten","im 10. Bezirk (Favoriten)","neutral","Bezirke heißen nach ihrer Nummer."],
+    ["da Hausmasta","der Hausmeister","locker",""],
+    ["as Vorzimmer","der Flur, die Diele","österr. Standard",""],
+    ["de Stiagn","die Treppe, das Stiegenhaus","neutral","Adresse: Gasse 5, Stiege 2, Tür 14."],
+    ["as Pickerl","der Aufkleber, die Vignette","österr. Standard","Parkpickerl = Anwohnerparkausweis."],
+    ["da Schanigartn","der Gastgarten auf dem Gehsteig","österr. Standard",""],
+    ["da Gehsteig","der Bürgersteig","österr. Standard",""],
+    ["da Gürtl","die große Ringstraße um die Innenbezirke","neutral","Nicht verwechseln mit dem Ring um die Innenstadt."],
+    ["Zuarückbleibn, bitte!","Zurückbleiben, bitte!","neutral","Die Durchsage, bevor die U-Bahn-Türen schließen."],
+    ["Wo is'n do de U-Bahn?","Wo ist hier die U-Bahn?","locker",""],
+    ["eineh'n / aussegeh","hineingehen / hinausgehen","locker","Eine = hinein, ausse = hinaus."]
+  ]);
+  const ALT=mk("a",[
+    ["de Bassena","das Wasserbecken am Gang im Zinshaus","veraltet","Gibt's nur noch in alten Häusern. Bassenatratsch = Klatsch unter Nachbarn. Vom französischen bassin (Becken)."],
+    ["as Trottoir","der Gehsteig","veraltet","Laut Duden außerhalb der Schweiz veraltend. Französisch, gesprochen etwa Trottoa."],
+    ["as Lavoir","die Waschschüssel","veraltet","Laut Duden veraltet. Französisch, gesprochen etwa Lawua."],
+    ["as Kanapee","das Sofa","veraltet","Laut Duden veraltend, heute oft ironisch. Aus dem Französischen."],
+    ["as Paraplü","der Regenschirm","veraltet","Laut Duden scherzhaft, sonst veraltet. Vom französischen parapluie."],
+    ["da Ganef","der Gauner, Betrüger","veraltet","Laut Duden österreichisch veraltet, oft abwertend. Vom jiddischen gánew."],
+    ["auf Lepschi gehn","sich herumtreiben, ausgehen","veraltet","Vom tschechischen lepší (besser). Den Gebrauch heute konnte ich nicht belegen."],
+    ["pomali","langsam, gemütlich","veraltet","Tschechisch pomalu = langsam. Den Gebrauch heute konnte ich nicht belegen."],
+    ["da Plafond","die Zimmerdecke","noch üblich","Laut Duden in Österreich normal. Französisch plat + fond = flacher Boden."],
+    ["da Fauteuil","der Polstersessel","noch üblich","Laut Duden in Österreich und der Schweiz üblich, sonst veraltend. Gesprochen etwa Fotöj."],
+    ["de Stellage","das Regal, Gestell","noch üblich","Laut Duden ohne Vermerk veraltet."],
+    ["sekkieren","ärgern, belästigen","noch üblich","Laut Duden österreichisch, sonst veraltet. Vom italienischen seccare."],
+    ["as Gfrett","die Plage, das Ärgernis","noch üblich","Des is a Gfrett = Das ist mühsam. Laut Duden österreichisch umgangssprachlich."],
+    ["da Pallawatsch","das Durcheinander, der Unsinn","noch üblich","Laut Duden vermutlich vom italienischen balordaggine (Tölpelei)."],
+    ["schmafu","schäbig, gemein","noch üblich","Ein Adjektiv: Der hot si schmafu benommen. Laut Duden besonders wienerisch, vermutlich vom französischen je m'en fous."],
+    ["de Zores","der Ärger, das Gezänk","noch üblich","Zores machen. Vom jiddischen zores (Sorgen)."],
+    ["as Masl","das Glück","noch üblich","Masl hobn = Glück haben. Vom jiddischen mazl."],
+    ["da Strizzi","der Strolch, auch Zuhälter","noch üblich","Laut Duden bayrisch-österreichisch umgangssprachlich. Herkunft ungeklärt."],
+    ["da Hallodri","der leichtsinnige Lebemann","noch üblich","Laut Duden wahrscheinlich von Allotria."],
+    ["as Gspusi","die Liebschaft, auch der Schatz","noch üblich","Vom italienischen sposa (Braut)."],
+    ["as Gschnas","das Kostümfest","noch üblich","Meist als Gschnasfest. Laut Duden österreichisch."],
+    ["da Schani","der Handlanger, Diener","noch üblich","I bin do ned dei Schani! Von Jean. Früher auch der Kellner, daher der Schanigarten."],
+    ["as Tschecherl","das kleine, einfache Café","noch üblich","Aus der Gaunersprache: schächer = Wirt."],
+    ["as Kracherl","die Limonade","noch üblich","Laut Duden nach dem Geräusch der Kohlensäure."],
+    ["de Gstättn","die abschüssige, steinige Wiese","noch üblich","Laut Duden ostösterreichisch umgangssprachlich."],
+    ["de Bagage","das Gesindel, die Sippschaft","abwertend","Nach dem verrufenen Tross alter Armeen. Als Wort für Gepäck veraltet."]
+  ]);
+  // 18+ Deck. Quellen: 1000things.at, vienna.at, ORF Wien
+  const SCHIMPF=mk("x",[
+    ["Heast, du Beidl!","Hey, du Idiot!","ordinär","Beidl ist das männliche Glied. Als Schimpfwort für lästige Leute."],
+    ["Ziag oh!","Hau ab!","derb","Geht statt Schleich di!"],
+    ["Oasch!","Arsch! (auch: Hau ab!)","ordinär","Vielseitig, je nach Tonfall."],
+    ["as Oaschloch","das Arschloch","ordinär","Arsch klingt in Wien wie Oasch."],
+    ["Jetzt is ois im Oasch.","Jetzt ist alles kaputt.","ordinär","Die Lage hat sich zum Schlechten gewendet."],
+    ["Des interessiert mi wia a Schas im Woid.","Das interessiert mich überhaupt nicht.","ordinär","Schas = Furz. Woid = Wald."],
+    ["Der gschissene Kieberer","der verdammte Polizist","ordinär","gschissn = beschissen."],
+    ["Der Voidillo hot bei mia ausgschissn.","Der hat es sich bei mir verscherzt.","ordinär","Heißt: Für den hab ich keinen Respekt mehr."],
+    ["I prack da ane!","Ich hau dir eine!","derb","Ganz drastisch: … dass'd mitn Oasch auf'd Uhr schaust!"],
+    ["Jetzt rüttelst am Watschenbaum!","Gleich fängst du dir eine!","derb","Der Watschenbaum ist erfunden. Wer dran rüttelt, dem fällt eine Ohrfeige runter."],
+    ["Drah di, Deppata!","Dreh dich um und geh, du Blödmann!","derb","Gut, um ein lästiges Gespräch zu beenden."],
+    ["da Fetznschädl","der Dummkopf, Naivling","derb","Wörtlich: hat nur Lumpen im Kopf. Fast liebevoll."],
+    ["Augschwabter Donaufetzn","langweiliger Mitläufer","derb","Jemand ohne eigene Meinung."],
+    ["da Kieberer","der Polizist (abfällig)","abwertend",""],
+    ["da Gschöda","der Polizist (abfällig)","abwertend","Weil die Uniform wie frisch geschält aussieht."],
+    ["Hände foitn, Goschn hoitn!","Halt den Mund!","derb","Goschn = Mund. Oft gegen Predigten aus Kirche oder Politik."],
+    ["Hoit de Schlapfn!","Halt den Mund!","derb",""],
+    ["A Gsicht wia a eingaute Wiatshaustür","ein hässliches, griesgrämiges Gesicht","derb","Wie eine eingetretene Wirtshaustür."],
+    ["da Woamduscher","das Weichei","derb","Wörtlich: Warmduscher."],
+    ["as Waserl","der Schwächling, die Heulsuse","derb",""],
+    ["Dem geht da Reis!","Der hat Angst!","derb",""],
+    ["Do krieg i an Hois!","Das regt mich furchtbar auf!","locker","Wörtlich: Da krieg ich einen Hals."],
+    ["a Gfüüda","ein dicker Mensch","abwertend","Wörtlich: ein Gefüllter."],
+    ["da Ohrwaschlkaktus","jemand mit großen Ohren","derb","Ohrwaschl = Ohrmuschel."],
+    ["as Zniachtl","der kleine, schmächtige Mensch","derb",""],
+    ["da Tachinierer","der Drückeberger, Faulpelz","derb",""],
+    ["da Sacklpicker","jemand, der im Gefängnis gesessen ist","derb",""],
+    ["Hau di üba d'Häuser!","Verschwinde!","derb",""],
+    ["Hupf in Gatsch und schlog a Wön!","Hau ab! (scherzhaft)","derb","Wörtlich: Spring in den Matsch und schlag eine Welle. Meist lustig gemeint."],
+    ["Wia a Autobus dreinschaun","blöd und ahnungslos schauen","locker",""],
+    ["da Trottl","der Trottel","derb","Laut einer Studie eins der beliebtesten Wiener Schimpfwörter."],
+    ["Kruzifix!","Verdammt nochmal!","derb","Ein typischer Fluch aus der katholischen Ecke."]
+  ]);
+  const DECKS={greet:GREET,food:FOOD,schm:SCHM,way:WAY,alt:ALT,schimpf:SCHIMPF,all:[...GREET,...FOOD,...SCHM,...WAY,...ALT]};
+  const CAMP=["greet","food","schm","way","alt"];
+  const NAMES={greet:"Begrüßen & Alltag",food:"Essen & Beisl",schm:"Schmäh & Grant",way:"Unterwegs in Wien",alt:"Alt-Wienerisch",schimpf:"🔞 Schimpfen",all:"Alles gemischt"};
+  const EVERY=[...DECKS.all,...SCHIMPF];
+
+  // ---- Zustand ----
+  let deck="greet", mode="quiz", dir="mix", dia="wien", cur=null;
+  let score={ok:0,no:0,streak:0};
+  let run=0, best=0, goals=0, pendingReset=false, done={}, bonus=false, finale=false, hist={};
+  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;}}catch(e){}}
+  function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak}))}catch(e){}}
+  const pad=n=>String(n).padStart(2,"0");
+  const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+  function dayRec(){const k=keyOf(new Date());return hist[k]||(hist[k]={ok:0,no:0,best:0,topics:0});}
+
+  const $=s=>document.querySelector(s);
+  const card=$("#card");
+  const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+  const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const regHtml=c=>c.reg?` <span class="reg${c.reg==="derb"?" derb":c.reg==="ordinär"?" ordinär":""}">${esc(c.reg)}</span>`:"";
+  const W=c=>dia==="noe"&&c.noe?c.noe:c.wi;
+  const PLACE=()=>dia==="noe"?"Niederösterreich":"Wien";
+  const cmpHtml=c=>c.noe?`<div class="hint">${dia==="noe"?"In Wien: ":"In NÖ: "}<b>${esc(dia==="noe"?c.wi:c.noe)}</b></div>`:(dia==="noe"?`<div class="hint">In NÖ wie in Wien.</div>`:"");
+  const front=()=>dir==="mix"?(Math.random()<.5?"wi":"hd"):dir;
+
+  // ---- Vorlesen ----
+  let deVoice=null;
+  function pickVoice(){try{const v=speechSynthesis.getVoices();deVoice=v.find(x=>/^de-AT/i.test(x.lang))||v.find(x=>/^de/i.test(x.lang))||null;}catch(e){}}
+  if("speechSynthesis" in window){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}}
+  function speak(text,btn){
+    if(!("speechSynthesis" in window)){btn&&(btn.textContent="Kein Ton auf diesem Gerät");return;}
+    try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text.replace(/\s*\/\s*/g,", "));u.lang=deVoice?deVoice.lang:"de-AT";u.rate=.9;if(deVoice)u.voice=deVoice;speechSynthesis.speak(u);}
+    catch(e){btn&&(btn.textContent="Ton nicht verfügbar");}
+  }
+  const sayHtml=c=>`<div class="sayrow"><button class="say" type="button" data-say="${esc(W(c))}">🔊 Anhören</button><span class="hint">Die Computerstimme spricht Hochdeutsch, der Dialekt klingt nur ungefähr.</span></div>`;
+  card.addEventListener("click",e=>{const b=e.target.closest(".say");if(b)speak(b.dataset.say,b);});
+
+  // Stapel-Prinzip: jede Karte kommt einmal dran, bevor neu gemischt wird
+  const bags={};
+  function pick(){
+    const key=bonus?"all":deck,list=DECKS[key];
+    if(!bags[key]||!bags[key].length){
+      let b=shuffle(list);
+      if(b.length>1&&cur&&b[b.length-1].id===cur.id){[b[0],b[b.length-1]]=[b[b.length-1],b[0]];}
+      bags[key]=b;
+    }
+    return bags[key].pop();
+  }
+  const doneCount=()=>CAMP.filter(k=>done[k]).length;
+  function renderScore(){
+    $("#score").textContent=`Richtig ${score.ok} · Falsch ${score.no}`;
+    const s=run;
+    $("#stNum").textContent=bonus?"⭐":s;
+    const se=$("#stSerie");se.querySelector("b").textContent=score.streak;se.classList.toggle("hot",score.streak>0&&score.streak>=best);
+    $("#stFill").style.width=(bonus?100:Math.min(s,20)/20*100)+"%";
+    $("#stMeta").textContent=`Rekord ${best} · Themen ${doneCount()}/${CAMP.length}`;
+    document.querySelectorAll(".ms").forEach(m=>m.classList.toggle("hit",bonus||s>=+m.dataset.at));
+  }
+  function renderTabs(){document.querySelectorAll(".tab").forEach(t=>{t.setAttribute("aria-pressed",t.dataset.deck===deck);t.textContent=NAMES[t.dataset.deck]+(done[t.dataset.deck]?" ✓":"");});}
+  const MILES={5:"Leiwand! 5 richtig in Folge.",10:"Ur guat! 10er-Serie.",15:"Heast, nur no 5!",20:"Oida, 20 in Folge! Gratuliere. Der Themen-Balken startet neu, die 🔥 Serie läuft weiter."};
+  function setMsg(t,cls){const m=$("#stMsg");m.textContent=t;m.className="st-msg "+(cls||"");}
+  function flash(cls){const p=$("#streak");p.classList.remove("win","lost");void p.offsetWidth;p.classList.add(cls);}
+  let checkpoint=0, life=false;
+  const resetCP=()=>{checkpoint=0;life=false;};
+  function renderLife(){$("#stLife").textContent=life?`🛡️ Joker bereit: Bei einem Fehler geht's bei ${checkpoint} weiter`:(checkpoint?"Joker verbraucht. Der nächste Fehler heißt 0.":"");}
+  function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
+  function hit(){
+    const d=dayRec();
+    if(bonus){
+      bonus=false;score.ok++;d.ok++;score.streak++;bumpBest(d);run=0;resetCP();
+      const from=deck;
+      if(CAMP.includes(from)&&!done[from]){done[from]=true;d.topics++;goals++;}
+      const next=CAMP.find(k=>!done[k]);
+      if(!next){finale=true;setMsg("🏆 Bonusfrage richtig! Alle Themen gschafft!","good");}
+      else{deck=next;setMsg(`✅ Bonusfrage richtig, ${NAMES[from]} bestanden! Weiter mit: ${NAMES[next]}`,"good");}
+      flash("win");renderTabs();save();renderScore();renderDays();renderLife();return;
+    }
+    if(pendingReset){run=0;pendingReset=false;resetCP();}
+    score.ok++;score.streak++;run++;d.ok++;bumpBest(d);
+    if(run===20){
+      if(deck==="all"||deck==="schimpf"){goals++;pendingReset=true;setMsg(MILES[20],"good");}
+      else{bonus=true;setMsg("🎉 20 gschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.","good");}
+      flash("win");
+    }
+    else if(MILES[run]){checkpoint=run;life=true;setMsg(MILES[run]+` 🛡️ Checkpoint ${checkpoint}: Du hast an Joker.`,"good");flash("win");}
+    else setMsg(`Weiter so! No ${20-run} bis zum Ziel. 🔥 Serie ${score.streak}.`);
+    save();renderScore();renderDays();renderLife();
+  }
+  function miss(){
+    const d=dayRec();d.no++;score.no++;
+    const wasBonus=bonus;bonus=false;
+    const lostSerie=score.streak;score.streak=0;
+    const serieTxt=lostSerie>0?` 🔥 Serie bei ${lostSerie} gerissen.`:"";
+    if(pendingReset){pendingReset=false;run=0;resetCP();setMsg("Falsch."+serieTxt,"bad");if(lostSerie)flash("lost");save();renderScore();renderDays();renderLife();return;}
+    const lost=run;
+    if(life&&checkpoint>0){
+      life=false;run=checkpoint;
+      setMsg(`${wasBonus?"Bonusfrage verpasst. ":""}🛡️ Joker: Thema zurück auf ${checkpoint}.${serieTxt}`,"bad");flash("lost");
+    }else{
+      run=0;resetCP();
+      if(wasBonus)setMsg(`Bonusfrage verpasst, ka Joker mehr. Thema ${NAMES[deck]} zurück auf 0.${serieTxt}`,"bad");
+      else if(lost>0)setMsg(`Thema zurück auf 0. Geh bitte!${serieTxt}`,"bad");
+      else setMsg("Falsch."+serieTxt,"bad");
+      if(lost>0||lostSerie>0)flash("lost");
+    }
+    save();renderScore();renderDays();renderLife();
+  }
+
+  // ---- Frag den Wiener (Claude) ----
+  let sensei=null;
+  Promise.resolve(window.claude?.use?.("sample")).then(s=>{sensei=s;document.body.classList.toggle("has-sensei",!!s);}).catch(()=>{});
+  const RULES=c=>`Du bist ein gemütlicher, schlagfertiger Wiener, der Wienerisch und Niederösterreichisch erklärt. Der Lernende spricht Hochdeutsch.
+Antworte auf Hochdeutsch mit Wiener Beispielen, kurz und klar (höchstens 6 Sätze). Schreib Wiener Wörter immer als: Wienerisch (Hochdeutsch). Kein Markdown, keine Überschriften, keine Sternchen.
+Sag dazu, ob etwas derb, locker oder höflich ist. Wenn die Frage nichts mit Wienerisch oder österreichischem Deutsch zu tun hat, lenk freundlich zurück.
+Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wienerisch"} „${W(c)}“${c.noe?" (Wien: "+c.wi+", NÖ: "+c.noe+")":""} = Hochdeutsch „${c.hd}“${c.reg?", Stil: "+c.reg:""}${c.note?", Hinweis: "+c.note:""}.`;
+  const askHtml=()=>`<div class="ask" data-sensei>
+      <label for="askIn" class="ask-l">☕ Frag den Wiener</label>
+      <div class="ask-row"><input id="askIn" type="text" placeholder="z. B. Woher kommt Oida?" autocomplete="off"><button class="btn" id="askBtn" type="button">Fragen</button></div>
+      <div class="ask-log" id="askLog"></div>
+    </div>`;
+  function wireAsk(c){
+    const box=card.querySelector("[data-sensei]");if(!box)return;
+    const inp=$("#askIn"),btn=$("#askBtn"),log=$("#askLog");
+    const turns=[{role:"user",content:RULES(c)},{role:"assistant",content:"Bassd, frag nur."}];
+    let busy=false;
+    async function go(){
+      const q=inp.value.trim();if(!q||busy)return;
+      if(!sensei){log.insertAdjacentHTML("beforeend",`<div class="a err">Der Wiener ist hier nicht da. Öffne die Seite auf claude.ai.</div>`);return;}
+      busy=true;btn.disabled=true;inp.value="";
+      const qe=document.createElement("div");qe.className="q";qe.textContent=q;log.append(qe);
+      const ae=document.createElement("div");ae.className="a";ae.textContent="Denkt nach…";log.append(ae);
+      turns.push({role:"user",content:q});
+      try{
+        const {text}=await sensei(turns,{cache:false,modelTier:"quick",onText:({text})=>{ae.textContent=text;}});
+        ae.textContent=text;turns.push({role:"assistant",content:text});
+      }catch(e){
+        turns.pop();
+        const m={not_granted:"Du hast dem Dojo nicht erlaubt, Claude zu fragen.",rate_limited:"Grad zu viele Fragen. Probier's gleich nochmal.",sampling_disabled:"Claude ist für diesen Account nicht verfügbar.",session_expired:"Bitte melde dich neu an.",refused:"Darauf kann der Wiener nicht antworten."};
+        ae.textContent=(e&&e.text)||m[e&&e.code]||"Das hat nicht geklappt. Probier's nochmal.";ae.classList.add("err");
+      }finally{busy=false;btn.disabled=false;inp.focus();}
+    }
+    btn.onclick=go;inp.onkeydown=e=>{if(e.key==="Enter")go();};
+  }
+
+  // ---- Finale ----
+  const SAYINGS=[
+    ["Nur ned hudln.","Nur nicht hetzen. Alles mit Ruhe."],
+    ["Schau ma moi, dann seng ma scho.","Schauen wir mal, dann sehen wir schon."],
+    ["Wos ma ned im Kopf hot, muaß ma in de Füaß hobn.","Was man nicht im Kopf hat, muss man in den Füßen haben."],
+    ["Bassd scho, wird scho wern.","Passt schon, das wird schon."]
+  ];
+  function showFinale(){
+    const s=rnd(SAYINGS),c={wi:s[0],hd:s[1]};
+    card.innerHTML=`<div class="prompt-label">🏆 Alle ${CAMP.length} Themen gschafft · Gratuliere!</div>
+      <div class="big">${esc(W(c))}</div>
+      <div class="meaning"><b>${esc(c.hd)}</b></div>
+      ${sayHtml(c)}
+      <div class="hint">A Wiener Weisheit für di. Du bist jetzt offiziell Stammgast in diesem Dojo.</div>
+      <div class="actions"><button class="btn ghost" id="other">Anderer Spruch</button><button class="btn" id="restart">Alle Themen neu starten</button></div>`;
+    $("#other").onclick=showFinale;
+    $("#restart").onclick=()=>{done={};finale=false;bonus=false;run=0;resetCP();renderLife();deck="greet";setMsg("Neue Runde! Schaff 20 in Folge pro Thema.");save();renderScore();renderTabs();render();};
+  }
+
+  // ---- Tageshighscore ----
+  const WD=["So","Mo","Di","Mi","Do","Fr","Sa"];
+  function renderDays(){
+    const d=dayRec();
+    $("#today").innerHTML=[["Richtig heute",d.ok],["Beste Serie heute",d.best],["Themen heute",d.topics],["Fehler heute",d.no]]
+      .map(([l,v])=>`<div class="tile"><span class="tv">${v}</span><span class="tl">${l}</span></div>`).join("");
+    const days=[];for(let i=6;i>=0;i--){const t=new Date();t.setDate(t.getDate()-i);const k=keyOf(t);days.push({wd:WD[t.getDay()],date:pad(t.getDate())+"."+pad(t.getMonth()+1)+".",r:hist[k]||{ok:0,best:0}});}
+    const max=Math.max(1,...days.map(x=>x.r.ok));
+    $("#week").innerHTML=days.map((x,i)=>`<div class="bcol${i===6?" now":""}"><span class="bv">${x.r.ok}</span><div class="wbar"><div style="height:${x.r.ok/max*100}%"></div></div><span class="bwd">${x.wd}</span><span class="bd">${x.date}</span><span class="bs" title="Beste Serie">🔥${x.r.best}</span></div>`).join("");
+    let top=null;for(const k in hist){if(!top||hist[k].best>hist[top].best||(hist[k].best===hist[top].best&&hist[k].ok>hist[top].ok))top=k;}
+    $("#bestday").textContent=top&&hist[top].ok?`Bester Tag: ${top.split("-").reverse().join(".")} mit Serie ${hist[top].best} und ${hist[top].ok} richtigen Antworten`:"No ka Eintrag. Leg los!";
+  }
+
+  const backHtml=c=>`<div class="back">
+      <div class="big">${esc(W(c))}</div>
+      <div class="meaning"><b>${esc(c.hd)}</b>${regHtml(c)}</div>
+      ${cmpHtml(c)}
+      ${sayHtml(c)}
+      ${c.note?`<div class="calc">${esc(c.note)}</div>`:""}
+    </div>`;
+  const bonusTag=()=>bonus?"⭐ Bonusfrage · ":"";
+
+  function showCard(){
+    if(finale){showFinale();return;}
+    cur=pick();const f=front();
+    card.innerHTML=`<div class="prompt-label">${bonusTag()}${f==="wi"?"Was heißt das auf Hochdeutsch?":`Wie sagt man das in ${PLACE()}?`}</div>
+      <div class="big ${f==="hd"?"hd":""}">${esc(f==="wi"?W(cur):cur.hd)}</div>
+      ${f==="wi"?sayHtml(cur):""}
+      <div class="actions"><button class="btn" id="flip">Umdrehen</button></div>`;
+    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">Nochmal üben</button><button class="btn" id="next">Gewusst · Weiter</button></div>`+askHtml();wireAsk(cur);
+      $("#next").onclick=()=>{hit();showCard();};
+      $("#again").onclick=()=>{miss();showCard();};
+    };
+  }
+
+  // Falsche Antworten so wählen, dass sie gleich aussehen (Schrägstrich, Satz, Artikel)
+  const ansText=(c,f)=>f==="wi"?c.hd:W(c);
+  const feat=t=>({slash:t.includes("/"),satz:/[!?.]$/.test(t.trim()),art:/^(da|de|as|a|an|der|die|das|ein|eine)\s/i.test(t),len:t.length});
+  function distractors(c,f){
+    const ft=feat(ansText(c,f));
+    const score=x=>{const fx=feat(ansText(x,f));return (fx.slash===ft.slash?4:0)+(fx.satz===ft.satz?2:0)+(fx.art===ft.art?1:0)-Math.abs(fx.len-ft.len)/40;};
+    const pool=c.deck==="schimpf"?SCHIMPF:EVERY.filter(x=>x.deck!=="schimpf");
+    const seenTxt=new Set([ansText(c,f)]);
+    const ranked=shuffle(pool.filter(x=>x.id!==c.id)).map(x=>({x,s:score(x)+(x.deck===c.deck?1.5:0)})).sort((a,b)=>b.s-a.s);
+    const out=[];
+    for(const r of ranked){
+      const t=ansText(r.x,f);if(seenTxt.has(t))continue;
+      if(ft.slash!==feat(t).slash)continue;
+      seenTxt.add(t);out.push(r.x);if(out.length===3)break;
+    }
+    if(out.length<3&&ft.slash){
+      // zu wenige Paare mit Schrägstrich: aus zwei kurzen Antworten ein Paar bauen
+      const short=shuffle(pool.filter(x=>x.id!==c.id&&!ansText(x,f).includes("/")&&ansText(x,f).length<=14));
+      for(let i=0;i+1<short.length&&out.length<3;i+=2){
+        const t=ansText(short[i],f)+" / "+ansText(short[i+1],f);
+        if(seenTxt.has(t))continue;seenTxt.add(t);
+        out.push({id:"fake"+i,deck:c.deck,wi:f==="wi"?"":t,hd:f==="wi"?t:"",noe:"",fake:true});
+      }
+    }
+    return out;
+  }
+  function showQuiz(){
+    if(finale){showFinale();return;}
+    cur=pick();const f=front();
+    const others=distractors(cur,f);
+    const opts=shuffle([cur,...others]);
+    card.innerHTML=`<div class="prompt-label">${bonusTag()}${f==="wi"?"Was heißt das auf Hochdeutsch?":`Wie sagt man das in ${PLACE()}?`}</div>
+      <div class="big ${f==="hd"?"hd":""}">${esc(f==="wi"?W(cur):cur.hd)}</div>
+      ${f==="wi"?sayHtml(cur):""}
+      <div class="choices">${opts.map((o,i)=>`<button class="choice" id="c${i}" data-id="${o.id}">${esc(f==="wi"?o.hd:W(o))}</button>`).join("")}</div>
+      <div class="feedback" id="fb"></div>
+      <div class="actions"><button class="btn" id="next" hidden>Weiter</button></div>
+      <div id="askSlot"></div>`;
+    card.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
+      const ok=b.dataset.id===cur.id;
+      card.querySelectorAll(".choice").forEach(x=>{x.disabled=true;if(x.dataset.id===cur.id)x.classList.add("right")});
+      if(!ok)b.classList.add("wrong");
+      if(ok)hit();else miss();
+      const fb=$("#fb");fb.className="feedback "+(ok?"ok":"no");
+      const picked=EVERY.find(x=>x.id===b.dataset.id);
+      let html=`<div>${esc((ok?"Richtig! ":"Leider falsch. ")+`${W(cur)} = ${cur.hd}`)}${regHtml(cur)}</div>`+cmpHtml(cur);
+      if(f==="hd")html+=sayHtml(cur);
+      if(cur.note)html+=`<div class="calc">${esc(cur.note)}</div>`;
+      if(!ok&&picked)html+=`<div class="calc picked">Du hast gewählt: ${esc(W(picked))} = ${esc(picked.hd)}</div>`;
+      fb.innerHTML=html;
+      const nx=$("#next");nx.hidden=false;nx.focus();nx.onclick=showQuiz;
+      $("#askSlot").innerHTML=askHtml();wireAsk(cur);
+    });
+    card.classList.add("pop");setTimeout(()=>card.classList.remove("pop"),160);
+  }
+
+  function render(){
+    document.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===mode));
+    document.querySelectorAll("[data-dir]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dir===dir));
+    document.querySelectorAll("[data-dia]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.dia===dia));
+    if(deck==="schimpf"&&!adult()){showGate();return;}
+    mode==="quiz"?showQuiz():showCard();
+  }
+  // ---- 18+ Abfrage (nur Selbstauskunft, keine echte Prüfung) ----
+  function adult(){try{return localStorage.getItem("weanerdojo-18")==="1";}catch(e){return window.__adult===true;}}
+  function showGate(){
+    card.innerHTML=`<div class="prompt-label">🔞 Ab 18</div>
+      <div class="big hd">Schimpfen auf Wienerisch</div>
+      <div class="hint">Dieses Deck ist gesperrt, bis du bestätigst, dass du mindestens 18 bist.</div>
+      <div class="actions"><button class="btn" id="gateOpen" type="button">Altersabfrage öffnen</button></div>`;
+    $("#gateOpen").onclick=openGate;
+  }
+  function openGate(){
+    const y=new Date().getFullYear(),m=$("#gate");
+    $("#ageYear").value="";$("#ageChk").checked=false;$("#ageMsg").textContent="";$("#ageOk").disabled=true;
+    m.hidden=false;$("#ageYear").focus();
+  }
+  function closeGate(){$("#gate").hidden=true;}
+  (function wireGate(){
+    const y=new Date().getFullYear();
+    const chk=$("#ageChk"),ok=$("#ageOk"),yr=$("#ageYear"),msg=$("#ageMsg");
+    yr.max=y;
+    const upd=()=>{ok.disabled=!(chk.checked&&yr.value);};
+    chk.onchange=upd;yr.oninput=upd;
+    const go=()=>{
+      const v=parseInt(yr.value,10);
+      if(!chk.checked){msg.textContent="Bitte bestätige, dass du mindestens 18 bist.";return;}
+      if(!v||v<1900||v>y){msg.textContent="Bitte ein gültiges Geburtsjahr eingeben.";return;}
+      if(y-v<18){msg.textContent="Dieses Deck ist erst ab 18. Probier ein anderes Thema!";return;}
+      try{localStorage.setItem("weanerdojo-18","1");}catch(e){window.__adult=true;}
+      closeGate();deck="schimpf";bonus=false;cur=null;renderTabs();save();renderScore();render();
+    };
+    ok.onclick=go;yr.onkeydown=e=>{if(e.key==="Enter")go();};
+    $("#ageNo").onclick=closeGate;
+    $("#gate").addEventListener("keydown",e=>{if(e.key==="Escape")$("#ageNo").click();});
+  })();
+
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(t.dataset.deck==="schimpf"&&!adult()){openGate();return;}if(t.dataset.deck!==deck){run=0;resetCP();renderLife();}deck=t.dataset.deck;bonus=false;cur=null;renderTabs();save();renderScore();render();});
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;save();render();});
+  document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;save();render();});
+  document.querySelectorAll("[data-dia]").forEach(b=>b.onclick=()=>{dia=b.dataset.dia;save();render();});
+
+  load();if(deck==="schimpf"&&!adult())deck="greet";renderTabs();renderScore();renderDays();renderLife();render();
+})();
+</script>
+
+</body></html>
