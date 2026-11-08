@@ -29,7 +29,25 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .schild .lin{background:var(--rot);color:#fff;border-radius:6px;padding:3px 9px;font-family:var(--f-mono);letter-spacing:.04em}
 .schild .ziel{color:var(--muted);font-weight:600}
 .tabs,.modes{display:flex;gap:8px;flex-wrap:wrap}
-.head-r{display:flex;align-items:center;gap:12px}
+.head-r{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0}
+.spruch{font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--rot);border-radius:10px;padding:8px 14px;display:flex;flex-direction:column;gap:1px;max-width:340px;min-width:0;cursor:pointer;color:var(--ink)}
+.spruch:hover{border-color:var(--rot)}
+.sp-lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sp-wi{font-family:var(--f-word);font-weight:700;font-size:18px;line-height:1.25}
+.sp-hd{font-size:13px;color:var(--muted)}
+.spruch.neu{animation:glow 1.2s ease 2}
+.side-bug{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.gate-box.album-box{max-width:560px;max-height:85vh;overflow:auto;border-color:var(--line)}
+.album-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.gate-box .album-head h2{color:var(--ink)}
+.album-list{display:flex;flex-direction:column;gap:14px}
+.album-cat h3{font-family:var(--f-body);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:600}
+.album-item{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin-bottom:6px;background:var(--sign2)}
+.album-item .wi{font-family:var(--f-word);font-weight:700;font-size:17px}
+.album-item .hd{font-size:13px;color:var(--muted)}
+.album-item.lock{opacity:.6;border-style:dashed}
+.album-item .tag{font-size:11px;color:var(--gold);font-weight:700}
+.album-src{font-size:12px}
 .theme-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;display:grid;place-items:center;padding:0}
 .theme-btn:hover{border-color:var(--gold)}
 .tab18[aria-pressed="false"]{border-style:dashed}
@@ -235,7 +253,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   <header>
     <h1>Wien / Niederösterreich Dojo<small>Hochdeutsch ↔ Wienerisch · Alltag · Beisl · Schmäh · Unterwegs · Alt-Wien · Wien ↔ NÖ</small></h1>
     <div class="head-r">
-      <div class="schild" aria-hidden="true"><span class="lin">D</span><span class="ziel">Richtung Schmäh</span></div>
+      <button class="spruch" id="spruch" type="button" aria-label="Spruch des Tages, öffnet die Spruch-Sammlung"><span class="sp-lab">📜 Spruch des Tages <span id="spCount"></span></span><span class="sp-wi" id="spWi">…</span><span class="sp-hd" id="spHd"></span></button>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
@@ -282,6 +300,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
       <div class="serie" id="stSerie" title="Serie über alle Themen"><div class="lab">🔥 Serie</div><div class="big"><b>0</b></div></div>
       <div><div class="lab">Rekord</div><div class="val" id="stMeta">0</div></div>
       <div class="st-life" id="stLife"></div>
+      <div class="side-bug"><a class="bug" id="sideBug" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener" data-card="">⚑ Diese Karte melden</a><span class="bug-hint" hidden>Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.</span></div>
     </aside>
     <div class="card" id="card" aria-live="polite"></div>
   </div>
@@ -326,6 +345,14 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     <p class="hint">Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.</p>
     <a class="btn rate-btn" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener">Bewertung &amp; Feedback abgeben ↗</a>
   </section>
+  <div class="gate-bg" id="album" hidden role="dialog" aria-modal="true" aria-labelledby="albumT">
+    <div class="gate-box album-box">
+      <div class="album-head"><h2 id="albumT">📜 Deine Spruch-Sammlung</h2><button class="btn ghost" id="albumX" type="button">Schließen</button></div>
+      <p class="hint">Jeden Tag gibt's einen Spruch für alle. Extra-Sprüche schaltest du frei, indem du in einem Thema deinen <b>Rekord brichst</b> (mindestens 5 richtig in Folge, mehr als dein bisheriger Bestwert im Thema).</p>
+      <div id="albumList" class="album-list"></div>
+      <p class="hint album-src">Quellen: 1000things.at, Babbel Magazin, Vienna Würstelstand, vienna.at. Wienerische Schreibweise teils angepasst.</p>
+    </div>
+  </div>
   <div class="gate-bg" id="gate" hidden role="dialog" aria-modal="true" aria-labelledby="gateT">
     <div class="gate-box">
       <div class="gate-icon" aria-hidden="true">🔞</div>
@@ -529,6 +556,36 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     ["da Trottl","der Trottel","derb","Laut einer Studie eins der beliebtesten Wiener Schimpfwörter."],
     ["Kruzifix!","Verdammt nochmal!","derb","Ein typischer Fluch aus der katholischen Ecke."]
   ]);
+  // ---- Sprüche (Spruch des Tages + Freischalten per Themen-Rekord) ----
+  // [id, Thema, Wienerisch, Hochdeutsch]
+  const SPRUECHE=[
+    ["s1","greet","Tschau-Baba, Bussi, bis bald!","Tschüss, Küsschen, bis bald!"],
+    ["s2","greet","Gibst da Oma no a Bussi?","Gibst du der Oma noch ein Küsschen?"],
+    ["s3","greet","Pudel di ned auf, Hustinettenbär!","Reg dich nicht so auf! (aus der Serie „Muttertag“)"],
+    ["s4","greet","I sogs glei, i woars ned!","Ich sag's gleich, ich war's nicht! (aus „Muttertag“)"],
+    ["s5","food","A Bier geht si no aus.","Ein Bier geht sich noch aus (passt noch)."],
+    ["s6","food","Heute großes Ereignis, nix Schnitzel.","Heute fällt das Schnitzel aus. (aus „Kaisermühlen Blues“)"],
+    ["s7","food","Mei Bier is ned deppat!","Beleidige mein Bier nicht! (aus „Ein echter Wiener geht nicht unter“)"],
+    ["s8","food","Des Schnitzl woar ur guat.","Das Schnitzel war sehr gut."],
+    ["s9","food","Geh ma no auf a Fluchtachterl?","Trinken wir noch ein letztes Glas Wein zum Abschied?"],
+    ["s10","schm","Red ka Topfn!","Red keinen Unsinn!"],
+    ["s11","schm","Do krieg i an Hois!","Das regt mich furchtbar auf!"],
+    ["s12","schm","Dem geht da Reis.","Der hat Angst."],
+    ["s13","schm","Jetzt rüttelst am Watschenbaum!","Gleich fängst du dir eine Ohrfeige ein!"],
+    ["s14","schm","So an Schmarrn schau i ma ned o.","So einen Unsinn schaue ich mir nicht an."],
+    ["s15","way","Gemma auf an Gspritztn ins Tschocherl am Eck?","Gehen wir auf einen Spritzer ins kleine Lokal an der Ecke?"],
+    ["s16","way","Heuer woar ma no goar ned beim Heurigen.","Heuer waren wir noch gar nicht beim Heurigen."],
+    ["s17","way","Des is a ur zache Hackn.","Das ist eine sehr mühsame Arbeit."],
+    ["s18","way","Hupf in Gatsch und schlog a Wön!","Hau ab! (meist scherzhaft)"],
+    ["s19","alt","Der hot a Bankl grissn.","Der ist gestorben."],
+    ["s20","alt","Heit gemma mulatieren!","Heute feiern wir ausgelassen!"],
+    ["s21","alt","Heit steig i in de Panier.","Heute betrinke ich mich ordentlich."],
+    ["s22","alt","Zieh dei Anser Panier o!","Zieh dein Sonntagsgewand an!"],
+    ["s23","schimpf","Des interessiert mi wia a Schas im Woid.","Das interessiert mich überhaupt nicht."],
+    ["s24","schimpf","Hände foitn, Goschn hoitn!","Halt den Mund!"],
+    ["s25","schimpf","Heast, du Beidl, schleich di!","Hey, du Idiot, hau ab!"],
+    ["s26","schimpf","Jetzt is ois im Oasch.","Jetzt ist alles kaputt."]
+  ].map(r=>({id:r[0],cat:r[1],wi:r[2],hd:r[3]}));
   const DECKS={greet:GREET,food:FOOD,schm:SCHM,way:WAY,alt:ALT,schimpf:SCHIMPF,all:[...GREET,...FOOD,...SCHM,...WAY,...ALT]};
   const CAMP=["greet","food","schm","way","alt"];
   const NAMES={greet:"Begrüßen & Alltag",food:"Essen & Beisl",schm:"Schmäh & Grant",way:"Unterwegs in Wien",alt:"Alt-Wienerisch",schimpf:"🔞 Schimpfen",all:"Alles gemischt"};
@@ -538,8 +595,9 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   let deck="greet", mode="quiz", dir="mix", dia="wien", cur=null;
   let score={ok:0,no:0,streak:0};
   let run=0, best=0, goals=0, pendingReset=false, done={}, bonus=false, finale=false, hist={};
-  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;}}catch(e){}}
-  function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak}))}catch(e){}}
+  let tBest={}, unlocked=[], tRun=0, tAwarded=false;
+  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;tBest=s.tBest||{};unlocked=s.unlocked||[];}}catch(e){}}
+  function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak,tBest,unlocked}))}catch(e){}}
   const pad=n=>String(n).padStart(2,"0");
   const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
   function dayRec(){const k=keyOf(new Date());return hist[k]||(hist[k]={ok:0,no:0,best:0,topics:0});}
@@ -569,7 +627,8 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   // Fehler melden: Karte in die Zwischenablage, dann Formular öffnen
   const FORM="https://forms.gle/J5YVc7wGqwLjL6ny5";
   const bugHtml=c=>`<div class="sayrow"><a class="bug" href="${FORM}" target="_blank" rel="noopener" data-card="${esc(c.wi+" = "+c.hd+(c.noe?" (NÖ: "+c.noe+")":""))}">🐞 Fehler bei dieser Karte melden</a><span class="bug-hint" hidden>Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.</span></div>`;
-  card.addEventListener("click",e=>{const a=e.target.closest(".bug");if(!a)return;
+  const setBug=c=>{const a=$("#sideBug");if(!a||!c)return;a.dataset.card=c.wi+" = "+c.hd+(c.noe?" (NÖ: "+c.noe+")":"");const h=a.nextElementSibling;if(h)h.hidden=true;};
+  document.addEventListener("click",e=>{const a=e.target.closest(".bug");if(!a)return;
     const h=a.nextElementSibling;
     try{navigator.clipboard.writeText(a.dataset.card).then(()=>{if(h)h.hidden=false;}).catch(()=>{});}catch(err){}
   });
@@ -592,7 +651,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     $("#stNum").textContent=bonus?"⭐":s;
     $("#stRing").style.setProperty("--p",bonus?100:Math.min(s,20)/20*100);
     const se=$("#stSerie");se.querySelector("b").textContent=score.streak;se.classList.toggle("hot",score.streak>0&&score.streak>=best);
-    $("#stMeta").innerHTML=`${best}<div class="sub">Themen ${doneCount()}/${CAMP.length} bestanden</div>`;
+    $("#stMeta").innerHTML=`${best}<div class="sub">Im Thema: ${deck==="all"?"–":(tBest[deck]||0)}</div><div class="sub">Themen ${doneCount()}/${CAMP.length} bestanden</div>`;
     $("#stTopic").textContent=bonus?"⭐ Bonusfrage":NAMES[deck];
   }
   function renderTabs(){document.querySelectorAll(".tab").forEach(t=>{t.setAttribute("aria-pressed",t.dataset.deck===deck);t.textContent=NAMES[t.dataset.deck]+(done[t.dataset.deck]?" ✓":"");});}
@@ -602,6 +661,42 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   let checkpoint=0, life=false;
   const resetCP=()=>{checkpoint=0;life=false;};
   function renderLife(){$("#stLife").textContent=life?`🛡️ Joker bereit (zurück auf ${checkpoint})`:(checkpoint?"Joker verbraucht":"");}
+  // Themen-Rekord: mind. 5 in Folge und mehr als der bisherige Bestwert im Thema → Extra-Spruch
+  function topicHit(){
+    if(deck==="all")return;
+    tRun++;
+    const prev=tBest[deck]||0;
+    if(tRun>prev){tBest[deck]=tRun;
+      if(tRun>=5&&!tAwarded){tAwarded=true;
+        const s=SPRUECHE.find(x=>x.cat===deck&&!unlocked.includes(x.id)&&x.id!==dailySpruch().id);
+        if(s){unlocked.push(s.id);renderSpruch();const sp=$("#spruch");sp.classList.remove("neu");void sp.offsetWidth;sp.classList.add("neu");
+          return `📜 Neuer Rekord in ${NAMES[deck]} (${tRun})! Spruch freigeschaltet: „${s.wi}“`;}
+      }}
+    return "";
+  }
+  const topicReset=()=>{tRun=0;tAwarded=false;};
+  function dailySpruch(){
+    const pool=SPRUECHE.filter(x=>x.cat!=="schimpf");
+    const t=new Date();const day=Math.floor(Date.UTC(t.getFullYear(),t.getMonth(),t.getDate())/864e5);
+    return pool[day%pool.length];
+  }
+  function renderSpruch(){
+    const s=dailySpruch();$("#spWi").textContent=s.wi;$("#spHd").textContent=s.hd;
+    const vis=SPRUECHE.filter(x=>x.cat!=="schimpf"||adult());
+    const have=vis.filter(x=>unlocked.includes(x.id)||x.id===s.id).length;
+    $("#spCount").textContent=`· ${have}/${vis.length}`;
+  }
+  function openAlbum(){
+    const d=dailySpruch();
+    const cats=["greet","food","schm","way","alt"].concat(adult()?["schimpf"]:[]);
+    $("#albumList").innerHTML=cats.map(c=>{
+      const items=SPRUECHE.filter(x=>x.cat===c);
+      return `<div class="album-cat"><h3>${esc(NAMES[c])} · Rekord ${tBest[c]||0}</h3>${items.map(x=>{
+        const open=unlocked.includes(x.id)||x.id===d.id;
+        return open?`<div class="album-item">${x.id===d.id?`<div class="tag">Heute</div>`:""}<div class="wi">${esc(x.wi)}</div><div class="hd">${esc(x.hd)}</div></div>`
+          :`<div class="album-item lock"><div class="wi">🔒 ???</div><div class="hd">Brich deinen Rekord in „${esc(NAMES[c])}“, um diesen Spruch freizuschalten.</div></div>`;}).join("")}</div>`;}).join("");
+    $("#album").hidden=false;$("#albumX").focus();
+  }
   function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
   function hit(){
     const d=dayRec();
@@ -616,6 +711,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     }
     if(pendingReset){run=0;pendingReset=false;resetCP();}
     score.ok++;score.streak++;run++;d.ok++;bumpBest(d);
+    const recMsg=topicHit();
     if(run===20){
       if(deck==="all"||deck==="schimpf"){goals++;pendingReset=true;setMsg(MILES[20],"good");}
       else{bonus=true;setMsg("🎉 20 gschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.","good");}
@@ -623,10 +719,11 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     }
     else if(MILES[run]){checkpoint=run;life=true;setMsg(MILES[run]+` 🛡️ Checkpoint ${checkpoint}: Du hast an Joker.`,"good");flash("win");}
     else setMsg(`Weiter so! No ${20-run} bis zum Ziel. 🔥 Serie ${score.streak}.`);
+    if(recMsg)setMsg(recMsg,"good");
     save();renderScore();renderDays();renderLife();
   }
   function miss(){
-    const d=dayRec();d.no++;score.no++;
+    const d=dayRec();d.no++;score.no++;topicReset();
     const wasBonus=bonus;bonus=false;
     const lostSerie=score.streak;score.streak=0;
     const serieTxt=lostSerie>0?` 🔥 Serie bei ${lostSerie} gerissen.`:"";
@@ -719,7 +816,6 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       ${cmpHtml(c)}
       ${sayHtml(c)}
       ${c.note?`<div class="calc">${esc(c.note)}</div>`:""}
-      ${bugHtml(c)}
     </div>`;
   const bonusTag=()=>bonus?"⭐ Bonusfrage · ":"";
   const crest=()=>{const sv=document.querySelector(dia==="noe"?"#v-noe svg":"#v-wien svg");if(!sv)return "";const c=sv.cloneNode(true);c.setAttribute("class","crest");return c.outerHTML;};
@@ -733,7 +829,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
 
   function showCard(){
     if(finale){showFinale();return;}
-    cur=pick();const f=front();
+    cur=pick();setBug(cur);const f=front();
     card.innerHTML=`${signHtml(f==="wi"?W(cur):cur.hd,f)}
       ${f==="wi"?sayHtml(cur):""}
       <div class="actions"><button class="btn" id="flip">Umdrehen</button></div>`;
@@ -771,7 +867,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   }
   function showQuiz(){
     if(finale){showFinale();return;}
-    cur=pick();const f=front();
+    cur=pick();setBug(cur);const f=front();
     const others=distractors(cur,f);
     const opts=shuffle([cur,...others]);
     card.innerHTML=`${signHtml(f==="wi"?W(cur):cur.hd,f)}
@@ -790,7 +886,6 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       let html=`<div>${esc((ok?"Richtig! ":"Leider falsch. ")+`${W(cur)} = ${cur.hd}`)}${regHtml(cur)}</div>`+cmpHtml(cur);
       if(f==="hd")html+=sayHtml(cur);
       if(cur.note)html+=`<div class="calc">${esc(cur.note)}</div>`;
-      html+=bugHtml(cur);
       if(!ok&&picked)html+=`<div class="calc picked">Du hast gewählt: ${esc(W(picked))} = ${esc(picked.hd)}</div>`;
       fb.innerHTML=html;
       const nx=$("#next");nx.hidden=false;nx.focus();nx.onclick=showQuiz;
@@ -833,19 +928,23 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       if(!v||v<1900||v>y){msg.textContent="Bitte ein gültiges Geburtsjahr eingeben.";return;}
       if(y-v<18){msg.textContent="Dieses Deck ist erst ab 18. Probier ein anderes Thema!";return;}
       try{localStorage.setItem("weanerdojo-18","1");}catch(e){window.__adult=true;}
-      closeGate();deck="schimpf";bonus=false;cur=null;renderTabs();save();renderScore();render();
+      closeGate();renderSpruch();deck="schimpf";bonus=false;cur=null;renderTabs();save();renderScore();render();
     };
     ok.onclick=go;yr.onkeydown=e=>{if(e.key==="Enter")go();};
     $("#ageNo").onclick=closeGate;
     $("#gate").addEventListener("keydown",e=>{if(e.key==="Escape")$("#ageNo").click();});
   })();
 
-  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(t.dataset.deck==="schimpf"&&!adult()){openGate();return;}if(t.dataset.deck!==deck){run=0;resetCP();renderLife();}deck=t.dataset.deck;bonus=false;cur=null;renderTabs();save();renderScore();render();});
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(t.dataset.deck==="schimpf"&&!adult()){openGate();return;}if(t.dataset.deck!==deck){run=0;resetCP();renderLife();topicReset();}deck=t.dataset.deck;bonus=false;cur=null;renderTabs();save();renderScore();render();});
   document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;save();render();});
   document.querySelectorAll("[data-dir]").forEach(b=>b.onclick=()=>{dir=b.dataset.dir;save();render();});
   document.querySelectorAll("[data-dia]").forEach(b=>b.onclick=()=>{dia=b.dataset.dia;save();render();});
 
-  load();if(deck==="schimpf"&&!adult())deck="greet";renderTabs();renderScore();renderDays();renderLife();render();
+  $("#spruch").onclick=openAlbum;
+  $("#albumX").onclick=()=>{$("#album").hidden=true;$("#spruch").focus();};
+  $("#album").addEventListener("click",e=>{if(e.target.id==="album")$("#album").hidden=true;});
+  $("#album").addEventListener("keydown",e=>{if(e.key==="Escape")$("#album").hidden=true;});
+  load();if(deck==="schimpf"&&!adult())deck="greet";renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();
 })();
 </script>
 
