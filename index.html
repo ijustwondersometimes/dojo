@@ -777,15 +777,20 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   const ST={ok:0,no:0,best:0,rec:0,t0:Date.now(),decks:{}};
   const statOn=()=>{try{return localStorage.getItem("weanerdojo-stats")!=="off";}catch(e){return true;}};
   function vid(){try{let v=localStorage.getItem("weanerdojo-vid");if(!v){v=Math.random().toString(36).slice(2,8);localStorage.setItem("weanerdojo-vid",v);}return v;}catch(e){return "-";}}
-  function stat(ok,rec){const k=(bonus?"bonus·":"")+deck,x=ST.decks[k]||(ST.decks[k]={ok:0,no:0});if(ok){ST.ok++;x.ok++;if(score.streak>ST.best)ST.best=score.streak;if(rec)ST.rec++;}else{ST.no++;x.no++;}}
-  function sendStats(){
-    if(!TRACK.url||!statOn()||ST.ok+ST.no===0)return;
-    const v={set:[LANG,dia,mode,dir].join(" · "),topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,
+  function stat(ok,rec){const k=(bonus?"bonus·":"")+deck,x=ST.decks[k]||(ST.decks[k]={ok:0,no:0});if(ok){ST.ok++;x.ok++;if(score.streak>ST.best)ST.best=score.streak;if(rec)ST.rec++;}else{ST.no++;x.no++;}if(ST.ok+ST.no>=5)sendStats();}
+  // Gesendet wird: 1x beim Öffnen (👋 Besuch), alle 5 Antworten (Zwischenstand) und der Rest beim Verlassen.
+  // Grund: Am Handy (iPhone, Discord-Browser) geht das Senden beim Verlassen oft verloren.
+  function sendStats(visit){
+    if(!TRACK.url||!statOn()||(!visit&&ST.ok+ST.no===0))return;
+    const v=visit?{set:[LANG,dia,mode,dir].join(" · "),topics:"👋 Besuch",ok:0,no:0,best:0,rec:0,min:0,
+      dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+(location.hostname.endsWith("github.io")?" · web":" · datei"),vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()}
+    :{set:[LANG,dia,mode,dir].join(" · "),topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,
       min:Math.max(1,Math.round((Date.now()-ST.t0)/60000)),dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+(location.hostname.endsWith("github.io")?" · web":" · datei"),vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()};
-    try{const fd=new URLSearchParams();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));fetch(TRACK.url,{method:"POST",mode:"no-cors",keepalive:true,body:fd}).catch(()=>{});ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}catch(e){}
+    try{const fd=new URLSearchParams();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));fetch(TRACK.url,{method:"POST",mode:"no-cors",keepalive:true,body:fd}).catch(()=>{});if(visit)return;ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}catch(e){}
   }
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendStats();});
-  addEventListener("pagehide",sendStats);
+  addEventListener("pagehide",()=>sendStats());
+  setTimeout(()=>{try{if(sessionStorage.getItem("weanerdojo-visit"))return;sessionStorage.setItem("weanerdojo-visit","1");}catch(e){}sendStats(true);},1500);
   if(TRACK.url){const o=$("#statOpt"),c=$("#statChk");o.hidden=false;c.checked=statOn();c.onchange=()=>{try{localStorage.setItem("weanerdojo-stats",c.checked?"on":"off");}catch(e){}};}
   function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
   function hit(){
