@@ -771,7 +771,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     $("#album").hidden=false;$("#albumX").focus();
   }
   // ---- Anonyme Statistik (Google-Formular, aus solange TRACK.url leer) ----
-  const TRACK={url:"",e:{set:"",topics:"",ok:"",no:"",best:"",rec:"",min:"",dev:"",vid:""}};
+  const TRACK={url:"https://docs.google.com/forms/d/e/1FAIpQLSfLMCiDjU8Fs7kYsFPGgTf43u5rygWrRUHnFF58tp19fSY-VA/formResponse",e:{set:"entry.359920970",topics:"entry.1053893183",ok:"entry.44368377",no:"entry.1082048446",best:"entry.1082761211",rec:"entry.597537572",min:"entry.588406045",dev:"entry.945445590",vid:"entry.1526991492"}};
   const ST={ok:0,no:0,best:0,rec:0,t0:Date.now(),decks:{}};
   const statOn=()=>{try{return localStorage.getItem("weanerdojo-stats")!=="off";}catch(e){return true;}};
   function vid(){try{let v=localStorage.getItem("weanerdojo-vid");if(!v){v=Math.random().toString(36).slice(2,8);localStorage.setItem("weanerdojo-vid",v);}return v;}catch(e){return "-";}}
