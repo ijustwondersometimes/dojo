@@ -782,7 +782,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     if(!TRACK.url||!statOn()||ST.ok+ST.no===0)return;
     const v={set:[LANG,dia,mode,dir].join(" · "),topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,
       min:Math.max(1,Math.round((Date.now()-ST.t0)/60000)),dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+(location.hostname.endsWith("github.io")?" · web":" · datei"),vid:vid()};
-    try{const fd=new FormData();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));if(navigator.sendBeacon(TRACK.url,fd)){ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}}catch(e){}
+    try{const fd=new URLSearchParams();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));fetch(TRACK.url,{method:"POST",mode:"no-cors",keepalive:true,body:fd}).catch(()=>{});ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}catch(e){}
   }
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendStats();});
   addEventListener("pagehide",sendStats);
