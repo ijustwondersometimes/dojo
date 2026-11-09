@@ -244,6 +244,8 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
 /* ---- Schild mit dem gefragten Wort ---- */
 .sign{position:relative;background:linear-gradient(180deg,var(--sign1),var(--sign2));border:1px solid var(--signline);border-radius:12px;padding:14px 28px 14px 36px;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.28);max-width:100%;min-width:min(100%,360px)}
 .sign:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;border-radius:12px 0 0 12px;background:var(--rot)}
+.sign.ok:before{background:var(--ok)}
+.btn.okb{background:var(--ok);border-color:var(--ok)}
 .sign .lab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px}
 .sign .w{font-family:var(--f-word);font-weight:700;font-size:clamp(40px,9vw,62px);line-height:1.12;color:var(--ink);overflow-wrap:anywhere;text-wrap:balance}
 .sign .w.l2{font-size:clamp(30px,6.5vw,44px)}
@@ -922,7 +924,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       ${f==="wi"?sayHtml(cur):""}
       <p class="hint card-hint">${T("hintFront")}</p>
       <div class="actions"><button class="btn" id="flip">${T("flip")}</button></div>`;
-    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><p class="hint card-hint" style="flex-basis:100%;text-align:center;margin:0">${T("knew")}</p><button class="btn ghost" id="again">${T("no")}</button><button class="btn" id="next">${T("yes")}</button></div>`+askHtml();wireAsk(cur);
+    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><p class="hint card-hint" style="flex-basis:100%;text-align:center;margin:0">${T("knew")}</p><button class="btn ghost" id="again">${T("no")}</button><button class="btn okb" id="next">${T("yes")}</button></div>`+askHtml();wireAsk(cur);card.querySelector(".sign")?.classList.add("ok");
       $("#next").onclick=()=>{hit();showCard();};
       $("#again").onclick=()=>{miss();showCard();};
     };
@@ -968,7 +970,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     card.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
       const ok=b.dataset.id===cur.id;
       card.querySelectorAll(".choice").forEach(x=>{x.disabled=true;if(x.dataset.id===cur.id)x.classList.add("right")});
-      if(!ok)b.classList.add("wrong");
+      if(!ok)b.classList.add("wrong");else card.querySelector(".sign")?.classList.add("ok");
       if(ok)hit();else miss();
       const fb=$("#fb");fb.className="feedback "+(ok?"ok":"no");
       const picked=EVERY.find(x=>x.id===b.dataset.id);
