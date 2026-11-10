@@ -3,6 +3,8 @@
 // Nur Admin:   /admin (Seite) und /admin/api/* – geschützt durch ein Passwort (Worker-Secret ADMIN_PASSWORD)
 // Alles andere liefert die statischen Dateien (index.html usw.) aus.
 
+import ADMIN_HTML from "./admin.html"; // wird von wrangler als Text eingebunden
+
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, vid TEXT, kind TEXT, settings TEXT, topics TEXT, decks TEXT, ok INTEGER, no INTEGER, best INTEGER, rec INTEGER, min INTEGER, dev TEXT, geo TEXT)`,
   `CREATE INDEX IF NOT EXISTS stats_ts ON stats(ts)`,
@@ -256,18 +258,8 @@ export default {
         catch (e) { return json({ ok: false, error: String(e.message || e) }, 500); }
       }
       if (path !== "/admin") return Response.redirect(new URL("/admin", url), 302);
-      // admin.html aus den statischen Dateien holen – mehrere Schreibweisen probieren
-      // und interne Weiterleitungen (z. B. /admin.html → /admin) selbst auflösen
-      let page = null;
-      for (const p of ["/admin.html", "/admin", "/admin/"]) {
-        let res = await env.ASSETS.fetch(new Request(new URL(p, url)));
-        const loc = res.headers.get("location");
-        if (res.status >= 300 && res.status < 400 && loc) res = await env.ASSETS.fetch(new Request(new URL(loc, url)));
-        if (res.ok) { page = res; break; }
-      }
-      if (!page) return new Response("admin.html nicht gefunden (liegt sie im Repo-Hauptordner?).", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
-      const r = new Response(page.body, { status: 200, headers: page.headers });
-      r.headers.set("content-type", "text/html; charset=utf-8");
+      // admin.html steckt direkt im Worker (import oben) – unabhängig von den statischen Dateien
+      const r = new Response(ADMIN_HTML, { headers: { "content-type": "text/html; charset=utf-8" } });
       r.headers.set("cache-control", "no-store");
       r.headers.set("x-robots-tag", "noindex");
       return r;

@@ -6,3 +6,4 @@ schema.sql
 README.md
 .assetsignore
 node_modules
+admin.html

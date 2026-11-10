@@ -18,5 +18,7 @@
       "database_id": "7b4a1f3e-b777-4e58-b95d-e98ce9e10ce0"
     }
   ],
+  // admin.html wird als Text direkt in den Worker eingebaut
+  "rules": [{ "type": "Text", "globs": ["**/*.html"], "fallthrough": true }],
   "observability": { "enabled": true }
 }
