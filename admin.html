@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Dojo Admin</title>
+<style>
+:root{--paper:#eceeee;--surface:#fff;--ink:#1c1f23;--muted:#5c646c;--rot:#c8102e;--gold:#9a7a2e;--ok:#2e7a4c;--line:#d5d9dc;--blau:#1d4f9c;
+--f:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;--fd:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif}
+@media (prefers-color-scheme:dark){:root{--paper:#131517;--surface:#1c1f22;--ink:#ebeeef;--muted:#9aa2a9;--rot:#ef5b6e;--gold:#d6b35c;--ok:#6cc08f;--line:#2e3338;--blau:#7fa6ea}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.45 var(--f)}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font:700 24px var(--fd);margin:0}h1 span{color:var(--rot)}
+h2{font:700 17px var(--fd);margin:0 0 10px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button,select{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:7px 12px;cursor:pointer}
+nav button[aria-selected=true]{background:var(--rot);border-color:var(--rot);color:#fff}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:12px}
+.box{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0}
+.kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font:700 26px var(--fd);margin-top:2px}
+.two{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-bottom:12px}
+.bars{display:flex;align-items:flex-end;gap:3px;height:140px;padding-top:6px}
+.bars div{flex:1;min-width:3px;background:var(--rot);border-radius:3px 3px 0 0;position:relative}
+.bars div.u{background:var(--gold)}
+.bars-x{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
+.legend{font-size:12px;color:var(--muted);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:-1px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meter{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:3px}.meter i{display:block;height:100%;background:var(--ok)}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.bug{color:var(--rot);border-color:var(--rot)}.tag.vote{color:var(--blau);border-color:var(--blau)}.tag.feedback{color:var(--ok);border-color:var(--ok)}
+.stars{color:var(--gold);letter-spacing:1px}
+.muted{color:var(--muted)}
+.del{padding:3px 9px;font-size:13px;color:var(--rot)}
+.scroll{overflow-x:auto}
+.msg{padding:20px;text-align:center;color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Dojo <span>Admin</span></h1>
+    <nav role="tablist">
+      <button role="tab" data-tab="stats" aria-selected="true">📊 Statistik</button>
+      <button role="tab" data-tab="fb">💬 Feedback</button>
+      <button role="tab" data-tab="hs">🏆 Bestenliste</button>
+    </nav>
+  </header>
+
+  <section id="tab-stats">
+    <div class="filters">
+      <select id="days"><option value="7">Letzte 7 Tage</option><option value="30" selected>Letzte 30 Tage</option><option value="90">Letzte 90 Tage</option><option value="365">Letztes Jahr</option></select>
+      <button id="csvStats">⬇ Statistik als CSV</button>
+    </div>
+    <div class="grid" id="kpis"></div>
+    <div class="box" style="margin-bottom:12px"><h2>Pro Tag (UTC)</h2><div class="bars" id="bars"></div><div class="bars-x" id="barsX"></div>
+      <div class="legend"><i style="background:var(--rot)"></i>Besuche<i style="background:var(--gold)"></i>Anwender</div></div>
+    <div class="two">
+      <div class="box"><h2>Themen: Antworten & Trefferquote</h2><div class="scroll"><table id="decks"></table></div></div>
+      <div class="box"><h2>Feedback-Eingänge</h2><table id="fbCount"></table></div>
+    </div>
+    <div class="two">
+      <div class="box"><h2>Geräte</h2><table id="dev"></table></div>
+      <div class="box"><h2>Herkunft (Zeitzone · Sprache)</h2><table id="geo"></table></div>
+      <div class="box"><h2>Einstellungen beim Öffnen</h2><table id="set"></table></div>
+    </div>
+  </section>
+
+  <section id="tab-fb" hidden>
+    <div class="filters">
+      <select id="fbKind"><option value="">Alle</option><option value="feedback">Feedback</option><option value="bug">Fehlermeldungen</option><option value="vote">Abstimmung</option></select>
+      <button id="csvFb">⬇ Feedback als CSV</button>
+    </div>
+    <div class="box" id="voteBox" style="margin-bottom:12px"><h2>Abstimmung: nächstes Thema</h2><table id="votes"></table></div>
+    <div class="box scroll"><table id="fbList"></table></div>
+  </section>
+
+  <section id="tab-hs" hidden>
+    <div class="box scroll"><table id="hsList"></table></div>
+  </section>
+</div>
+<script>
+(function(){
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const fmt=n=>Number(n||0).toLocaleString("de-AT");
+  const when=ts=>new Date(ts).toLocaleString("de-AT",{timeZone:"Europe/Vienna",day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
+  async function api(p,opt){const r=await fetch("/admin/api/"+p,opt);if(r.status===403){document.body.innerHTML='<div class="msg">Kein Zugang – bitte neu über Cloudflare Access anmelden.</div>';throw 0;}return r.json();}
+  const rowsTable=(el,rows,label)=>{el.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.k||"–")}</td><td class="n">${fmt(r.n)}</td></tr>`).join(""):`<tr><td class="muted">${label||"Noch keine Daten"}</td></tr>`;};
+
+  // Tabs
+  document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
+    document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
+    ["stats","fb","hs"].forEach(t=>$("#tab-"+t).hidden=t!==b.dataset.tab);
+    ({stats:loadStats,fb:loadFb,hs:loadHs})[b.dataset.tab]();
+  });
+
+  async function loadStats(){
+    const s=await api("summary?days="+$("#days").value);const t=s.total||{};
+    const acc=(t.ok||0)+(t.no||0)?Math.round(100*t.ok/((t.ok||0)+(t.no||0)))+" %":"–";
+    $("#kpis").innerHTML=[["Anwender",fmt(t.users)],["Besuche",fmt(t.visits)],["Antworten",fmt((t.ok||0)+(t.no||0))],["Trefferquote",acc],["Lernzeit",fmt(Math.round((t.min||0)/60))+" h"],["Längste Serie",fmt(t.best)],["Bestenliste",fmt(s.scores)]]
+      .map(([l,v])=>`<div class="box kpi"><div class="l">${l}</div><div class="v">${v}</div></div>`).join("");
+    const pd=s.perDay||[],max=Math.max(1,...pd.map(d=>d.visits||0),...pd.map(d=>d.users||0));
+    $("#bars").innerHTML=pd.length?pd.map(d=>`<div title="${d.d}: ${d.visits} Besuche" style="height:${100*(d.visits||0)/max}%"></div><div class="u" title="${d.d}: ${d.users} Anwender" style="height:${100*(d.users||0)/max}%"></div>`).join(""):'<span class="muted">Noch keine Daten</span>';
+    $("#barsX").innerHTML=pd.length?`<span>${pd[0].d}</span><span>${pd[pd.length-1].d}</span>`:"";
+    const dk=Object.entries(s.decks||{}).map(([k,x])=>({k,ok:x.ok,no:x.no,n:x.ok+x.no})).sort((a,b)=>b.n-a.n);
+    $("#decks").innerHTML=dk.length?`<tr><th>Thema</th><th class="n">Antworten</th><th>Richtig</th></tr>`+dk.map(d=>{const p=d.n?Math.round(100*d.ok/d.n):0;return `<tr><td>${esc(d.k)}</td><td class="n">${fmt(d.n)}</td><td style="min-width:110px">${p} %<div class="meter"><i style="width:${p}%"></i></div></td></tr>`;}).join(""):'<tr><td class="muted">Noch keine Daten</td></tr>';
+    const names={feedback:"Feedback",bug:"Fehlermeldungen",vote:"Stimmen"};
+    rowsTable($("#fbCount"),(s.feedback||[]).map(r=>({k:names[r.k]||r.k,n:r.n})),"Noch nichts eingegangen");
+    rowsTable($("#dev"),s.devices||[]);rowsTable($("#geo"),s.geo||[]);rowsTable($("#set"),s.settings||[]);
+  }
+  $("#days").onchange=loadStats;
+  $("#csvStats").onclick=()=>location.href="/admin/api/export?table=stats";
+  $("#csvFb").onclick=()=>location.href="/admin/api/export?table=feedback";
+
+  let fbRows=[];
+  async function loadFb(){fbRows=(await api("feedback")).rows||[];renderFb();}
+  function renderFb(){
+    const k=$("#fbKind").value,rows=fbRows.filter(r=>!k||r.kind===k);
+    const tally={};fbRows.filter(r=>r.kind==="vote").forEach(r=>{const t=r.topic||"–";tally[t]=(tally[t]||0)+1;});
+    rowsTable($("#votes"),Object.entries(tally).map(([k,n])=>({k,n})).sort((a,b)=>b.n-a.n),"Noch keine Stimmen");
+    $("#fbList").innerHTML=rows.length?`<tr><th>Wann</th><th>Art</th><th>Inhalt</th><th></th></tr>`+rows.map(r=>`<tr>
+      <td class="n">${when(r.ts)}</td>
+      <td><span class="tag ${esc(r.kind)}">${esc(r.kind)}</span></td>
+      <td>${r.rating?`<div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>`:""}${r.topic?`<b>${esc(r.topic)}</b><br>`:""}${r.card?`<div class="muted">Karte: ${esc(r.card)}</div>`:""}${esc(r.text)}<div class="muted" style="font-size:12px">${esc(r.lang||"")} · ${esc(r.vid||"")}</div></td>
+      <td><button class="del" data-id="${r.id}" title="Löschen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch nichts eingegangen</td></tr>';
+  }
+  $("#fbKind").onchange=renderFb;
+  $("#fbList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag löschen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"feedback",id:+b.dataset.id})});loadFb();};
+
+  async function loadHs(){
+    const rows=(await api("scores")).rows||[];
+    $("#hsList").innerHTML=rows.length?`<tr><th>#</th><th>Name</th><th class="n">Serie</th><th>Wann</th><th>ID</th><th></th></tr>`+rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td class="n">${fmt(r.best)}</td><td>${when(r.ts)}</td><td class="muted">${esc(r.vid)}</td><td><button class="del" data-vid="${esc(r.vid)}" title="Entfernen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch keine Einträge</td></tr>';
+  }
+  $("#hsList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag aus der Bestenliste entfernen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"scores",vid:b.dataset.vid})});loadHs();};
+
+  loadStats().catch(()=>{});
+})();
+</script>
+</body>
+</html>

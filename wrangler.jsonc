@@ -1,0 +1,27 @@
+// Cloudflare-Konfiguration für das Wien / NÖ Dojo (Worker "dojo")
+{
+  "name": "dojo",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    // Diese Pfade gehen zuerst durch den Worker (API + geschützte Admin-Seite)
+    "run_worker_first": ["/api/*", "/admin*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dojo-db",
+      // Nach dem Anlegen der Datenbank im Dashboard hier die Database ID eintragen
+      "database_id": "HIER_DATABASE_ID_EINTRAGEN"
+    }
+  ],
+  "vars": {
+    // Cloudflare Access: Team-Name (xyz aus xyz.cloudflareaccess.com) und Application Audience (AUD) Tag
+    "ACCESS_TEAM": "",
+    "ACCESS_AUD": ""
+  },
+  "observability": { "enabled": true }
+}

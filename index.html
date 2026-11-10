@@ -216,6 +216,24 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
 .bug{font-size:13px;color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .bug:hover{color:var(--rot)}
 .bug-hint{font-size:12px;color:var(--ok)}
+.fb-box{max-width:460px;text-align:left;align-items:stretch}
+.fb-box textarea,.fb-box select,.hs-form input{font:inherit;width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+.fb-box textarea{resize:vertical;min-height:90px}
+.fb-card{font-size:14px;padding:8px 12px;border-radius:10px;background:var(--side);border:1px solid var(--line)}
+.fb-stars{display:flex;gap:4px}
+.fb-stars button{font-size:28px;line-height:1;background:none;border:0;padding:2px;color:var(--line);cursor:pointer}
+.fb-stars button.on{color:var(--gold)}
+.fb-stars button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+.fb-alt{font-size:12px;color:var(--muted)}
+.hs-list{margin:0;padding:0;list-style:none;width:100%;counter-reset:hs}
+.hs-list li{display:flex;gap:10px;align-items:baseline;padding:6px 2px;border-bottom:1px solid var(--line);counter-increment:hs}
+.hs-list li::before{content:counter(hs);width:1.6em;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.hs-list li:nth-child(1)::before{content:"🥇"}.hs-list li:nth-child(2)::before{content:"🥈"}.hs-list li:nth-child(3)::before{content:"🥉"}
+.hs-list .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hs-list .sc{font-weight:700;font-variant-numeric:tabular-nums}
+.hs-list li.me{color:var(--rot)}
+.hs-form{display:flex;gap:8px;width:100%;flex-wrap:wrap}
+.hs-form input{flex:1;min-width:160px;width:auto}
 
 /* ---- Spielfeld: Seitenleiste + Karte ---- */
 .play{display:grid;grid-template-columns:170px minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -379,16 +397,35 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     </div>
     </div>
   </details>
+  <section class="rate" id="hs" hidden>
+    <h2 data-i18n="hsH">🏆 Bestenliste</h2>
+    <p class="hint" data-i18n="hsP">Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.</p>
+    <ol class="hs-list" id="hsList"></ol>
+    <div class="hs-form"><input id="hsName" maxlength="20" autocomplete="nickname" aria-label="Name" placeholder="Dein Name"><button class="btn" id="hsSend" type="button"></button></div>
+    <div class="hint" id="hsMsg" aria-live="polite"></div>
+  </section>
   <section class="rate" id="feedback">
     <h2 data-i18n="fbH">⭐ Bewerten &amp; Feedback</h2>
     <p class="hint" data-i18n="fbP">Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.</p>
-    <a class="btn rate-btn" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener" data-i18n="fbBtn">Bewertung &amp; Feedback abgeben ↗</a>
+    <a class="btn rate-btn" id="fbLink" href="https://forms.gle/J5YVc7wGqwLjL6ny5" target="_blank" rel="noopener" data-i18n="fbBtn">Bewertung &amp; Feedback abgeben ↗</a>
   </section>
   <section class="rate" id="vote">
     <h2 data-i18n="voteH">🗳️ Mitbestimmen</h2>
     <p class="hint" data-i18n="voteP">Welches Thema soll als Nächstes ins Dojo? Fußball, Heuriger, Arbeit, Liebe, Wienerlied, Mehlspeisen, Wetter oder dein eigener Vorschlag. Eine Stimme, kein Konto nötig.</p>
-    <a class="btn ghost rate-btn" href="https://forms.gle/CPLAtFVDDcbW2mgP8" target="_blank" rel="noopener" data-i18n="voteBtn">Jetzt abstimmen ↗</a>
+    <a class="btn ghost rate-btn" id="voteLink" href="https://forms.gle/CPLAtFVDDcbW2mgP8" target="_blank" rel="noopener" data-i18n="voteBtn">Jetzt abstimmen ↗</a>
   </section>
+  <div class="gate-bg" id="fbDlg" hidden role="dialog" aria-modal="true" aria-labelledby="fbT">
+    <div class="gate-box fb-box">
+      <h2 id="fbT"></h2>
+      <div id="fbCardRow" hidden><div class="lbl" data-i18n="fbCardL">Gemeldete Karte</div><div class="fb-card" id="fbCard"></div></div>
+      <div id="fbStarRow"><div class="lbl" data-i18n="fbStarL">Wie gefällt dir das Dojo?</div><div class="fb-stars" id="fbStars"></div></div>
+      <div id="fbVoteRow" hidden><label class="lbl" for="fbVote" data-i18n="fbVoteL">Welches Thema als Nächstes?</label><select id="fbVote"></select></div>
+      <label class="lbl" for="fbText" id="fbTextL"></label>
+      <textarea id="fbText" maxlength="1000" rows="4"></textarea>
+      <div class="feedback" id="fbMsg" aria-live="polite"></div>
+      <div class="actions"><button class="btn ghost" id="fbX" type="button" data-i18n="fbCancel">Abbrechen</button><button class="btn" id="fbSend" type="button" data-i18n="fbSend">Senden</button></div>
+    </div>
+  </div>
   <div class="gate-bg" id="album" hidden role="dialog" aria-modal="true" aria-labelledby="albumT">
     <div class="gate-box album-box">
       <div class="album-head"><h2 id="albumT" data-i18n="albumT">😂 Deine Witze-Sammlung</h2><button class="btn ghost" id="albumX" type="button" data-i18n="albumX">Schließen</button></div>
@@ -654,6 +691,14 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   ].map(r=>({id:r[0],cat:r[1],t:r[2],hd:r[3]}));
   // ---- Sprache: Deutsch / Englisch ----
   const UI={"statLab": ["Anonyme Statistik senden", "Send anonymous stats"], "statTip": ["Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet.", "Helps improve the Dojo. Only topics, points, streak and settings are sent, no names. Untick = nothing is sent."], "ansLab": ["Auf Hochdeutsch", "In Standard German"], "sub": ["Wienerisch &amp; Niederösterreichisch lernen", "Learn Viennese &amp; Lower Austrian dialect"], "witzTip": ["Deine Witze-Sammlung. Neue Witze gibt's für jeden gebrochenen Themen-Rekord.", "Your joke collection. Every topic record you break unlocks a new joke."], "spLab": ["📜 Wiener Spruch", "📜 Viennese saying"], "spTip": ["Klick für den nächsten Spruch", "Click for the next saying"], "tipWien": ["Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa.", "Viennese dialect: old “ei” becomes “aa”, e.g. haaß, dahaam, Staa."], "tipNoe": ["Niederösterreichisch: altes ei wird zu oa, z. B. hoaß, dahoam, Stoa. Wo es keinen Unterschied gibt, steht „wie in Wien“.", "Lower Austrian: old “ei” becomes “oa”, e.g. hoaß, dahoam, Stoa. Where there is no difference, it says “same as Vienna”."], "noeName": ["Niederösterreich", "Lower Austria"], "quiz": ["Quiz", "Quiz"], "card": ["Karteikarten", "Flashcards"], "tipQuiz": ["Vier Antworten zur Auswahl, eine davon ist richtig.", "Four answers to choose from, one of them is right."], "tipCard": ["Karte umdrehen und selbst einschätzen, ob du es gewusst hast.", "Flip the card and judge for yourself whether you knew it."], "dirWi": ["Dialekt → Hd.", "Dialect → German"], "dirMix": ["Gemischt", "Mixed"], "dirHd": ["Hd. → Dialekt", "German → Dialect"], "tipDirWi": ["Du siehst das Dialekt-Wort und suchst das Hochdeutsche.", "You see the dialect word and look for the Standard German one."], "tipDirMix": ["Mal vom Dialekt ins Hochdeutsche, mal umgekehrt.", "Sometimes dialect → Standard German, sometimes the other way round."], "tipDirHd": ["Du siehst das Hochdeutsche und suchst das Dialekt-Wort.", "You see the Standard German word and look for the dialect one."], "sTopic": ["Thema", "Topic"], "sSerie": ["🔥 Serie", "🔥 Streak"], "sRekord": ["Rekord", "Record"], "sHeute": ["Heute", "Today"], "sBug": ["⚑ Diese Karte melden", "⚑ Report this card"], "bugHint": ["Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.", "Card copied. Paste it into “Welche Karte?” in the form."], "msgStart": ["Schaff 20 in Folge im Thema, dann kommt a Bonusfrage aus allen Themen. Die 🔥 Serie läuft über alle Themen weiter, bis zum ersten Fehler. Bei 5, 10 und 15 kriagst an 🛡️ Joker.", "Get 20 in a row in a topic to unlock a bonus question from all topics. Your 🔥 streak continues across topics until your first mistake. At 5, 10 and 15 you get a 🛡️ joker."], "days": ["Tageshighscore", "Daily high score"], "wTitle": ["📖 Wissen zum Nachlesen", "📖 Background reading"], "wSub": ["Kleine Wiener Grammatik · Unterschiede Wien und Niederösterreich · Was man nur in Österreich sagt, Alt-Wienerisch und „derb“", "Mini Viennese grammar · Vienna vs. Lower Austria · Words only Austrians use, Old Viennese and “rude” words"], "fbH": ["⭐ Bewerten &amp; Feedback", "⭐ Rate &amp; give feedback"], "fbP": ["Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.", "How do you like the Dojo? Found a mistake, want a new topic? Tell us. No account needed, takes a minute. (The form is in German.)"], "fbBtn": ["Bewertung &amp; Feedback abgeben ↗", "Rate &amp; send feedback ↗"], "voteH": ["🗳️ Mitbestimmen", "🗳️ Have your say"], "voteP": ["Welches Thema soll als Nächstes ins Dojo? Fußball, Heuriger, Arbeit, Liebe, Wienerlied, Mehlspeisen, Wetter oder dein eigener Vorschlag. Eine Stimme, kein Konto nötig.", "Which topic should come next? Football, wine taverns, work, love, Viennese songs, pastries, weather or your own idea. One vote, no account needed."], "voteBtn": ["Jetzt abstimmen ↗", "Vote now ↗"], "albumT": ["😂 Deine Witze-Sammlung", "😂 Your joke collection"], "albumX": ["Schließen", "Close"], "albumP": ["Für jeden gebrochenen <b>Themen-Rekord</b> (mindestens 5 richtig in Folge und mehr als dein bisheriger Bestwert in diesem Thema) gibt's einen Wiener Witz aus diesem Thema.", "Every <b>topic record</b> you break (at least 5 in a row and more than your previous best in that topic) unlocks a Viennese joke from that topic. The jokes stay in dialect, with a short English explanation."], "albumSrc": ["Witze: nacherzählte Volkswitze und eigene, im Wiener Stil. Sprüche oben: 1000things.at, Babbel Magazin, Vienna Würstelstand.", "Jokes: retold folk jokes and original ones in Viennese style. Sayings: 1000things.at, Babbel Magazine, Vienna Würstelstand."], "gateT": ["Nichts für Kinder", "Not for children"], "gateP": ["Das Deck „Schimpfen“ enthält ordinäre und derbe Ausdrücke. Es ist nur für Erwachsene.", "The “Swearing” deck contains vulgar and rude expressions. It is for adults only."], "gateYear": ["Geburtsjahr", "Year of birth"], "gateChk": ["Ich bestätige, dass ich mindestens 18 Jahre alt bin.", "I confirm that I am at least 18 years old."], "gateNo": ["Abbrechen", "Cancel"], "gateOk": ["Freischalten", "Unlock"], "langTip": ["Switch to English", "Auf Deutsch umschalten"], "hd": ["Hochdeutsch", "Standard German"], "dWien": ["Wienerisch", "Viennese"], "dNoe": ["Niederösterreichisch", "Lower Austrian"], "qToHd": ["Was heißt das auf <b>Hochdeutsch</b>?", "What is this in <b>Standard German</b>?"], "qToDia": ["Wie sagt man das auf <b>{d}</b>?", "How do you say this in <b>{d}</b>?"], "bonus": ["⭐ Bonusfrage", "⭐ Bonus question"], "hintFront": ["Überleg dir die Antwort im Kopf, dann dreh die Karte um und schau, ob du richtig lagst.", "Think of the answer, then flip the card and see if you were right."], "flip": ["Karte umdrehen", "Flip card"], "knew": ["Hast du es gewusst?", "Did you know it?"], "no": ["✗ Nicht gewusst", "✗ Didn't know"], "yes": ["✓ Gewusst", "✓ Knew it"], "next": ["Weiter", "Next"], "listen": ["🔊 Anhören", "🔊 Listen"], "voiceNote": ["Die Computerstimme spricht Hochdeutsch, der Dialekt klingt nur ungefähr.", "The computer voice speaks Standard German, so the dialect only sounds roughly right."], "noSound": ["Kein Ton auf diesem Gerät", "No sound on this device"], "soundNA": ["Ton nicht verfügbar", "Sound not available"], "right": ["Richtig!", "Correct!"], "wrong": ["Leider falsch.", "Sorry, wrong."], "picked": ["Du hast gewählt:", "You picked:"], "inWien": ["In Wien:", "In Vienna:"], "inNoe": ["In NÖ:", "In Lower Austria:"], "sameNoe": ["In NÖ wie in Wien.", "Same in Lower Austria as in Vienna."], "score": ["Richtig {a} · Falsch {b}", "Right {a} · Wrong {b}"], "inTopic": ["Im Thema: {n}", "This topic: {n}"], "topicsDone": ["Themen {a}/{b} bestanden", "Topics passed: {a}/{b}"], "m5": ["Leiwand! 5 richtig in Folge.", "Leiwand (great)! 5 in a row."], "m10": ["Ur guat! 10er-Serie.", "Ur guat (really good)! A 10 streak."], "m15": ["Heast, nur no 5!", "Heast (hey), only 5 to go!"], "m20": ["Oida, 20 in Folge! Gratuliere. Der Themen-Balken startet neu, die 🔥 Serie läuft weiter.", "Oida, 20 in a row! Congratulations. The topic bar restarts, your 🔥 streak keeps going."], "lifeOn": ["🛡️ Joker bereit (zurück auf {n})", "🛡️ Joker ready (back to {n})"], "lifeUsed": ["Joker verbraucht", "Joker used"], "rec": ["😂 Neuer Rekord in {t} ({n})! Ein Witz ist freigeschaltet. Klick oben auf 😂.", "😂 New record in {t} ({n})! A joke is unlocked. Click 😂 at the top."], "albumCat": ["{t} · Rekord {n}", "{t} · record {n}"], "lockTxt": ["Brich deinen Rekord in „{t}“, um diesen Witz freizuschalten.", "Break your record in “{t}” to unlock this joke."], "bonusAll": ["🏆 Bonusfrage richtig! Alle Themen gschafft!", "🏆 Bonus question right! All topics done!"], "bonusOk": ["✅ Bonusfrage richtig, {a} bestanden! Weiter mit: {b}", "✅ Bonus question right, {a} passed! Next up: {b}"], "bonus20": ["🎉 20 gschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.", "🎉 20 done! Now comes the ⭐ bonus question from all topics. Get it right to pass the topic."], "checkpoint": [" 🛡️ Checkpoint {n}: Du hast an Joker.", " 🛡️ Checkpoint {n}: you have a joker."], "keepGoing": ["Weiter so! No {n} bis zum Ziel. 🔥 Serie {s}.", "Keep going! {n} more to the goal. 🔥 Streak {s}."], "serieLost": [" 🔥 Serie bei {n} gerissen.", " 🔥 Streak broken at {n}."], "cardNo": ["Nicht gewusst, kein Problem. Die Karte kommt später wieder.", "Didn't know it, no problem. The card will come back later."], "falsch": ["Falsch.", "Wrong."], "bonusMissed": ["Bonusfrage verpasst. ", "Bonus question missed. "], "jokerBack": ["🛡️ Joker: Thema zurück auf {n}.", "🛡️ Joker: topic back to {n}."], "bonusNoJoker": ["Bonusfrage verpasst, ka Joker mehr. Thema {t} zurück auf 0.", "Bonus question missed, no joker left. {t} back to 0."], "topicZero": ["Thema zurück auf 0. Geh bitte!", "Topic back to 0. Geh bitte (oh come on)!"], "finaleLab": ["🏆 Alle {n} Themen gschafft · Gratuliere!", "🏆 All {n} topics done · Congratulations!"], "finaleHint": ["A Wiener Weisheit für di. Du bist jetzt offiziell Stammgast in diesem Dojo.", "A bit of Viennese wisdom for you. You're now officially a regular in this Dojo."], "other": ["Anderer Spruch", "Another saying"], "restart": ["Alle Themen neu starten", "Restart all topics"], "newRound": ["Neue Runde! Schaff 20 in Folge pro Thema.", "New round! Get 20 in a row per topic."], "tOk": ["Richtig heute", "Right today"], "tBest": ["Beste Serie heute", "Best streak today"], "tTopics": ["Themen heute", "Topics today"], "tNo": ["Fehler heute", "Mistakes today"], "bestDay": ["Bester Tag: {d} mit Serie {s} und {n} richtigen Antworten", "Best day: {d} with a streak of {s} and {n} right answers"], "noEntry": ["No ka Eintrag. Leg los!", "No entries yet. Let's go!"], "gate18": ["🔞 Ab 18", "🔞 18+"], "swear": ["Schimpfen auf Wienerisch", "Swearing in Viennese"], "gateLocked": ["Dieses Deck ist gesperrt, bis du bestätigst, dass du mindestens 18 bist.", "This deck is locked until you confirm you are at least 18."], "gateOpen": ["Altersabfrage öffnen", "Open age check"], "gErrChk": ["Bitte bestätige, dass du mindestens 18 bist.", "Please confirm that you are at least 18."], "gErrYear": ["Bitte ein gültiges Geburtsjahr eingeben.", "Please enter a valid year of birth."], "gErrAge": ["Dieses Deck ist erst ab 18. Probier ein anderes Thema!", "This deck is 18+ only. Try another topic!"], "askL": ["☕ Frag den Wiener", "☕ Ask the Viennese"], "askPh": ["z. B. Woher kommt Oida?", "e.g. Where does “Oida” come from?"], "askBtn": ["Fragen", "Ask"], "thinking": ["Denkt nach…", "Thinking…"], "noSensei": ["Der Wiener ist hier nicht da. Öffne die Seite auf claude.ai.", "The Viennese isn't available here. Open the page on claude.ai."], "errNG": ["Du hast dem Dojo nicht erlaubt, Claude zu fragen.", "You didn't allow the Dojo to ask Claude."], "errRL": ["Grad zu viele Fragen. Probier's gleich nochmal.", "Too many questions right now. Try again in a moment."], "errSD": ["Claude ist für diesen Account nicht verfügbar.", "Claude isn't available for this account."], "errSE": ["Bitte melde dich neu an.", "Please sign in again."], "errRF": ["Darauf kann der Wiener nicht antworten.", "The Viennese can't answer that."], "errGen": ["Das hat nicht geklappt. Probier's nochmal.", "That didn't work. Please try again."]};
+  Object.assign(UI,{"hsH":["🏆 Bestenliste","🏆 Leaderboard"],"hsP":["Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.","The longest 🔥 streaks of all Dojo guests. No account: enter a name and submit your record."],
+  "hsBtn":["Rekord eintragen ({n})","Submit record ({n})"],"hsPh":["Dein Name","Your name"],"hsNone":["No ka Eintrag. Sei der Erste!","No entries yet. Be the first!"],"hsNeed":["Erst a Serie spielen, dann eintragen.","Play a streak first, then submit."],"hsName":["Bitte an Namen eingeben.","Please enter a name."],
+  "hsOk":["Eingetragen! Platz {r} mit Serie {n}.","Submitted! Rank {r} with a streak of {n}."],"hsErr":["Hat ned geklappt. Probier's später nochmal.","That didn't work. Please try again later."],
+  "fbTF":["⭐ Bewerten & Feedback","⭐ Rate & give feedback"],"fbTB":["⚑ Karte melden","⚑ Report card"],"fbTV":["🗳️ Mitbestimmen","🗳️ Have your say"],
+  "fbCardL":["Gemeldete Karte","Reported card"],"fbStarL":["Wie gefällt dir das Dojo?","How do you like the Dojo?"],"fbVoteL":["Welches Thema als Nächstes?","Which topic next?"],
+  "fbTxtF":["Was gefällt dir, was fehlt? (freiwillig)","What do you like, what's missing? (optional)"],"fbTxtB":["Was stimmt nicht an der Karte?","What's wrong with this card?"],"fbTxtV":["Eigener Vorschlag oder Kommentar (freiwillig)","Your own idea or a comment (optional)"],
+  "fbCancel":["Abbrechen","Cancel"],"fbSend":["Senden","Send"],"fbThanks":["Danke! Is angekommen. 🙏","Thanks! It arrived. 🙏"],"fbEmpty":["Bitte Sterne vergeben oder was reinschreiben.","Please give stars or write something."],
+  "fbFail":["Senden hat ned geklappt.","Sending didn't work."],"fbAlt":["Stattdessen das Formular öffnen ↗","Open the form instead ↗"],"fbRL":["Grad zu viel auf einmal. Probier's später nochmal.","Too much at once. Please try again later."]});
   const MEAN_EN={"g0": "Hi! / Bye! (Servus)", "g1": "Hi there!", "g2": "Good day! (formal)", "g3": "Bye!", "g4": "dude, mate", "g5": "Listen! / Hey!", "g6": "great, awesome", "g7": "very, totally", "g8": "It's fine. / OK.", "g9": "Sure. / Of course.", "g10": "Oh come on! / Stop it!", "g11": "What's up?", "g12": "I have no idea.", "g13": "at home", "g14": "I don't know.", "g15": "two", "g16": "hot", "g17": "I don't care.", "g18": "to work", "g19": "buddy, friend", "g20": "a little", "g21": "today / yesterday", "g22": "January", "g23": "February", "g24": "the bag", "g25": "the cupboard", "g26": "Let's go!", "g27": "We'll see.", "f0": "the tomato", "f1": "the potatoes", "f2": "the cauliflower", "f3": "horseradish", "f4": "green beans", "f5": "apricots", "f6": "redcurrants", "f7": "curd cheese (quark)", "f8": "whipped cream", "f9": "minced meat", "f10": "the bread roll", "f11": "the crescent roll", "f12": "thin pancakes (crêpes)", "f13": "a cheese sausage (Käsekrainer)", "f14": "a hot sausage", "f15": "the meat", "f16": "half a litre of beer", "f17": "0.3 litres of beer", "f18": "0.2 litres of beer", "f19": "a wine spritzer", "f20": "a Viennese milky coffee", "f21": "the big mug", "f22": "the snack, light meal", "f23": "to fancy something", "f24": "The bill, please!", "f25": "the shot glass", "f26": "the pub, simple inn", "f27": "wine tavern with its own wine", "s0": "wit, charm, also fibbing", "s1": "to crack jokes", "s2": "the bad mood", "s3": "grumpy", "s4": "to moan, to grumble", "s5": "to whine constantly", "s6": "unpleasant, annoying", "s7": "fuss, unnecessary hassle", "s8": "the idiot", "s9": "the idiot", "s10": "the crook, rascal", "s11": "the meanie, rascal", "s12": "Get lost!", "s13": "Are you crazy?", "s14": "Hey, how are you talking to me?", "s15": "That won't be enough. / Won't work.", "s16": "Nothing is certain.", "s17": "You'll be amazed! / Crazy!", "s18": "Nonsense!", "s19": "whatever, doesn't matter", "s20": "polite old greeting (to ladies)", "s21": "Your humble servant!", "s22": "No rush.", "w0": "the tram", "w1": "the stone", "w2": "to go home", "w3": "public transport", "w4": "the ticket inspector", "w5": "the neighbourhood", "w6": "the small park", "w7": "the sausage stand", "w8": "the kiosk (papers, tobacco, tickets)", "w9": "the corner grocery", "w10": "the horse-drawn carriage", "w11": "St. Stephen's Cathedral", "w12": "the amusement park (with Ferris wheel)", "w13": "in the 10th district", "w14": "the caretaker", "w15": "the hallway", "w16": "the staircase", "w17": "the sticker, toll vignette", "w18": "the pavement café terrace", "w19": "the pavement", "w20": "the big ring road around the inner districts", "w21": "Stand back, please!", "w22": "Where is the underground here?", "w23": "to go in / to go out", "a0": "the water basin in the hallway of old tenements", "a1": "the pavement", "a2": "the washbasin", "a3": "the sofa", "a4": "the umbrella", "a5": "the crook, swindler", "a6": "to go out on the town", "a7": "slowly, leisurely", "a8": "the ceiling", "a9": "the armchair", "a10": "the shelf, rack", "a11": "to annoy, to pester", "a12": "nuisance, hassle", "a13": "the mess, nonsense", "a14": "shabby, mean", "a15": "trouble, squabbling", "a16": "luck", "a17": "the rogue, also pimp", "a18": "the carefree playboy", "a19": "the love affair, also sweetheart", "a20": "the costume party", "a21": "the lackey, servant", "a22": "the small, simple café", "a23": "the lemonade", "a24": "the steep stony meadow", "a25": "the rabble, the bunch", "x0": "Hey, you idiot!", "x1": "Get lost!", "x2": "Arse! (also: get lost!)", "x3": "the arsehole", "x4": "Now everything's screwed.", "x5": "I couldn't care less.", "x6": "the damn cop", "x7": "He's blown it with me.", "x8": "I'll smack you one!", "x9": "You're about to get slapped!", "x10": "Turn around and go, you dummy!", "x11": "the fool, naive person", "x12": "boring conformist", "x13": "the cop (derogatory)", "x14": "the cop (derogatory)", "x15": "Shut your mouth!", "x16": "Shut up!", "x17": "an ugly, grumpy face", "x18": "the wimp", "x19": "the weakling, crybaby", "x20": "He's scared!", "x21": "That drives me mad!", "x22": "a fat person", "x23": "someone with big ears", "x24": "the small, scrawny person", "x25": "the shirker, slacker", "x26": "someone who's been in prison", "x27": "Disappear!", "x28": "Get lost! (jokingly)", "x29": "to look stupid and clueless", "x30": "the idiot", "x31": "Damn it!"};
   const SP_EN={"s1": "Bye, kisses, see you soon!", "s2": "Will you give grandma a kiss?", "s3": "Don't get so worked up! (from the TV series “Muttertag”)", "s4": "I'm telling you right away, it wasn't me! (from “Muttertag”)", "s5": "There's still time for one more beer.", "s6": "No schnitzel today, big occasion. (from “Kaisermühlen Blues”)", "s7": "Don't insult my beer! (from “Ein echter Wiener geht nicht unter”)", "s8": "The schnitzel was really good.", "s9": "Shall we have one last glass of wine before we go?", "s10": "Don't talk nonsense!", "s11": "That drives me mad!", "s12": "He's scared.", "s13": "You're about to get slapped!", "s14": "I won't watch such rubbish.", "s15": "Shall we have a wine spritzer at the little pub on the corner?", "s16": "We haven't been to a wine tavern at all this year.", "s17": "That's a really tough job.", "s18": "Get lost! (usually jokingly)", "s19": "He kicked the bucket (he died).", "s20": "Today we party hard!", "s21": "Today I'm getting properly drunk.", "s22": "Put on your Sunday best!", "s23": "I couldn't care less.", "s24": "Shut your mouth!", "s25": "Hey, you idiot, get lost!", "s26": "Now everything's screwed."};
   const WZ_EN={"w1": "“Grüß Gott” (literally “greet God”) taken literally.", "w2": "Oida is the all-purpose way to address someone.", "w3": "Baba means bye, not dad.", "w4": "Classic Viennese waiter humour.", "w5": "Gspritzter = wine spritzer, Bim = tram.", "w6": "Eitrige = cheese sausage.", "w7": "Raunzen = moaning, the Viennese national sport.", "w8": "Viennese grumpiness beats any pessimist.", "w9": "Grumpiness as proof of identity.", "w10": "“Free” as in costing nothing.", "w11": "Short ways, short answers.", "w12": "Schwarzkappler = ticket inspector.", "w13": "Old Viennese wisdom.", "w14": "Gspusi = love affair.", "w15": "Bassena = old shared water basin in the hallway, a gossip spot.", "w16": "Koffer (suitcase) = idiot.", "w17": "Schleich di = get lost.", "w18": "Watschenbaum = the tree slaps fall from."};
@@ -711,6 +756,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   const bugHtml=c=>`<div class="sayrow"><a class="bug" href="${FORM}" target="_blank" rel="noopener" data-card="${esc(c.wi+" = "+c.hd+(c.noe?" (NÖ: "+c.noe+")":""))}">🐞 Fehler bei dieser Karte melden</a><span class="bug-hint" hidden>Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.</span></div>`;
   const setBug=c=>{const a=$("#sideBug");if(!a||!c)return;a.dataset.card=c.wi+" = "+c.hd+(c.noe?" (NÖ: "+c.noe+")":"");const h=a.nextElementSibling;if(h)h.hidden=true;};
   document.addEventListener("click",e=>{const a=e.target.closest(".bug");if(!a)return;
+    if(API_ON&&typeof openFb==="function"){e.preventDefault();openFb("bug",a.dataset.card||"");return;}
     const h=a.nextElementSibling;
     try{navigator.clipboard.writeText(a.dataset.card).then(()=>{if(h)h.hidden=false;}).catch(()=>{});}catch(err){}
   });
@@ -729,6 +775,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   const doneCount=()=>CAMP.filter(k=>done[k]).length;
   function renderScore(){
     $("#score").textContent=T("score",{a:score.ok,b:score.no});
+    {const hb=document.getElementById("hsSend");if(hb)hb.textContent=T("hsBtn",{n:best});}
     const s=run;
     $("#stNum").textContent=bonus?"⭐":s;
     $("#stRing").style.setProperty("--p",bonus?100:Math.min(s,20)/20*100);
@@ -775,6 +822,15 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   // ---- Anonyme Statistik (Google-Formular, aus solange TRACK.url leer) ----
   const TRACK={url:"https://docs.google.com/forms/d/e/1FAIpQLSfLMCiDjU8Fs7kYsFPGgTf43u5rygWrRUHnFF58tp19fSY-VA/formResponse",e:{set:"entry.359920970",topics:"entry.1053893183",ok:"entry.44368377",no:"entry.1082048446",best:"entry.1082761211",rec:"entry.597537572",min:"entry.588406045",dev:"entry.945445590",vid:"entry.1526991492",geo:"entry.1318686726"}};
   const ST={ok:0,no:0,best:0,rec:0,t0:Date.now(),decks:{}};
+  // ---- Cloudflare: eigene API (D1) + Web Analytics ----
+  const CF_HOST="https://dojo.ijustwondersometimes.workers.dev";
+  const API_ON=location.protocol==="https:"&&/(^|\.)(github\.io|workers\.dev)$/.test(location.hostname);
+  const API=location.hostname.endsWith("workers.dev")?"":CF_HOST;
+  const HOSTTAG=location.protocol==="file:"?" · datei":location.hostname.endsWith("github.io")?" · github":location.hostname.endsWith("workers.dev")?" · cloudflare":" · web";
+  const CF_BEACON=""; // Token aus Cloudflare → Web Analytics → Site hinzufügen (leer = aus)
+  if(CF_BEACON&&API_ON){const sc=document.createElement("script");sc.defer=true;sc.src="https://static.cloudflareinsights.com/beacon.min.js";sc.dataset.cfBeacon=JSON.stringify({token:CF_BEACON});document.head.appendChild(sc);}
+  // text/plain = keine CORS-Vorabanfrage, klappt auch beim Verlassen der Seite
+  function apiPost(path,data){return fetch(API+path,{method:"POST",keepalive:true,headers:{"content-type":"text/plain"},body:JSON.stringify(data)});}
   const statOn=()=>{try{return localStorage.getItem("weanerdojo-stats")!=="off";}catch(e){return true;}};
   function vid(){try{let v=localStorage.getItem("weanerdojo-vid");if(!v){v=Math.random().toString(36).slice(2,8);localStorage.setItem("weanerdojo-vid",v);}return v;}catch(e){return "-";}}
   function stat(ok,rec){const k=(bonus?"bonus·":"")+deck,x=ST.decks[k]||(ST.decks[k]={ok:0,no:0});if(ok){ST.ok++;x.ok++;if(score.streak>ST.best)ST.best=score.streak;if(rec)ST.rec++;}else{ST.no++;x.no++;}if(ST.ok+ST.no>=5)sendStats();}
@@ -783,9 +839,10 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   function sendStats(visit){
     if(!TRACK.url||!statOn()||(!visit&&ST.ok+ST.no===0))return;
     const v=visit?{set:[LANG,dia,mode,dir].join(" · "),topics:"👋 Besuch",ok:0,no:0,best:0,rec:0,min:0,
-      dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+(location.hostname.endsWith("github.io")?" · web":" · datei"),vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()}
+      dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+HOSTTAG,vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()}
     :{set:[LANG,dia,mode,dir].join(" · "),topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,
-      min:Math.max(1,Math.round((Date.now()-ST.t0)/60000)),dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+(location.hostname.endsWith("github.io")?" · web":" · datei"),vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()};
+      min:Math.max(1,Math.round((Date.now()-ST.t0)/60000)),dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+HOSTTAG,vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()};
+    if(API_ON){try{apiPost("/api/stats",Object.assign({kind:visit?"visit":"progress",decks:visit?{}:ST.decks},v)).catch(()=>{});}catch(e){}}
     try{const fd=new URLSearchParams();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));fetch(TRACK.url,{method:"POST",mode:"no-cors",keepalive:true,body:fd}).catch(()=>{});if(visit)return;ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}catch(e){}
   }
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendStats();});
@@ -1038,6 +1095,64 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
 
   // Sprache anwenden: statische Texte, Namen, Wissen, dann neu zeichnen
   const WISSEN_DE=$("#wissenInner").innerHTML;
+  // ---- Feedback, Fehler melden, Abstimmen (Cloudflare D1; Google-Formular bleibt als Ausweich) ----
+  const VOTES=[["Fußball","Football"],["Heuriger","Wine taverns"],["Arbeit","Work"],["Liebe","Love"],["Wienerlied","Viennese songs"],["Mehlspeisen","Pastries"],["Wetter","Weather"],["Eigener Vorschlag","Own idea"]];
+  const FB_FORMS={feedback:"https://forms.gle/J5YVc7wGqwLjL6ny5",bug:"https://forms.gle/J5YVc7wGqwLjL6ny5",vote:"https://forms.gle/CPLAtFVDDcbW2mgP8"};
+  let fbKind="feedback",fbRate=0,fbBack=null;
+  function paintStars(){$("#fbStars").querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("on",i<fbRate);b.setAttribute("aria-pressed",i<fbRate);});}
+  function openFb(kind,card){
+    fbKind=kind;fbRate=0;fbBack=document.activeElement;
+    $("#fbT").textContent=T(kind==="bug"?"fbTB":kind==="vote"?"fbTV":"fbTF");
+    $("#fbCardRow").hidden=kind!=="bug";$("#fbCard").textContent=card||"–";
+    $("#fbStarRow").hidden=kind!=="feedback";$("#fbVoteRow").hidden=kind!=="vote";
+    $("#fbStars").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" aria-label="${n}">★</button>`).join("");paintStars();
+    $("#fbVote").innerHTML=VOTES.map(v=>`<option value="${esc(v[0])}">${esc(EN()?v[1]:v[0])}</option>`).join("");
+    $("#fbTextL").textContent=T(kind==="bug"?"fbTxtB":kind==="vote"?"fbTxtV":"fbTxtF");
+    $("#fbText").value="";$("#fbMsg").textContent="";$("#fbMsg").className="feedback";$("#fbSend").disabled=false;
+    $("#fbDlg").hidden=false;(kind==="vote"?$("#fbVote"):kind==="bug"?$("#fbText"):$("#fbStars button")).focus();
+    $("#fbDlg").dataset.card=card||"";
+  }
+  function closeFb(){$("#fbDlg").hidden=true;if(fbBack&&fbBack.focus)fbBack.focus();}
+  $("#fbStars").onclick=e=>{const b=e.target.closest("button");if(!b)return;fbRate=+b.getAttribute("aria-label");paintStars();};
+  $("#fbX").onclick=closeFb;
+  $("#fbDlg").addEventListener("click",e=>{if(e.target.id==="fbDlg")closeFb();});
+  $("#fbDlg").addEventListener("keydown",e=>{if(e.key==="Escape")closeFb();});
+  $("#fbSend").onclick=async()=>{
+    const text=$("#fbText").value.trim(),m=$("#fbMsg");
+    const d={kind:fbKind,text,vid:vid(),lang:LANG};
+    if(fbKind==="feedback")d.rating=fbRate;
+    if(fbKind==="vote")d.topic=$("#fbVote").value;
+    if(fbKind==="bug")d.card=$("#fbDlg").dataset.card;
+    if((fbKind==="feedback"&&!fbRate&&!text)||(fbKind==="bug"&&!text)){m.className="feedback no";m.textContent=T("fbEmpty");return;}
+    $("#fbSend").disabled=true;
+    try{const r=await apiPost("/api/feedback",d);if(!r.ok)throw r.status;m.className="feedback ok";m.textContent=T("fbThanks");setTimeout(closeFb,1400);}
+    catch(err){$("#fbSend").disabled=false;m.className="feedback no";m.innerHTML=esc(T(err===429?"fbRL":"fbFail"))+` <a class="fb-alt" href="${FB_FORMS[fbKind]}" target="_blank" rel="noopener">${esc(T("fbAlt"))}</a>`;}
+  };
+  if(API_ON){
+    $("#fbLink").addEventListener("click",e=>{e.preventDefault();openFb("feedback");});
+    $("#voteLink").addEventListener("click",e=>{e.preventDefault();openFb("vote");});
+  }
+  // ---- Öffentliche Bestenliste (ohne Anmeldung) ----
+  let hsTop=[];
+  function hsMyName(){try{return localStorage.getItem("weanerdojo-name")||"";}catch(e){return "";}}
+  function renderHs(){
+    if(!API_ON)return;
+    const me=hsMyName();
+    $("#hsList").innerHTML=hsTop.length?hsTop.map(r=>`<li${r.name===me?' class="me"':""}><span class="nm">${esc(r.name)}</span><span class="sc">🔥 ${r.best}</span></li>`).join(""):`<li class="hint" style="counter-increment:none">${esc(T("hsNone"))}</li>`;
+    $("#hsSend").textContent=T("hsBtn",{n:best});$("#hsName").placeholder=T("hsPh");
+    if(!$("#hsName").value)$("#hsName").value=me;
+  }
+  async function loadHs(){try{const r=await fetch(API+"/api/highscore");const j=await r.json();if(!j.ok)return;hsTop=j.top||[];$("#hs").hidden=false;renderHs();}catch(e){}}
+  $("#hsSend").onclick=async()=>{
+    const name=$("#hsName").value.trim(),m=$("#hsMsg");
+    if(!best){m.textContent=T("hsNeed");return;}
+    if(!name){m.textContent=T("hsName");$("#hsName").focus();return;}
+    try{localStorage.setItem("weanerdojo-name",name);}catch(e){}
+    $("#hsSend").disabled=true;
+    try{const r=await apiPost("/api/score",{vid:vid(),name,best});const j=await r.json();if(!j.ok)throw 0;m.textContent=T("hsOk",{r:j.rank,n:j.best});await loadHs();}
+    catch(e){m.textContent=T("hsErr");}
+    $("#hsSend").disabled=false;
+  };
   function applyLang(){
     document.documentElement.lang=LANG;
     document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(!(k in UI))return;el.innerHTML=EN()?UI[k][1]:UI[k][0];});
@@ -1047,14 +1162,14 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     $("#langBtn").textContent=EN()?"DE":"EN";
     $("#langBtn").setAttribute("aria-label",EN()?"Auf Deutsch umschalten":"Switch to English");
   }
-  $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(T("msgStart"));render();};
+  $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(T("msgStart"));render();renderHs();};
   $("#spruch").onclick=nextSpruch;
   $("#witzBtn").onclick=openAlbum;
   $("#albumX").onclick=()=>{$("#album").hidden=true;$("#spruch").focus();};
   $("#album").addEventListener("click",e=>{if(e.target.id==="album")$("#album").hidden=true;});
   $("#album").addEventListener("keydown",e=>{if(e.key==="Escape")$("#album").hidden=true;});
   (function(){const h=$("#hCrests");["#v-wien svg","#v-noe svg"].forEach(q=>{const v=document.querySelector(q);if(v)h.appendChild(v.cloneNode(true));});})();
-  load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();
+  load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();loadHs();
 })();
 </script>
 
