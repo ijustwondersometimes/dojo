@@ -92,14 +92,15 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt=n=>Number(n||0).toLocaleString("de-AT");
   const when=ts=>new Date(ts).toLocaleString("de-AT",{timeZone:"Europe/Vienna",day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
-  async function api(p,opt){const r=await fetch("/admin/api/"+p,opt);if(r.status===401||r.status===403){document.body.innerHTML='<div class="msg">Kein Zugang – bitte Seite neu laden und Passwort eingeben.</div>';throw 0;}return r.json();}
+  async function api(p,opt){const r=await fetch("/admin/api/"+p,Object.assign({credentials:"same-origin",cache:"no-store"},opt));if(r.status===401||r.status===403){document.body.innerHTML='<div class="msg">Kein Zugang – bitte Seite neu laden und Passwort eingeben.</div>';throw 0;}const t=await r.text();try{return JSON.parse(t);}catch(e){throw new Error("Antwort "+r.status+" ist kein JSON: "+t.slice(0,120));}}
+  const showErr=e=>{if(e===0)return;let b=document.getElementById("err");if(!b){b=document.createElement("div");b.id="err";b.className="msg";b.style.cssText="background:#fde8e8;color:#9b1c1c;padding:12px;border-radius:10px;margin:12px 0;font-family:monospace;font-size:13px";document.querySelector("main,body").prepend(b);}b.textContent="Fehler beim Laden: "+(e&&e.message||e);};
   const rowsTable=(el,rows,label)=>{el.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.k||"–")}</td><td class="n">${fmt(r.n)}</td></tr>`).join(""):`<tr><td class="muted">${label||"Noch keine Daten"}</td></tr>`;};
 
   // Tabs
   document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
     document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
     ["stats","fb","hs"].forEach(t=>$("#tab-"+t).hidden=t!==b.dataset.tab);
-    ({stats:loadStats,fb:loadFb,hs:loadHs})[b.dataset.tab]();
+    ({stats:loadStats,fb:loadFb,hs:loadHs})[b.dataset.tab]().catch(showErr);
   });
 
   async function loadStats(){
@@ -116,7 +117,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     rowsTable($("#fbCount"),(s.feedback||[]).map(r=>({k:names[r.k]||r.k,n:r.n})),"Noch nichts eingegangen");
     rowsTable($("#dev"),s.devices||[]);rowsTable($("#geo"),s.geo||[]);rowsTable($("#set"),s.settings||[]);
   }
-  $("#days").onchange=loadStats;
+  $("#days").onchange=()=>loadStats().catch(showErr);
   $("#csvStats").onclick=()=>location.href="/admin/api/export?table=stats";
   $("#csvFb").onclick=()=>location.href="/admin/api/export?table=feedback";
 
@@ -141,7 +142,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   }
   $("#hsList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag aus der Bestenliste entfernen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"scores",vid:b.dataset.vid})});loadHs();};
 
-  loadStats().catch(()=>{});
+  loadStats().catch(showErr);
 })();
 </script>
 </body>
