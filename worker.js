@@ -1,6 +1,6 @@
 // Wien / NÖ Dojo – Cloudflare Worker
 // Öffentlich:  POST /api/stats · POST /api/feedback · GET /api/highscore · POST /api/score
-// Nur Admin:   /admin (Seite) und /admin/api/* – geschützt durch Cloudflare Access (JWT wird hier geprüft)
+// Nur Admin:   /admin (Seite) und /admin/api/* – geschützt durch ein Passwort (Worker-Secret ADMIN_PASSWORD)
 // Alles andere liefert die statischen Dateien (index.html usw.) aus.
 
 const SCHEMA = [
@@ -112,38 +112,47 @@ async function postScore(req, env) {
   return json({ ok: true, best: me.best, rank: rank.r });
 }
 
-// ---------- Cloudflare Access prüfen ----------
-let certCache = { at: 0, keys: [] };
-const b64u = (s) => Uint8Array.from(atob(s.replace(/-/g, "+").replace(/_/g, "/") + "===".slice((s.length + 3) % 4)), (c) => c.charCodeAt(0));
-const b64uJson = (s) => JSON.parse(new TextDecoder().decode(b64u(s)));
+// ---------- Admin-Passwort prüfen (Worker-Secret ADMIN_PASSWORD) ----------
+// Der Browser fragt per Login-Fenster nach Benutzername + Passwort (HTTP Basic Auth über HTTPS).
+// Der Benutzername ist egal, nur das Passwort zählt. Danach schickt der Browser es bei jedem
+// Aufruf von /admin/api/* automatisch mit – an der Admin-Seite muss nichts geändert werden.
+const enc = new TextEncoder();
+const sha256 = async (s) => new Uint8Array(await crypto.subtle.digest("SHA-256", enc.encode(s)));
 
-async function accessUser(req, env) {
-  const team = env.ACCESS_TEAM, aud = env.ACCESS_AUD;
-  if (!team || !aud) return { error: "setup" };
-  let token = req.headers.get("Cf-Access-Jwt-Assertion");
-  if (!token) {
-    const m = (req.headers.get("Cookie") || "").match(/(?:^|;\s*)CF_Authorization=([^;]+)/);
-    token = m && m[1];
-  }
-  if (!token) return { error: "login" };
+async function checkAdmin(req, env) {
+  const secret = env.ADMIN_PASSWORD;
+  if (!secret) return "setup";
+  const m = (req.headers.get("Authorization") || "").match(/^Basic\s+([A-Za-z0-9+/=]+)$/i);
+  if (!m) return "login";
+  let given = "";
   try {
-    const [h, p, s] = token.split(".");
-    const head = b64uJson(h), pay = b64uJson(p);
-    const iss = `https://${team}.cloudflareaccess.com`;
-    if (Date.now() - certCache.at > 3600e3 || !certCache.keys.some((k) => k.kid === head.kid)) {
-      const r = await fetch(`${iss}/cdn-cgi/access/certs`);
-      certCache = { at: Date.now(), keys: (await r.json()).keys || [] };
-    }
-    const jwk = certCache.keys.find((k) => k.kid === head.kid);
-    if (!jwk) return { error: "key" };
-    const key = await crypto.subtle.importKey("jwk", jwk, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]);
-    const valid = await crypto.subtle.verify("RSASSA-PKCS1-v1_5", key, b64u(s), new TextEncoder().encode(`${h}.${p}`));
-    const auds = Array.isArray(pay.aud) ? pay.aud : [pay.aud];
-    if (!valid || !auds.includes(aud) || pay.iss !== iss || (pay.exp || 0) * 1000 < Date.now()) return { error: "token" };
-    return { email: pay.email || "" };
+    const raw = Uint8Array.from(atob(m[1]), (c) => c.charCodeAt(0));
+    const pair = new TextDecoder().decode(raw); // UTF-8, damit auch Umlaute im Passwort gehen
+    given = pair.slice(pair.indexOf(":") + 1);
   } catch (e) {
-    return { error: "token" };
+    return "login";
   }
+  // Vergleich über Hashes in konstanter Zeit (verrät nichts über Länge oder Anfang des Passworts)
+  const [a, b] = await Promise.all([sha256(given), sha256(secret)]);
+  if (crypto.subtle.timingSafeEqual(a, b)) return null;
+  await new Promise((r) => setTimeout(r, 1000)); // Bremse gegen Durchprobieren
+  return "falsch";
+}
+
+function denyAdmin(path, why) {
+  if (why === "setup") {
+    const msg = "Admin ist noch nicht eingerichtet: Secret ADMIN_PASSWORD fehlt (npx wrangler secret put ADMIN_PASSWORD).";
+    return path.startsWith("/admin/api/")
+      ? json({ ok: false, error: "setup" }, 503)
+      : new Response(msg, { status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
+  }
+  const headers = {
+    "WWW-Authenticate": 'Basic realm="Dojo Admin", charset="UTF-8"',
+    "cache-control": "no-store",
+  };
+  return path.startsWith("/admin/api/")
+    ? json({ ok: false, error: "login" }, 401, headers)
+    : new Response("Kein Zugang.", { status: 401, headers: { ...headers, "content-type": "text/plain; charset=utf-8" } });
 }
 
 // ---------- Admin-API ----------
@@ -181,7 +190,7 @@ function csv(rows) {
   if (!rows.length) return "";
   const cols = Object.keys(rows[0]);
   const q = (v) => (v == null ? "" : /[",\n;]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v));
-  return "﻿" + [cols.join(";"), ...rows.map((r) => cols.map((c) => q(r[c])).join(";"))].join("\n");
+  return "\uFEFF" + [cols.join(";"), ...rows.map((r) => cols.map((c) => q(r[c])).join(";"))].join("\n");
 }
 
 async function adminApi(req, env, path, url) {
@@ -240,13 +249,8 @@ export default {
     }
 
     if (path === "/admin" || path.startsWith("/admin/") || path.startsWith("/admin.")) {
-      const u = await accessUser(req, env);
-      if (u.error) {
-        const msg = u.error === "setup"
-          ? "Admin ist noch nicht eingerichtet: ACCESS_TEAM und ACCESS_AUD fehlen in wrangler.jsonc."
-          : "Kein Zugang. Diese Seite ist nur über Cloudflare Access erreichbar.";
-        return path.startsWith("/admin/api/") ? json({ ok: false, error: u.error }, 403) : new Response(msg, { status: 403, headers: { "content-type": "text/plain; charset=utf-8" } });
-      }
+      const why = await checkAdmin(req, env);
+      if (why) return denyAdmin(path, why);
       if (path.startsWith("/admin/api/")) {
         try { await ensureSchema(env); return await adminApi(req, env, path, url); }
         catch (e) { return json({ ok: false, error: String(e.message || e) }, 500); }
