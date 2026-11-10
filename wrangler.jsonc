@@ -18,10 +18,5 @@
       "database_id": "7b4a1f3e-b777-4e58-b95d-e98ce9e10ce0"
     }
   ],
-  "vars": {
-    // Cloudflare Access: Team-Name (xyz aus xyz.cloudflareaccess.com) und Application Audience (AUD) Tag
-    "ACCESS_TEAM": "",
-    "ACCESS_AUD": ""
-  },
   "observability": { "enabled": true }
 }
