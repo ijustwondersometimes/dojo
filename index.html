@@ -819,8 +819,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
         :`<div class="album-item lock"><div class="wi">🔒 ???</div><div class="hd">${esc(T("lockTxt",{t:NAMES[c]}))}</div></div>`).join("")}</div>`;}).join("");
     $("#album").hidden=false;$("#albumX").focus();
   }
-  // ---- Anonyme Statistik (Google-Formular, aus solange TRACK.url leer) ----
-  const TRACK={url:"https://docs.google.com/forms/d/e/1FAIpQLSfLMCiDjU8Fs7kYsFPGgTf43u5rygWrRUHnFF58tp19fSY-VA/formResponse",e:{set:"entry.359920970",topics:"entry.1053893183",ok:"entry.44368377",no:"entry.1082048446",best:"entry.1082761211",rec:"entry.597537572",min:"entry.588406045",dev:"entry.945445590",vid:"entry.1526991492",geo:"entry.1318686726"}};
+  // ---- Anonyme Statistik (nur noch Cloudflare-Datenbank) ----
   const ST={ok:0,no:0,best:0,rec:0,t0:Date.now(),decks:{}};
   // ---- Cloudflare: eigene API (D1) + Web Analytics ----
   const CF_HOST="https://dojo.ijustwondersometimes.workers.dev";
@@ -837,18 +836,18 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   // Gesendet wird: 1x beim Öffnen (👋 Besuch), alle 5 Antworten (Zwischenstand) und der Rest beim Verlassen.
   // Grund: Am Handy (iPhone, Discord-Browser) geht das Senden beim Verlassen oft verloren.
   function sendStats(visit){
-    if(!TRACK.url||!statOn()||(!visit&&ST.ok+ST.no===0))return;
+    if(!API_ON||!statOn()||(!visit&&ST.ok+ST.no===0))return;
     const v=visit?{set:[LANG,dia,mode,dir].join(" · "),topics:"👋 Besuch",ok:0,no:0,best:0,rec:0,min:0,
       dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+HOSTTAG,vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()}
     :{set:[LANG,dia,mode,dir].join(" · "),topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,
       min:Math.max(1,Math.round((Date.now()-ST.t0)/60000)),dev:(matchMedia("(max-width:700px)").matches?"Handy":"PC")+HOSTTAG,vid:vid(),geo:(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone+" · "+(navigator.language||"-");}catch(e){return "-";}})()};
     if(API_ON){try{apiPost("/api/stats",Object.assign({kind:visit?"visit":"progress",decks:visit?{}:ST.decks},v)).catch(()=>{});}catch(e){}}
-    try{const fd=new URLSearchParams();for(const k in TRACK.e)if(TRACK.e[k])fd.append(TRACK.e[k],String(v[k]));fetch(TRACK.url,{method:"POST",mode:"no-cors",keepalive:true,body:fd}).catch(()=>{});if(visit)return;ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();}catch(e){}
+    if(visit)return;ST.ok=ST.no=ST.best=ST.rec=0;ST.decks={};ST.t0=Date.now();
   }
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")sendStats();});
   addEventListener("pagehide",()=>sendStats());
   setTimeout(()=>{try{if(sessionStorage.getItem("weanerdojo-visit"))return;sessionStorage.setItem("weanerdojo-visit","1");}catch(e){}sendStats(true);},1500);
-  if(TRACK.url){const o=$("#statOpt"),c=$("#statChk");o.hidden=false;c.checked=statOn();c.onchange=()=>{try{localStorage.setItem("weanerdojo-stats",c.checked?"on":"off");}catch(e){}};}
+  if(API_ON){const o=$("#statOpt"),c=$("#statChk");o.hidden=false;c.checked=statOn();c.onchange=()=>{try{localStorage.setItem("weanerdojo-stats",c.checked?"on":"off");}catch(e){}};}
   function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
   function hit(){
     const d=dayRec();
