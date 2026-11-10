@@ -14,8 +14,8 @@
     {
       "binding": "DB",
       "database_name": "dojo-db",
-      // Nach dem Anlegen der Datenbank im Dashboard hier die Database ID eintragen
-      "database_id": "HIER_DATABASE_ID_EINTRAGEN"
+      // D1-Datenbank dojo-db (Westeuropa), angelegt am 10.11.2026
+      "database_id": "7b4a1f3e-b777-4e58-b95d-e98ce9e10ce0"
     }
   ],
   "vars": {
