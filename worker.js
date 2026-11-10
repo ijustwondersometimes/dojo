@@ -256,8 +256,18 @@ export default {
         catch (e) { return json({ ok: false, error: String(e.message || e) }, 500); }
       }
       if (path !== "/admin") return Response.redirect(new URL("/admin", url), 302);
-      const page = await env.ASSETS.fetch(new Request(new URL("/admin", url), req));
-      const r = new Response(page.body, page);
+      // admin.html aus den statischen Dateien holen – mehrere Schreibweisen probieren
+      // und interne Weiterleitungen (z. B. /admin.html → /admin) selbst auflösen
+      let page = null;
+      for (const p of ["/admin.html", "/admin", "/admin/"]) {
+        let res = await env.ASSETS.fetch(new Request(new URL(p, url)));
+        const loc = res.headers.get("location");
+        if (res.status >= 300 && res.status < 400 && loc) res = await env.ASSETS.fetch(new Request(new URL(loc, url)));
+        if (res.ok) { page = res; break; }
+      }
+      if (!page) return new Response("admin.html nicht gefunden (liegt sie im Repo-Hauptordner?).", { status: 404, headers: { "content-type": "text/plain; charset=utf-8" } });
+      const r = new Response(page.body, { status: 200, headers: page.headers });
+      r.headers.set("content-type", "text/html; charset=utf-8");
       r.headers.set("cache-control", "no-store");
       r.headers.set("x-robots-tag", "noindex");
       return r;

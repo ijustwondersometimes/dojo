@@ -92,7 +92,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt=n=>Number(n||0).toLocaleString("de-AT");
   const when=ts=>new Date(ts).toLocaleString("de-AT",{timeZone:"Europe/Vienna",day:"2-digit",month:"2-digit",year:"2-digit",hour:"2-digit",minute:"2-digit"});
-  async function api(p,opt){const r=await fetch("/admin/api/"+p,opt);if(r.status===403){document.body.innerHTML='<div class="msg">Kein Zugang – bitte neu über Cloudflare Access anmelden.</div>';throw 0;}return r.json();}
+  async function api(p,opt){const r=await fetch("/admin/api/"+p,opt);if(r.status===401||r.status===403){document.body.innerHTML='<div class="msg">Kein Zugang – bitte Seite neu laden und Passwort eingeben.</div>';throw 0;}return r.json();}
   const rowsTable=(el,rows,label)=>{el.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.k||"–")}</td><td class="n">${fmt(r.n)}</td></tr>`).join(""):`<tr><td class="muted">${label||"Noch keine Daten"}</td></tr>`;};
 
   // Tabs
