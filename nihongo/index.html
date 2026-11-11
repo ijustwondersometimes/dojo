@@ -166,20 +166,30 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .copy a{color:var(--ai)}
 .stat-opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .stat-opt input{accent-color:var(--shu);width:15px;height:15px;margin:0}
-.fold summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
-.fold summary::-webkit-details-marker{display:none}
-.fold summary::before{content:"▸";color:var(--shu);font-size:18px}
-.fold[open] summary::before{content:"▾"}
-.fold[open] summary{margin-bottom:10px}
-.fold .fix+.fix{margin-top:10px}
+.lang-btn{font:inherit;font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;width:40px;height:40px;padding:0;cursor:pointer}
+.lang-btn:hover{border-color:var(--shu)}
+/* ---- Wissen zum Aufklappen (wie im Wien / NÖ Dojo) ---- */
+.wissen{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.wissen>summary{cursor:pointer;list-style:none;padding:16px 18px;display:flex;align-items:center;gap:14px}
+.wissen>summary::-webkit-details-marker{display:none}
+.wissen>summary:focus-visible{outline:2px solid var(--shu);outline-offset:2px;border-radius:14px}
+.wissen .wt{flex:1;min-width:0}
+.wissen .wt h2{margin:0}
+.wissen .wt p{margin:4px 0 0;font-size:14px;color:var(--muted)}
+.wissen .chev{color:var(--muted);font-size:20px;transition:transform .2s}
+.wissen[open] .chev{transform:rotate(90deg)}
+.wissen .inner{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+.wissen .inner h3{font-family:var(--f-display);font-weight:700;font-size:18px;margin:8px 0 0}
+.fix p b{color:var(--ink)}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>Nihongo Dojo<small>Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
+    <h1>Nihongo Dojo<small data-i18n="sub">Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
     <div class="head-r">
-      <div class="hanko" title="練習 (renshuu) = Übung" aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
+      <div class="hanko" id="hanko" title="練習 (renshuu) = Übung" aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
+      <button class="lang-btn" id="langBtn" type="button" title="Switch to English" aria-label="Switch to English">EN</button>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
@@ -200,13 +210,13 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 
   <div class="bar">
     <div class="modes" role="group" aria-label="Lernmodus">
-      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true">Quiz</button>
-      <button class="mode" id="m-card" data-mode="card" aria-pressed="false">Karteikarten</button>
+      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true" data-i18n="quiz">Quiz</button>
+      <button class="mode" id="m-card" data-mode="card" aria-pressed="false" data-i18n="card">Karteikarten</button>
     </div>
     <div class="modes" role="group" aria-label="Schrift">
-      <span class="lbl">Schrift</span>
+      <span class="lbl" data-i18n="script">Schrift</span>
       <button class="mode" id="s-jp" data-script="jp" aria-pressed="true">日本語</button>
-      <button class="mode" id="s-both" data-script="both" aria-pressed="false">Beides</button>
+      <button class="mode" id="s-both" data-script="both" aria-pressed="false" data-i18n="both">Beides</button>
       <button class="mode" id="s-ro" data-script="ro" aria-pressed="false">Romaji</button>
     </div>
     <div class="score" id="score">Richtig 0 · Falsch 0 · Serie 0</div>
@@ -214,7 +224,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 
   <div class="streak" id="streak">
     <div class="st-top">
-      <span class="st-num"><b id="stNum">0</b> / 20 in Folge</span>
+      <span class="st-num"><b id="stNum">0</b> <span data-i18n="inRow">/ 20 in Folge</span></span>
       <span class="st-meta" id="stMeta">Rekord 0 · Ziele 0</span>
     </div>
     <div class="track" aria-hidden="true">
@@ -231,76 +241,71 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   <div class="card" id="card" aria-live="polite"></div>
 
   <section class="days">
-    <h2>Tageshighscore</h2>
+    <h2 data-i18n="days">Tageshighscore</h2>
     <div class="tiles" id="today"></div>
     <div class="week" id="week" aria-label="Richtige Antworten der letzten 7 Tage"></div>
     <p class="hint" id="bestday"></p>
   </section>
 
   <section class="rate" id="hs" hidden>
-    <h2>🏆 Bestenliste</h2>
-    <p class="hint">Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.</p>
+    <h2 data-i18n="hsH">🏆 Bestenliste</h2>
+    <p class="hint" data-i18n="hsP">Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.</p>
     <ol class="hs-list" id="hsList"></ol>
-    <div class="hs-form"><input id="hsName" maxlength="20" autocomplete="nickname" aria-label="Name" placeholder="Dein Name"><button class="btn" id="hsSend" type="button">Rekord eintragen</button></div>
+    <div class="hs-form"><input id="hsName" maxlength="20" autocomplete="nickname" aria-label="Name" placeholder="Dein Name" data-i18n-ph="hsPh"><button class="btn" id="hsSend" type="button">Rekord eintragen</button></div>
     <div class="hint" id="hsMsg" aria-live="polite"></div>
   </section>
   <section class="rate" id="feedback" hidden>
-    <h2>⭐ Bewerten &amp; Feedback</h2>
-    <p class="hint">Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.</p>
-    <button class="btn" id="fbOpen" type="button">Bewertung &amp; Feedback abgeben</button>
+    <h2 data-i18n="fbH">⭐ Bewerten &amp; Feedback</h2>
+    <p class="hint" data-i18n="fbP">Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.</p>
+    <button class="btn" id="fbOpen" type="button" data-i18n="fbBtn">Bewertung &amp; Feedback abgeben</button>
   </section>
   <section class="rate" id="vote" hidden>
-    <h2>🗳️ Mitbestimmen</h2>
-    <p class="hint">Welches Thema soll als Nächstes ins Dojo? Essen bestellen, Uhrzeit, Familie, Hiragana &amp; Katakana, Anime-Sätze, ein neuer Song oder dein eigener Vorschlag.</p>
-    <button class="btn ghost" id="voteOpen" type="button">Jetzt abstimmen</button>
+    <h2 data-i18n="voteH">🗳️ Mitbestimmen</h2>
+    <p class="hint" data-i18n="voteP">Welches Thema soll als Nächstes ins Dojo? Essen bestellen, Uhrzeit, Familie, Hiragana &amp; Katakana, Anime-Sätze, ein neuer Song oder dein eigener Vorschlag.</p>
+    <button class="btn ghost" id="voteOpen" type="button" data-i18n="voteBtn">Jetzt abstimmen</button>
   </section>
   <div class="gate-bg" id="fbDlg" hidden role="dialog" aria-modal="true" aria-labelledby="fbT">
     <div class="gate-box fb-box">
       <h2 id="fbT"></h2>
-      <div id="fbCardRow" hidden><div class="lbl">Gemeldete Karte</div><div class="fb-card" id="fbCard"></div></div>
-      <div id="fbStarRow"><div class="lbl">Wie gefällt dir das Dojo?</div><div class="fb-stars" id="fbStars"></div></div>
-      <div id="fbVoteRow" hidden><label class="lbl" for="fbVote">Welches Thema als Nächstes?</label><select id="fbVote"></select></div>
+      <div id="fbCardRow" hidden><div class="lbl" data-i18n="fbCardL">Gemeldete Karte</div><div class="fb-card" id="fbCard"></div></div>
+      <div id="fbStarRow"><div class="lbl" data-i18n="fbStarL">Wie gefällt dir das Dojo?</div><div class="fb-stars" id="fbStars"></div></div>
+      <div id="fbVoteRow" hidden><label class="lbl" for="fbVote" data-i18n="fbVoteL">Welches Thema als Nächstes?</label><select id="fbVote"></select></div>
       <label class="lbl" for="fbText" id="fbTextL"></label>
       <textarea id="fbText" maxlength="1000" rows="4"></textarea>
       <div class="feedback" id="fbMsg" aria-live="polite"></div>
-      <div class="actions"><button class="btn ghost" id="fbX" type="button">Abbrechen</button><button class="btn" id="fbSend" type="button">Senden</button></div>
+      <div class="actions"><button class="btn ghost" id="fbX" type="button" data-i18n="cancel">Abbrechen</button><button class="btn" id="fbSend" type="button" data-i18n="send">Senden</button></div>
     </div>
   </div>
 
-  <section class="notes">
-    <details class="fold">
-    <summary><h2>Song-Lektion: シルエット (Silhouette, KANA-BOON)</h2></summary>
+  <details class="wissen" id="wissen">
+    <summary><span class="wt"><h2 data-i18n="wTitle">📖 Wissen zum Nachlesen</h2><p data-i18n="wSub">Song-Lektionen: Silhouette, Bubble, mosi mosi? · Aussprache-Regeln · Merkhilfe Wochentage</p></span><span class="chev" aria-hidden="true">›</span></summary>
+    <div class="inner" id="wissenInner">
+    <h3>Song-Lektion: シルエット (Silhouette, KANA-BOON)</h3>
     <div class="fix" style="border-left-color:var(--ok)">
-      <p><b style="color:var(--ink)">Worum geht's:</b> Erwachsenwerden. Die Zeit läuft weiter, Erinnerungen verblassen, Menschen werden zu Schattenrissen. Aber jemand hat gezeigt, dass manches sich nie ändert. Das will der Sänger festhalten, wenn er erwachsen wird. Passt perfekt zu Naruto, Opening 16 von Shippuden.</p>
-      <p><b style="color:var(--ink)">Grammatik 1 – alte Verneinung ～ぬ:</b> 知らぬ, 消えぬ, やまぬ = 知らない, 消えない, やまない. Klingt poetisch und altmodisch.</p>
-      <p><b style="color:var(--ink)">Grammatik 2 – ～フリをする:</b> „so tun, als ob“. 知らないフリ = so tun, als wüsste man es nicht.</p>
-      <p><b style="color:var(--ink)">Grammatik 3 – ～てく:</b> kurz für ～ていく, etwas geht weiter oder entfernt sich. 奪ってく = nimmt immer weiter weg.</p>
-      <p><b style="color:var(--ink)">Easter Egg:</b> 木の葉 (konoha, Baumblatt) ist auch der Name von Narutos Dorf Konoha. Die fallenden Blätter am Ende sind ein Gruß an die Serie.</p>
+      <p><b>Worum geht's:</b> Erwachsenwerden. Die Zeit läuft weiter, Erinnerungen verblassen, Menschen werden zu Schattenrissen. Aber jemand hat gezeigt, dass manches sich nie ändert. Das will der Sänger festhalten, wenn er erwachsen wird. Passt perfekt zu Naruto, Opening 16 von Shippuden.</p>
+      <p><b>Grammatik 1 – alte Verneinung ～ぬ:</b> 知らぬ, 消えぬ, やまぬ = 知らない, 消えない, やまない. Klingt poetisch und altmodisch.</p>
+      <p><b>Grammatik 2 – ～フリをする:</b> „so tun, als ob“. 知らないフリ = so tun, als wüsste man es nicht.</p>
+      <p><b>Grammatik 3 – ～てく:</b> kurz für ～ていく, etwas geht weiter oder entfernt sich. 奪ってく = nimmt immer weiter weg.</p>
+      <p><b>Easter Egg:</b> 木の葉 (konoha, Baumblatt) ist auch der Name von Narutos Dorf Konoha. Die fallenden Blätter am Ende sind ein Gruß an die Serie.</p>
     </div>
-    </details>
-    <details class="fold">
-    <summary><h2>Song-Lektion: あぶく (Bubble, ヨルシカ)</h2></summary>
+    <h3>Song-Lektion: あぶく (Bubble, ヨルシカ)</h3>
     <div class="fix" style="border-left-color:var(--ai)">
-      <p><b style="color:var(--ink)">Worum geht's:</b> Ein „Tier“ in ihr – Traurigkeit, Wut, Schaffensdrang – lässt sie nicht los. Gedanken steigen wie Blasen auf und zerplatzen. Sie will ein Feuer der Freude entzünden und mit beiden Händen festhalten, was nicht ausbrennt. Kunst, Fantasie oder Flucht aus der Realität: Hauptsache, etwas bringt sie wieder zum Brennen.</p>
-      <p><b style="color:var(--ink)">Grammatik 1 – ～たいだけ:</b> „ich will nur …“. 掬いたいだけ = „ich will es nur auffangen“.</p>
-      <p><b style="color:var(--ink)">Grammatik 2 – ～ほど:</b> „so sehr, dass …“. 暇もないほど = „so sehr, dass keine Zeit bleibt“.</p>
-      <p><b style="color:var(--ink)">Grammatik 3 – ～ておくれ:</b> sanfte, etwas altmodische Bitte an jemanden: „tu das bitte für mich“.</p>
-      <p><b style="color:var(--ink)">Wortspiele:</b> あぶく (Blase) steckt auch in 泡銭 (Geld, das zerrinnt). 悠々, 想想 und 夕夕 spielen mit gleichen Silben. 掬う (schöpfen) klingt wie 救う (retten).</p>
+      <p><b>Worum geht's:</b> Ein „Tier“ in ihr – Traurigkeit, Wut, Schaffensdrang – lässt sie nicht los. Gedanken steigen wie Blasen auf und zerplatzen. Sie will ein Feuer der Freude entzünden und mit beiden Händen festhalten, was nicht ausbrennt. Kunst, Fantasie oder Flucht aus der Realität: Hauptsache, etwas bringt sie wieder zum Brennen.</p>
+      <p><b>Grammatik 1 – ～たいだけ:</b> „ich will nur …“. 掬いたいだけ = „ich will es nur auffangen“.</p>
+      <p><b>Grammatik 2 – ～ほど:</b> „so sehr, dass …“. 暇もないほど = „so sehr, dass keine Zeit bleibt“.</p>
+      <p><b>Grammatik 3 – ～ておくれ:</b> sanfte, etwas altmodische Bitte an jemanden: „tu das bitte für mich“.</p>
+      <p><b>Wortspiele:</b> あぶく (Blase) steckt auch in 泡銭 (Geld, das zerrinnt). 悠々, 想想 und 夕夕 spielen mit gleichen Silben. 掬う (schöpfen) klingt wie 救う (retten).</p>
     </div>
-    </details>
-    <details class="fold">
-    <summary><h2>Song-Lektion: mosi mosi? (楽音 Sasane)</h2></summary>
+    <h3>Song-Lektion: mosi mosi? (楽音 Sasane)</h3>
     <div class="fix" style="border-left-color:var(--shu)">
-      <p><b style="color:var(--ink)">Worum geht's:</b> Ein Mädchen „funkt“ ins Weltall, weil sie sich in ein Alien bzw. einen Unbekannten verguckt hat. Liebe wird als Funksignal erzählt: Sie sendet, wartet auf Antwort, hat mal kein Netz – und will ihn trotzdem finden.</p>
-      <p><b style="color:var(--ink)">Grammatik 1 – ～中 (chuu):</b> „gerade dabei“. 交信中 = gerade in Funkkontakt, 送信中 = wird gesendet.</p>
-      <p><b style="color:var(--ink)">Grammatik 2 – ～てる:</b> Umgangssprache für ～ている (Verlauf). 聞こえてる？ = „Hörst du (gerade)?“</p>
-      <p><b style="color:var(--ink)">Grammatik 3 – Passiv ～られる / ～われる:</b> 叱られる (geschimpft werden), 嫌われる (nicht gemocht werden), 攫われる (entführt werden).</p>
-      <p><b style="color:var(--ink)">Wortspiele:</b> 電波 heißt Funkwelle, ist aber auch Slang für „abgedreht“. ないしらせ/お知らせ spielt mit „keine Nachricht = gute Nachricht“, und しらせ ist zugleich der Name des japanischen Antarktis-Eisbrechers. ニッチ (Nische) klingt wie にっち aus „weder vor noch zurück“.</p>
-      <p><b style="color:var(--ink)">So übst du:</b> Erst das Deck lernen, dann den Text auf Genius mitlesen und markieren, welche Wörter du schon erkennst.</p>
+      <p><b>Worum geht's:</b> Ein Mädchen „funkt“ ins Weltall, weil sie sich in ein Alien bzw. einen Unbekannten verguckt hat. Liebe wird als Funksignal erzählt: Sie sendet, wartet auf Antwort, hat mal kein Netz – und will ihn trotzdem finden.</p>
+      <p><b>Grammatik 1 – ～中 (chuu):</b> „gerade dabei“. 交信中 = gerade in Funkkontakt, 送信中 = wird gesendet.</p>
+      <p><b>Grammatik 2 – ～てる:</b> Umgangssprache für ～ている (Verlauf). 聞こえてる？ = „Hörst du (gerade)?“</p>
+      <p><b>Grammatik 3 – Passiv ～られる / ～われる:</b> 叱られる (geschimpft werden), 嫌われる (nicht gemocht werden), 攫われる (entführt werden).</p>
+      <p><b>Wortspiele:</b> 電波 heißt Funkwelle, ist aber auch Slang für „abgedreht“. ないしらせ/お知らせ spielt mit „keine Nachricht = gute Nachricht“, und しらせ ist zugleich der Name des japanischen Antarktis-Eisbrechers. ニッチ (Nische) klingt wie にっち aus „weder vor noch zurück“.</p>
+      <p><b>So übst du:</b> Erst das Deck lernen, dann den Text auf Genius mitlesen und markieren, welche Wörter du schon erkennst.</p>
     </div>
-    </details>
-    <details class="fold">
-    <summary><h2>Aussprache-Regeln</h2></summary>
+    <h3>Aussprache-Regeln</h3>
     <div class="fix" style="border-left-color:var(--ok)">
       <div class="tbl"><table>
         <thead><tr><th>Romaji</th><th>Sprich wie</th><th>Beispiel</th></tr></thead>
@@ -319,14 +324,14 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       <p>Der 🔊-Button nutzt die japanische Stimme deines Geräts. Am Handy (iPhone, Android) ist sie fast immer vorhanden. Am PC fehlt sie manchmal, dann bleibt der Ton stumm.</p>
     </div>
     <div class="fix" style="border-left-color:var(--ai)">
-      <p><b style="color:var(--ink)">Merkhilfe Wochentage:</b> Mo = Mond = 月, So = Sonne = 日. Danach die fünf Elemente in fester Reihenfolge: Feuer 火, Wasser 水, Holz 木, Metall 金, Erde 土. Alle enden auf 曜日 (ようび).</p>
+      <p><b>Merkhilfe Wochentage:</b> Mo = Mond = 月, So = Sonne = 日. Danach die fünf Elemente in fester Reihenfolge: Feuer 火, Wasser 水, Holz 木, Metall 金, Erde 土. Alle enden auf 曜日 (ようび).</p>
     </div>
-    </details>
-  </section>
+    </div>
+  </details>
 
   <footer class="copy">
-    <span>© 2026 miab · Nihongo Dojo · <a href="../">Zum Wien / NÖ Dojo →</a></span>
-    <label class="stat-opt" id="statOpt" hidden title="Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet."><input type="checkbox" id="statChk" checked> <span>Anonyme Statistik senden</span></label>
+    <span>© 2026 miab · Nihongo Dojo · <a href="../" data-i18n="toWien">Zum Wien / NÖ Dojo →</a></span>
+    <label class="stat-opt" id="statOpt" hidden data-i18n-title="statTip" title="Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet."><input type="checkbox" id="statChk" checked> <span data-i18n="statLab">Anonyme Statistik senden</span></label>
   </footer>
 </div>
 
@@ -335,7 +340,8 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 (function(){
   const root=document.documentElement,tb=document.getElementById("themeBtn");
   const isDark=()=>root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-  const paintBtn=()=>{const d=isDark();tb.textContent=d?"☀️":"🌙";tb.title=d?"Hell":"Dunkel";};
+  const paintBtn=()=>{const d=isDark(),en=document.documentElement.lang==="en";tb.textContent=d?"☀️":"🌙";tb.title=d?(en?"Light":"Hell"):(en?"Dark":"Dunkel");};
+  window.__paintTheme=paintBtn;
   try{const t=localStorage.getItem("nihongodojo-theme");if(t)root.dataset.theme=t;}catch(e){}
   paintBtn();
   tb.onclick=()=>{const t=isDark()?"light":"dark";root.dataset.theme=t;try{localStorage.setItem("nihongodojo-theme",t);}catch(e){}paintBtn();};
@@ -598,12 +604,175 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   ]);
   const DECKS={num:NUM,day:DAY,greet:GREET,date:DATE,pol:POL,phr:PHR,song:SONG,mosi:MOSI,abuku:ABUKU,sil:SIL,all:[...NUM.filter((_,i)=>i%5===0||i<=12),...DAY,...GREET,...DATE,...POL,...PHR,...SONG,...MOSI,...ABUKU,...SIL]};
 
+  // ---- Sprache DE / EN (wie im Wien / NÖ Dojo) ----
+  let LANG="de";
+  try{LANG=localStorage.getItem("nihongodojo-lang")||((navigator.language||"de").toLowerCase().startsWith("de")?"de":"en");}catch(e){}
+  const EN=()=>LANG==="en";
+  const UI={
+    sub:["Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln","Numbers · Weekdays · Everyday · Dating · Favourite phrases · Song vocabulary"],
+    quiz:["Quiz","Quiz"],card:["Karteikarten","Flashcards"],script:["Schrift","Script"],both:["Beides","Both"],
+    inRow:["/ 20 in Folge","/ 20 in a row"],days:["Tageshighscore","Daily high score"],
+    hsH:["🏆 Bestenliste","🏆 Leaderboard"],hsP:["Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.","The longest 🔥 streaks of all Dojo guests. No account: enter a name and submit your record."],
+    hsPh:["Dein Name","Your name"],
+    fbH:["⭐ Bewerten &amp; Feedback","⭐ Rate &amp; give feedback"],fbP:["Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.","How do you like the Dojo? Found a mistake, want a new topic? Tell us. No account needed, takes a minute."],
+    fbBtn:["Bewertung &amp; Feedback abgeben","Rate &amp; send feedback"],
+    voteH:["🗳️ Mitbestimmen","🗳️ Have your say"],voteP:["Welches Thema soll als Nächstes ins Dojo? Essen bestellen, Uhrzeit, Familie, Hiragana &amp; Katakana, Anime-Sätze, ein neuer Song oder dein eigener Vorschlag.","Which topic should come next? Ordering food, telling the time, family, hiragana &amp; katakana, anime lines, a new song or your own idea."],
+    voteBtn:["Jetzt abstimmen","Vote now"],
+    fbCardL:["Gemeldete Karte","Reported card"],fbStarL:["Wie gefällt dir das Dojo?","How do you like the Dojo?"],fbVoteL:["Welches Thema als Nächstes?","Which topic next?"],
+    cancel:["Abbrechen","Cancel"],send:["Senden","Send"],
+    toWien:["Zum Wien / NÖ Dojo →","To the Vienna / Lower Austria Dojo →"],
+    statLab:["Anonyme Statistik senden","Send anonymous stats"],statTip:["Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet.","Helps improve the Dojo. Only topics, points, streak and settings are sent, no names. Untick = nothing is sent."],
+    wTitle:["📖 Wissen zum Nachlesen","📖 Background reading"],wSub:["Song-Lektionen: Silhouette, Bubble, mosi mosi? · Aussprache-Regeln · Merkhilfe Wochentage","Song lessons: Silhouette, Bubble, mosi mosi? · Pronunciation rules · Weekday memory aid"],
+    langTip:["Switch to English","Auf Deutsch umschalten"],
+    hanko:["練習 (renshuu) = Übung","練習 (renshuu) = practice"],
+    themeL:["Hell oder dunkel umschalten","Switch light or dark"],light:["Hell","Light"],dark:["Dunkel","Dark"],
+    msgStart:["Schaffe 20 in Folge, dann kommt eine Bonusfrage aus allen Themen. Bei 5, 10 und 15 bekommst du einen 🛡️ Joker: Ein Fehler wirft dich nur auf diesen Checkpoint zurück.","Get 20 in a row to unlock a bonus question from all topics. At 5, 10 and 15 you get a 🛡️ joker: a mistake only sends you back to that checkpoint."],
+    score:["Richtig {a} · Falsch {b}","Right {a} · Wrong {b}"],
+    meta:["Rekord {a} · Themen {b}/{c}","Record {a} · Topics {b}/{c}"],
+    hsBtn:["Rekord eintragen ({n})","Submit record ({n})"],
+    m5:["5 richtig in Folge! いいね！ (ii ne, sehr gut)","5 in a row! いいね！ (ii ne, nice)"],
+    m10:["10er-Serie! すごい！ (sugoi, Wahnsinn)","A 10 streak! すごい！ (sugoi, amazing)"],
+    m15:["15! Nur noch 5. がんばって！ (ganbatte)","15! Only 5 to go. がんばって！ (ganbatte, go for it)"],
+    m20:["🎉 20 in Folge! おめでとう！ (omedetou, Glückwunsch). Die nächste Runde startet bei 0.","🎉 20 in a row! おめでとう！ (omedetou, congratulations). The next round starts at 0."],
+    lifeOn:["🛡️ Joker bereit: Bei einem Fehler geht's bei {n} weiter","🛡️ Joker ready: after a mistake you continue at {n}"],
+    lifeUsed:["Joker verbraucht. Nächster Fehler bedeutet 0.","Joker used. The next mistake means 0."],
+    bonusAll:["🏆 Bonusfrage richtig! Du hast alle Themen geschafft!","🏆 Bonus question right! You've passed all topics!"],
+    bonusOk:["✅ Bonusfrage richtig, {a} bestanden! Weiter mit: {b}","✅ Bonus question right, {a} passed! Next up: {b}"],
+    bonus20:["🎉 20 geschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.","🎉 20 done! Now comes the ⭐ bonus question from all topics. Get it right to pass the topic."],
+    checkpoint:[" 🛡️ Checkpoint {n}: Du hast einen Joker."," 🛡️ Checkpoint {n}: you have a joker."],
+    keepGoing:["Weiter so! Noch {n} bis zum Ziel.","Keep going! {n} more to the goal."],
+    wrongStart:["Falsch. Die Serie startet beim nächsten Treffer.","Wrong. Your streak starts with the next right answer."],
+    bonusMissed:["Bonusfrage verpasst. ","Bonus question missed. "],
+    jokerUsed:["🛡️ Joker verbraucht: Serie {a} → zurück auf Checkpoint {b}. Der nächste Fehler vor {c} bringt dich auf 0.","🛡️ Joker used: streak {a} → back to checkpoint {b}. The next mistake before {c} takes you to 0."],
+    bonusNoJoker:["Bonusfrage verpasst, kein Joker übrig. Zurück auf 0 bei {t}, du schaffst das!","Bonus question missed, no joker left. Back to 0 in {t}, you can do it!"],
+    lostNoJoker:["Serie bei {n} verloren, kein Joker übrig. Zurück auf 0, von vorne!","Streak lost at {n}, no joker left. Back to 0, start again!"],
+    newTopic:["Neues Thema: {t}. Die Serie startet bei 0.","New topic: {t}. Your streak starts at 0."],
+    finaleLab:["🏆 Alle {n} Themen geschafft · おめでとう！","🏆 All {n} topics passed · おめでとう！"],
+    finaleHint:["Ein japanisches Sprichwort für dich. Du bist jetzt offiziell 先輩 (senpai) in diesem Dojo.","A Japanese proverb for you. You're now officially 先輩 (senpai) in this Dojo."],
+    other:["Anderer Spruch","Another proverb"],restart:["Alle Themen neu starten","Restart all topics"],newRound:["Neue Runde! Schaffe 20 in Folge pro Thema.","New round! Get 20 in a row per topic."],
+    tOk:["Richtig heute","Right today"],tBest:["Beste Serie heute","Best streak today"],tTopics:["Themen heute","Topics today"],tNo:["Fehler heute","Mistakes today"],
+    weekL:["Richtige Antworten der letzten 7 Tage","Right answers over the last 7 days"],bestStreak:["Beste Serie","Best streak"],
+    bestDay:["Bester Tag: {d} mit Serie {s} und {n} richtigen Antworten","Best day: {d} with a streak of {s} and {n} right answers"],noEntry:["Noch kein Eintrag. Leg los!","No entries yet. Let's go!"],
+    listen:["🔊 Anhören","🔊 Listen"],listenL:["Aussprache anhören","Listen to the pronunciation"],
+    noJa:["Keine japanische Stimme gefunden. Am Handy klappt es meist.","No Japanese voice found. It usually works on phones."],
+    noSound:["Kein Ton auf diesem Gerät","No sound on this device"],soundNA:["Ton nicht verfügbar","Sound not available"],
+    sayRough:["Sprich etwa:","Say roughly:"],bug:["🐞 Fehler bei dieser Karte melden","🐞 Report a mistake on this card"],
+    qMean:["Was bedeutet das?","What does this mean?"],qJp:["Wie heißt das auf Japanisch?","How do you say this in Japanese?"],qPick:["Wähle das richtige Japanisch","Pick the right Japanese"],
+    bonusTag:["⭐ Bonusfrage · ","⭐ Bonus question · "],
+    flip:["Umdrehen","Flip"],again:["Nochmal üben","Practise again"],knew:["Gewusst · Weiter","Knew it · Next"],
+    showR:["Romaji zeigen","Show romaji"],next:["Weiter","Next"],
+    right:["Richtig! ","Correct! "],wrong:["Leider falsch. ","Sorry, wrong. "],
+    built:["So setzt sich {n} zusammen: ","How {n} is built: "],picked:["Du hast gewählt: ","You picked: "],
+    askL:["🧑‍🏫 Frag den Sensei","🧑‍🏫 Ask the sensei"],askPh:["z. B. Was heißt deeto?","e.g. What does deeto mean?"],askBtn:["Fragen","Ask"],
+    noSensei:["Der Sensei ist hier nicht verfügbar. Öffne die Seite auf claude.ai.","The sensei isn't available here. Open the page on claude.ai."],
+    thinking:["Denkt nach…","Thinking…"],
+    errNG:["Du hast dem Dojo nicht erlaubt, Claude zu fragen.","You didn't allow the Dojo to ask Claude."],errRL:["Gerade zu viele Fragen. Versuch es gleich nochmal.","Too many questions right now. Try again in a moment."],
+    errSD:["Claude ist für diesen Account nicht verfügbar.","Claude isn't available for this account."],errSE:["Bitte melde dich neu an.","Please sign in again."],
+    errRF:["Darauf kann der Sensei nicht antworten.","The sensei can't answer that."],errGen:["Das hat nicht geklappt. Versuch es nochmal.","That didn't work. Please try again."],
+    fbTF:["⭐ Bewerten & Feedback","⭐ Rate & give feedback"],fbTB:["🐞 Karte melden","🐞 Report card"],fbTV:["🗳️ Mitbestimmen","🗳️ Have your say"],
+    fbTxtF:["Was gefällt dir, was fehlt? (freiwillig)","What do you like, what's missing? (optional)"],fbTxtB:["Was stimmt nicht an der Karte?","What's wrong with this card?"],fbTxtV:["Eigener Vorschlag oder Kommentar (freiwillig)","Your own idea or a comment (optional)"],
+    fbEmpty:["Bitte Sterne vergeben oder etwas reinschreiben.","Please give stars or write something."],fbThanks:["Danke! ありがとう！ Ist angekommen. 🙏","Thanks! ありがとう！ It arrived. 🙏"],
+    fbRL:["Gerade zu viel auf einmal. Probier's später nochmal.","Too much at once. Please try again later."],fbFail:["Senden hat nicht geklappt. Probier's später nochmal.","Sending didn't work. Please try again later."],
+    hsNone:["Noch kein Eintrag. Sei der Erste!","No entries yet. Be the first!"],hsNeed:["Erst eine Serie spielen, dann eintragen.","Play a streak first, then submit."],hsName:["Bitte einen Namen eingeben.","Please enter a name."],
+    hsOk:["Eingetragen! Platz {r} mit Serie {n}. すごい！","Submitted! Rank {r} with a streak of {n}. すごい！"],hsErr:["Hat nicht geklappt. Probier's später nochmal.","That didn't work. Please try again later."]
+  };
+  const T=(k,v)=>{const e=UI[k];let t=e?(EN()?e[1]:e[0]):k;if(v)for(const x in v)t=t.split("{"+x+"}").join(v[x]);return t;};
+  const NAMES_DE={num:"Zahlen 0–100",day:"Wochentage",greet:"Begrüßen & Vorstellen",date:"Small Talk & Date",pol:"Höflich & Unterwegs",phr:"Aus deinem Ordner",song:"♪ 修羅の花 · Flower of Carnage",mosi:"♪ もしもし？ · Hello?",abuku:"♪ あぶく · Bubble",sil:"♪ シルエット · Silhouette",all:"Alles gemischt"};
+  const NAMES_EN={num:"Numbers 0–100",day:"Weekdays",greet:"Greetings & introductions",date:"Small talk & dating",pol:"Polite & on the go",phr:"Favourite phrases",song:"♪ 修羅の花 · Flower of Carnage",mosi:"♪ もしもし？ · Hello?",abuku:"♪ あぶく · Bubble",sil:"♪ シルエット · Silhouette",all:"All mixed"};
+  const REG_EN={"höflich":"polite","locker":"casual"};
+  // Englische Bedeutung und Hinweis je Karte, gleiche Reihenfolge wie die Decks oben
+  const CARD_EN={
+    d:[["Monday","月 = moon"],["Tuesday","火 = fire"],["Wednesday","水 = water"],["Thursday","木 = wood, tree"],["Friday","金 = gold, metal"],["Saturday","土 = earth"],["Sunday","日 = sun"]],
+    p:[["Are you stupid?","Cheeky. Only among friends and as a joke."],["Do you like sushi?","好き (suki) = to like"],["Do you want to eat sushi?","食べたい (tabetai) = want to eat"],["Go-getter, pro","Someone who gets things done skilfully"],["to like","The opposite is 嫌い (kirai)"],["day of the week","Ending of all weekday names"]],
+    g:[["Hello / Good afternoon","During the day, fits almost always"],["Good morning","Among friends おはよう is enough"],["Good evening",""],["How are you? (polite)",""],["How's it going?",""],["I'm fine",""],["So-so",""],["Long time no see!",""],["See you",""],["Bye",""],["Good night","Casual: おやすみ"],["Goodbye","Sounds rather final, rare in everyday life"],["What is your name? (polite)",""],["What's your name?",""],["I am ...","Put your name here"],["Nice to meet you (first meeting)",""],["Nice to meet you, I look forward to knowing you","Said after introducing yourself"],["Where are you from?",""],["I'm from Austria","ドイツ (doitsu) = Germany"],["How old are you?",""],["I'm studying Japanese",""],["I only speak a little",""]],
+    t:[["What are your hobbies?",""],["I like video games",""],["I love Japan","大好き = to like a lot"],["Are you free this weekend?",""],["Shall we go on a date?","～ませんか = Shall we …?"],["Shall we go eat together?",""],["Shall we exchange contacts?",""],["Do you have LINE?","LINE is Japan's WhatsApp"],["You're cute",""],["Cool! / Good-looking!",""],["That was fun!",""],["I want to see you again",""],["I like you","Classic love confession"],["Really?",""],["Amazing! / Great!",""]],
+    h:[["Thank you very much","Casual: ありがとう"],["You're welcome",""],["Excuse me / Sorry","Also used to get someone's attention"],["I'm sorry",""],["Please (when asking)",""],["Yes / No",""],["I don't understand",""],["Once more, please",""],["Where is the toilet?",""],["How much is it?",""],["This one, please","For ordering: point and say it"],["Let's eat (before the meal)",""],["Thanks for the meal (afterwards)",""],["Delicious!",""],["Cheers!",""]],
+    s:[["Flower of Carnage","Song title · Meiko Kaji (梶芽衣子), 1973"],["Lady Snowblood","1973 film, inspiration for Kill Bill"],["Meiko Kaji","Singer and lead actress"],["Carnage, battle","Originally Buddhist: fighting demons"],["Flower",""],["Snow",""],["Princess",""],["Song lyrics",""],["Song","歌う (utau) = to sing"],["Revenge","Theme of the song"],["Tear",""],["Dream",""],["Woman",""],["Life",""],["Umbrella","Typical prop in Lady Snowblood"],["Morning",""],["Night",""],["River",""]],
+    mo:[["Hello? (on the phone)","Song title reference · 楽音 Sasane, 2026"],["Can you hear me?","聞こえる (kikoeru) = to be audible + ～てる = right now"],["Radio wave, signal","Also slang: “weird, spaced-out”"],["Mysterious radio signal","怪 = strange, eerie"],["Space, universe",""],["Little universe","小 = small"],["Totally absorbed, crazy about","夢中になる = to fall for something"],["Completely lost in it","Four-kanji idiom (四字熟語)"],["In radio contact","～中 (chuu) = in the middle of"],["Sending","Like on your phone while a message sends"],["No signal / dead zone","Also shown on Japanese phones"],["Light year","何光年 = how many light years?"],["Next door, neighbouring",""],["Block (in an address)","3丁目 = block 3 of the district"],["Figure, appearance","姿が見えない = can't be seen"],["Nowhere to be found","Shortened colloquially in the song"],["Dangling in mid-air","Wordplay: 宙 (chuu) = air, space"],["Loneliness",""],["To wander",""],["You (dear/polite)","In songs often the loved one"],["I wanted to see you / I missed you","Past tense of 会いたい"],["To meet someone (by chance)",""],["To suit, to look good on",""],["To be on the same wavelength","Literally the same as in English"],["To be scolded","Passive of 叱る (to scold)"],["To be disliked","Passive of 嫌う"],["Heart, feelings",""],["To be kidnapped","心を攫われる = to have your heart stolen"],["To dedicate, to offer","Poetic for 捧げる"],["To pour, to give (love)",""],["To wrap","リボンに包んで = wrapped in a ribbon"],["Red",""],["Hopscotch","Shortened to “kenpa” in the song"],["Can't go forward or back","Idiom, in the song a pun with ニッチ (niche)"],["To be abducted by aliens","Slang from “cattle mutilation”"]],
+    ab:[["Bubble, foam","Song title · ヨルシカ (Yorushika)"],["Easy money","Literally “foam money”, it vanishes quickly"],["Beast, wild animal","In the song: the feeling raging inside her"],["To squirm, to wriggle",""],["Water surface","Poetic reading, otherwise すいめん"],["To float up, to surface",""],["To disappear",""],["Sad",""],["To move, to drive",""],["To grip tightly","Also: to shape sushi (握り寿司)"],["To pass by",""],["Cloud",""],["Far away",""],["Howling (like a wolf)",""],["To catch your breath","息 = breath"],["No time for …","～暇もないほど = so much that there's no time"],["Painful, hard",""],["Calm, leisurely","Sound play with 夕 (yuu)"],["Dream",""],["To burn",""],["Soul",""],["Joy",""],["To light a fire",""],["Imagination",""],["To cool down","冷めない = never cooling"],["Both hands",""],["To burn out","Like “burnout”"],["To count",""],["To scoop (with your hand)","Sounds like 救う = to save → pun"],["Each one",""],["To dry out",""],["Simmering, bubbling","Onomatopoeia for slowly rising anger"],["To get angry",""],["Candle",""],["To remain",""],["Ridiculous, comical",""],["Lonely",""],["Sun",""],["Impatience, restlessness",""],["To pick (flowers)",""],["Half believing, half doubting","Four-kanji idiom"],["Wounded all over","Four-kanji idiom"],["To let out, to spit out",""],["Superpower",""],["Creation, fiction",""],["Escape from reality",""],["To make tremble",""],["Please do … (for me)","Pleading, slightly old-fashioned form"]],
+    si:[["Silhouette","Song title · KANA-BOON, Naruto Shippuden OP 16 (2014)"],["Ready, set, go!","Count-in when everyone starts at once"],["To step in, to dive in",""],["Starting line (go line)","Wordplay, also in the version name"],["Not to know","Old negation ～ぬ = ～ない"],["To cross a line",""],["To turn around, to look back",""],["To swelter in the heat","Summer-heat feeling"],["To sparkle, to glitter",""],["Sweat",""],["To spill, to drip",""],["To remember, to memorise","覚えてない = I don't remember"],["Everyone, all",""],["Important, precious","大事にする = to cherish"],["To forget",""],["To pretend","忘れたフリ = pretending to have forgotten"],["Can laugh","Potential form of 笑う"],["To recall",""],["Boy","Also a manga genre (Naruto is shōnen)"],["Everything",""],["To want (to have)","From 欲しい"],["To notice",""],["Clock hand",""],["Days, daily life",""],["To stop",""],["To steal, to take away","奪ってく = keeps taking more"],["To flow, to pass",""],["Memory",""],["In the distance",""],["To fear",""],["Unceasing","Old form of やまない"],["Fluttering lightly","Onomatopoeia for falling leaves"],["To dance, to whirl",""],["Tree leaf","Konoha = Naruto's village (木ノ葉隠れ)!"],["To worry, to grieve",""],["To spend time",""],["Unchanging",""],["To teach, to show","教えてくれた = taught me"],["Everlasting","Old negation ～ぬ"],["To grow up",""],["To let go","離さずに = without letting go"],["To keep protecting","～続ける = keep doing"],["Someday",""]]
+  };
+  const NUM_NOTE_EN={4:"also: し (shi)",7:"also: しち (shichi)",9:"also: く (ku)",0:"also: ゼロ (zero)"};
+  NUM.forEach((c,n)=>{c.en=c.de;c.noteEn=NUM_NOTE_EN[n]||"";if(n===100)c.calcEn="ひゃく (hyaku) is its own word for 100";});
+  [DAY,PHR,GREET,DATE,POL,SONG,MOSI,ABUKU,SIL].forEach(list=>{const pre=list[0].id.replace(/\d+$/,"");const tr=CARD_EN[pre];
+    if(!tr||tr.length!==list.length)console.warn("CARD_EN mismatch",pre);
+    list.forEach((c,i)=>{const e=tr&&tr[i];if(e){c.en=e[0];c.noteEn=e[1];}});});
+  // Anzeige-Helfer: Bedeutung, Hinweis, Rechenweg, Stil in der gewählten Sprache
+  const M=c=>EN()&&c.en?c.en:c.de;
+  const N=c=>EN()?(c.noteEn!=null?c.noteEn:c.note||""):(c.note||"");
+  const CALC=c=>EN()&&c.calcEn?c.calcEn:c.calc;
+  const REG=r=>EN()?(REG_EN[r]||r):r;
+  // Englische Aussprache-Hilfe: Silben mit englischen Vokalen, z. B. ichi → ee-chee
+  const VOW_EN={a:"ah",i:"ee",u:"oo",e:"eh",o:"oh",aa:"ah",ii:"ee",uu:"oo",ee:"eh",oo:"oh",ou:"oh",ei:"ay"};
+  function lautWordEn(w){
+    let tail="";
+    if(/desu$/.test(w)){w=w.slice(0,-4);tail="dess";}else if(/masu$/.test(w)){w=w.slice(0,-4);tail="mass";}
+    const syl=[];const re=/([^aeiou]*?)(aa|ii|uu|ee|oo|ou|ei|a|i|u|e|o)/g;let m,last=0;
+    while((m=re.exec(w))){let c=m[1];
+      if(syl.length&&c.length>1&&(c[0]===c[1]||c.startsWith("tch")||(c[0]==="n"&&c[1]!=="y")||c[0]==="'")){
+        if(c[0]!=="'")syl[syl.length-1]+=c[0];c=c.slice(1);}
+      syl.push(c.replace(/'/g,"")+VOW_EN[m[2]]);last=re.lastIndex;}
+    let rest=w.slice(last).replace(/'/g,"");
+    if(syl.length)syl[syl.length-1]+=rest;else if(rest)syl.push(rest);
+    if(tail)syl.push(tail);
+    return syl.join("-");
+  }
+  const lautEn=r=>String(r).toLowerCase().replace(/\.\.\./g,"…").replace(/[a-z']+/g,lautWordEn);
+  const NOTES_EN=`
+    <h3>Song lesson: シルエット (Silhouette, KANA-BOON)</h3>
+    <div class="fix" style="border-left-color:var(--ok)">
+      <p><b>What it's about:</b> Growing up. Time moves on, memories fade, people turn into silhouettes. But someone showed that some things never change, and the singer wants to hold on to that as he grows up. A perfect fit for Naruto, it's opening 16 of Shippuden.</p>
+      <p><b>Grammar 1 – old negation ～ぬ:</b> 知らぬ, 消えぬ, やまぬ = 知らない, 消えない, やまない. Sounds poetic and old-fashioned.</p>
+      <p><b>Grammar 2 – ～フリをする:</b> “to pretend”. 知らないフリ = pretending not to know.</p>
+      <p><b>Grammar 3 – ～てく:</b> short for ～ていく, something keeps going or moves away. 奪ってく = keeps taking more and more.</p>
+      <p><b>Easter egg:</b> 木の葉 (konoha, tree leaf) is also the name of Naruto's village Konoha. The falling leaves at the end are a nod to the series.</p>
+    </div>
+    <h3>Song lesson: あぶく (Bubble, ヨルシカ)</h3>
+    <div class="fix" style="border-left-color:var(--ai)">
+      <p><b>What it's about:</b> A “beast” inside her – sadness, anger, the urge to create – won't let go. Thoughts rise like bubbles and burst. She wants to light a fire of joy and hold on with both hands to whatever doesn't burn out. Art, fantasy or escaping reality: anything, as long as something makes her burn again.</p>
+      <p><b>Grammar 1 – ～たいだけ:</b> “I just want to …”. 掬いたいだけ = “I just want to catch it”.</p>
+      <p><b>Grammar 2 – ～ほど:</b> “so much that …”. 暇もないほど = “so much that there's no time left”.</p>
+      <p><b>Grammar 3 – ～ておくれ:</b> a gentle, slightly old-fashioned request: “please do this for me”.</p>
+      <p><b>Wordplay:</b> あぶく (bubble) also hides in 泡銭 (money that slips away). 悠々, 想想 and 夕夕 play with repeated syllables. 掬う (to scoop) sounds like 救う (to save).</p>
+    </div>
+    <h3>Song lesson: mosi mosi? (楽音 Sasane)</h3>
+    <div class="fix" style="border-left-color:var(--shu)">
+      <p><b>What it's about:</b> A girl “radios” into space because she has fallen for an alien, or a stranger. Love is told as a radio signal: she sends, waits for a reply, sometimes has no signal – and still wants to find him.</p>
+      <p><b>Grammar 1 – ～中 (chuu):</b> “in the middle of”. 交信中 = in radio contact right now, 送信中 = sending.</p>
+      <p><b>Grammar 2 – ～てる:</b> casual form of ～ている (ongoing action). 聞こえてる？ = “Can you hear me (right now)?”</p>
+      <p><b>Grammar 3 – passive ～られる / ～われる:</b> 叱られる (to be scolded), 嫌われる (to be disliked), 攫われる (to be kidnapped).</p>
+      <p><b>Wordplay:</b> 電波 means radio wave, but is also slang for “spaced-out”. ないしらせ/お知らせ plays with “no news is good news”, and しらせ is also the name of Japan's Antarctic icebreaker. ニッチ (niche) sounds like にっち from “can't go forward or back”.</p>
+      <p><b>How to practise:</b> Learn the deck first, then read along with the lyrics on Genius and mark the words you already recognise.</p>
+    </div>
+    <h3>Pronunciation rules</h3>
+    <div class="fix" style="border-left-color:var(--ok)">
+      <div class="tbl"><table>
+        <thead><tr><th>Romaji</th><th>Say like</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>a</td><td>“ah” as in father</td><td>san → sahn</td></tr>
+          <tr><td>i</td><td>“ee” as in see</td><td>ichi → ee-chee</td></tr>
+          <tr><td>u</td><td>“oo” as in food, short</td><td>sushi → soo-shee</td></tr>
+          <tr><td>e</td><td>“eh” as in bed</td><td>sensei → sehn-say</td></tr>
+          <tr><td>o</td><td>“oh”, short and pure</td><td>go → goh</td></tr>
+          <tr><td>r</td><td>a quick tap, between r and l (like the tt in American “butter”)</td><td>arigatou → ah-ree-gah-toh</td></tr>
+          <tr><td>g</td><td>always hard, as in go</td><td>genki → gehn-kee</td></tr>
+          <tr><td>ts</td><td>“ts” as in cats</td><td>tsuki → tsoo-kee</td></tr>
+          <tr><td>ou, uu, ii</td><td>hold the vowel a bit longer</td><td>arigatou → ah-ree-gah-tooh</td></tr>
+          <tr><td>desu, masu</td><td>the u is almost silent</td><td>desu → dess</td></tr>
+        </tbody>
+      </table></div>
+      <p>Every syllable gets roughly the same weight, there's no strong stress like in English. The 🔊 button uses your device's Japanese voice. Phones (iPhone, Android) almost always have one. On a PC it is sometimes missing, then there's no sound.</p>
+    </div>
+    <div class="fix" style="border-left-color:var(--ai)">
+      <p><b>Weekday memory aid:</b> Monday = Moon = 月, Sunday = Sun = 日, just like in English. Then the five elements in a fixed order: fire 火, water 水, wood 木, metal 金, earth 土. All end in 曜日 (ようび).</p>
+    </div>`;
+
   // ---- Zustand ----
   let deck="num", mode="quiz", script="jp", cur=null, flipped=false;
   let score={ok:0,no:0,streak:0};
   let best=0, goals=0, pendingReset=false;
   const CAMP=["num","day","greet","date","pol","phr","song","mosi","abuku","sil"];
-  const NAMES={num:"Zahlen 0–100",day:"Wochentage",greet:"Begrüßen & Vorstellen",date:"Small Talk & Date",pol:"Höflich & Unterwegs",phr:"Aus deinem Ordner",song:"♪ 修羅の花 · Flower of Carnage",mosi:"♪ もしもし？ · Hello?",abuku:"♪ あぶく · Bubble",sil:"♪ シルエット · Silhouette",all:"Alles gemischt"};
+  const NAMES=Object.assign({},NAMES_DE);
   const EVERY=[...NUM,...DAY,...GREET,...DATE,...POL,...PHR,...SONG,...MOSI,...ABUKU,...SIL];
   let done={}, bonus=false, finale=false, hist={};
   const KEY="nihongodojo";
@@ -637,7 +806,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   // Gesendet wird: 1x beim Öffnen (Besuch), alle 5 Antworten (Zwischenstand) und der Rest beim Verlassen
   function sendStats(visit){
     if(!API_ON||!statOn()||(!visit&&ST.ok+ST.no===0))return;
-    const base={set:["de",mode,script].join(" · "),dev:devTag(),vid:vid(),geo:geo()};
+    const base={set:[LANG,mode,script].join(" · "),dev:devTag(),vid:vid(),geo:geo()};
     const v=visit?Object.assign(base,{kind:"visit",topics:"👋 Besuch",decks:{},ok:0,no:0,best:0,rec:0,min:0})
       :Object.assign(base,{kind:"progress",decks:ST.decks,topics:Object.entries(ST.decks).map(([k,x])=>k+" "+x.ok+"✓ "+x.no+"✗").join(", "),ok:ST.ok,no:ST.no,best:ST.best,rec:ST.rec,min:Math.max(1,Math.round((Date.now()-ST.t0)/60000))});
     try{apiPost("/api/stats",v).catch(()=>{});}catch(e){}
@@ -659,43 +828,43 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   function pickVoice(){try{const v=speechSynthesis.getVoices();jaVoice=v.find(x=>/^ja/i.test(x.lang))||null;}catch(e){}}
   if("speechSynthesis" in window){pickVoice();try{speechSynthesis.onvoiceschanged=pickVoice;}catch(e){}}
   function speak(text,btn){
-    if(!("speechSynthesis" in window)){btn&&(btn.textContent="Kein Ton auf diesem Gerät");return;}
+    if(!("speechSynthesis" in window)){btn&&(btn.textContent=T("noSound"));return;}
     try{
       speechSynthesis.cancel();
       const u=new SpeechSynthesisUtterance(text.replace(/〇〇/g,"").replace(/\s*\/\s*/g,"、"));
       u.lang="ja-JP";u.rate=.85;if(jaVoice)u.voice=jaVoice;
       speechSynthesis.speak(u);
       if(!jaVoice&&btn){const n=btn.nextElementSibling;if(n&&n.classList.contains("nov"))n.hidden=false;}
-    }catch(e){btn&&(btn.textContent="Ton nicht verfügbar");}
+    }catch(e){btn&&(btn.textContent=T("soundNA"));}
   }
-  const sayHtml=c=>`<div class="sayrow"><button class="say" type="button" data-say="${esc(c.kana||c.jp)}" aria-label="Aussprache anhören">🔊 Anhören</button><span class="nov hint" hidden>Keine japanische Stimme gefunden. Am Handy klappt es meist.</span></div>`;
-  const lautHtml=c=>`<div class="laut">Sprich etwa: <b>${esc(laut(c.romaji))}</b></div>`;
+  const sayHtml=c=>`<div class="sayrow"><button class="say" type="button" data-say="${esc(c.kana||c.jp)}" aria-label="${T("listenL")}">${T("listen")}</button><span class="nov hint" hidden>${T("noJa")}</span></div>`;
+  const lautHtml=c=>`<div class="laut">${T("sayRough")} <b>${esc(EN()?lautEn(c.romaji):laut(c.romaji))}</b></div>`;
   // Fehler bei einer Karte melden (nur in der Online-Version)
-  const bugHtml=c=>API_ON?`<div class="sayrow"><button class="bug" type="button" data-card="${esc(c.jp+(c.kana?" ("+c.kana+")":"")+" · "+c.romaji+" = "+c.de)}">🐞 Fehler bei dieser Karte melden</button></div>`:"";
+  const bugHtml=c=>API_ON?`<div class="sayrow"><button class="bug" type="button" data-card="${esc(c.jp+(c.kana?" ("+c.kana+")":"")+" · "+c.romaji+" = "+c.de)}">${T("bug")}</button></div>`:"";
   card.addEventListener("click",e=>{const b=e.target.closest(".say");if(b)speak(b.dataset.say,b);const g=e.target.closest(".bug");if(g)openFb("bug",g.dataset.card);});
 
   function pick(){const list=bonus?DECKS.all:DECKS[deck];let c;do{c=rnd(list)}while(list.length>1&&cur&&c.id===cur.id);return c;}
   const doneCount=()=>CAMP.filter(k=>done[k]).length;
   function renderScore(){
-    $("#score").textContent=`Richtig ${score.ok} · Falsch ${score.no}`;
+    $("#score").textContent=T("score",{a:score.ok,b:score.no});
     const s=score.streak;
     $("#stNum").textContent=bonus?"⭐":s;
     $("#stFill").style.width=(bonus?100:Math.min(s,20)/20*100)+"%";
-    $("#stMeta").textContent=`Rekord ${best} · Themen ${doneCount()}/${CAMP.length}`;
+    $("#stMeta").textContent=T("meta",{a:best,b:doneCount(),c:CAMP.length});
     document.querySelectorAll(".ms").forEach(m=>m.classList.toggle("hit",bonus||s>=+m.dataset.at));
-    $("#hsSend").textContent=`Rekord eintragen (${best})`;
+    $("#hsSend").textContent=T("hsBtn",{n:best});
   }
   function renderTabs(){
     document.querySelectorAll(".tab").forEach(t=>{t.setAttribute("aria-pressed",t.dataset.deck===deck);t.textContent=NAMES[t.dataset.deck]+(done[t.dataset.deck]?" ✓":"");});
   }
-  const MILES={5:"5 richtig in Folge! いいね！ (ii ne, sehr gut)",10:"10er-Serie! すごい！ (sugoi, Wahnsinn)",15:"15! Nur noch 5. がんばって！ (ganbatte)",20:"🎉 20 in Folge! おめでとう！ (omedetou, Glückwunsch). Die nächste Runde startet bei 0."};
+  const MILES={5:()=>T("m5"),10:()=>T("m10"),15:()=>T("m15"),20:()=>T("m20")};
   function setMsg(t,cls){const m=$("#stMsg");m.textContent=t;m.className="st-msg "+(cls||"");}
   function flash(cls){const p=$("#streak");p.classList.remove("win","lost");void p.offsetWidth;p.classList.add(cls);}
   let checkpoint=0, life=false;
   const resetCP=()=>{checkpoint=0;life=false;};
   function renderLife(){
     const el=$("#stLife");
-    el.textContent=life?`🛡️ Joker bereit: Bei einem Fehler geht's bei ${checkpoint} weiter`:(checkpoint?`Joker verbraucht. Nächster Fehler bedeutet 0.`:"");
+    el.textContent=life?T("lifeOn",{n:checkpoint}):(checkpoint?T("lifeUsed"):"");
     el.className="st-life"+(life?" on":"");
   }
   function hit(){
@@ -706,8 +875,8 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       const from=deck;
       if(CAMP.includes(from)&&!done[from]){done[from]=true;d.topics++;goals++;ST.rec++;}
       const next=CAMP.find(k=>!done[k]);
-      if(!next){finale=true;setMsg("🏆 Bonusfrage richtig! Du hast alle Themen geschafft!","good");}
-      else{deck=next;setMsg(`✅ Bonusfrage richtig, ${NAMES[from]} bestanden! Weiter mit: ${NAMES[next]}`,"good");}
+      if(!next){finale=true;setMsg(T("bonusAll"),"good");}
+      else{deck=next;setMsg(T("bonusOk",{a:NAMES[from],b:NAMES[next]}),"good");}
       flash("win");renderTabs();save();renderScore();renderDays();renderLife();return;
     }
     if(pendingReset){score.streak=0;pendingReset=false;resetCP();}
@@ -716,28 +885,28 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     if(score.streak>d.best)d.best=score.streak;
     if(score.streak>ST.best)ST.best=score.streak;
     if(score.streak===20){
-      if(deck==="all"){goals++;pendingReset=true;setMsg(MILES[20],"good");}
-      else{bonus=true;setMsg("🎉 20 geschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.","good");}
+      if(deck==="all"){goals++;pendingReset=true;setMsg(MILES[20](),"good");}
+      else{bonus=true;setMsg(T("bonus20"),"good");}
       flash("win");
     }
-    else if(MILES[score.streak]){checkpoint=score.streak;life=true;setMsg(MILES[score.streak]+` 🛡️ Checkpoint ${checkpoint}: Du hast einen Joker.`,"good");flash("win");}
-    else setMsg(`Weiter so! Noch ${20-score.streak} bis zum Ziel.`);
+    else if(MILES[score.streak]){checkpoint=score.streak;life=true;setMsg(MILES[score.streak]()+T("checkpoint",{n:checkpoint}),"good");flash("win");}
+    else setMsg(T("keepGoing",{n:20-score.streak}));
     save();renderScore();renderDays();renderLife();
   }
   function miss(){
     stat(false);
     const d=dayRec();d.no++;score.no++;
     const wasBonus=bonus;bonus=false;
-    if(pendingReset){pendingReset=false;score.streak=0;resetCP();setMsg("Falsch. Die Serie startet beim nächsten Treffer.","bad");save();renderScore();renderDays();renderLife();return;}
+    if(pendingReset){pendingReset=false;score.streak=0;resetCP();setMsg(T("wrongStart"),"bad");save();renderScore();renderDays();renderLife();return;}
     const lost=score.streak;
     if(life&&checkpoint>0){
       life=false;score.streak=checkpoint;
-      setMsg(`${wasBonus?"Bonusfrage verpasst. ":""}🛡️ Joker verbraucht: Serie ${lost} → zurück auf Checkpoint ${checkpoint}. Der nächste Fehler vor ${checkpoint+5} bringt dich auf 0.`,"bad");flash("lost");
+      setMsg((wasBonus?T("bonusMissed"):"")+T("jokerUsed",{a:lost,b:checkpoint,c:checkpoint+5}),"bad");flash("lost");
     }else{
       score.streak=0;resetCP();
-      if(wasBonus)setMsg(`Bonusfrage verpasst, kein Joker übrig. Zurück auf 0 bei ${NAMES[deck]}, du schaffst das!`,"bad");
-      else if(lost>0)setMsg(`Serie bei ${lost} verloren, kein Joker übrig. Zurück auf 0, von vorne!`,"bad");
-      else setMsg("Falsch. Die Serie startet beim nächsten Treffer.","bad");
+      if(wasBonus)setMsg(T("bonusNoJoker",{t:NAMES[deck]}),"bad");
+      else if(lost>0)setMsg(T("lostNoJoker",{n:lost}),"bad");
+      else setMsg(T("wrongStart"),"bad");
       if(lost>0)flash("lost");
     }
     save();renderScore();renderDays();renderLife();
@@ -746,14 +915,18 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   // ---- Frag den Sensei (nur wenn die Seite in Claude läuft) ----
   let sensei=null;
   Promise.resolve(window.claude?.use?.("sample")).then(s=>{sensei=s;document.body.classList.toggle("has-sensei",!!s);}).catch(()=>{});
-  const RULES=c=>`Du bist ein geduldiger Japanisch-Lehrer für einen deutschsprachigen Anfänger, der mit Duolingo lernt.
+  const RULES=c=>EN()?`You are a patient Japanese teacher for an English-speaking beginner who learns with Duolingo.
+Answer in English, short and clear (at most 6 sentences). Always write Japanese words as: Japanese (kana, romaji). No Markdown, no headings, no asterisks.
+If the question has nothing to do with Japanese, kindly steer back to learning.
+Context, the current flashcard: ${c.jp}${c.kana?" ("+c.kana+")":""}, romaji: ${c.romaji}, meaning: ${M(c)}${N(c)?", note: "+N(c):""}.`
+  :`Du bist ein geduldiger Japanisch-Lehrer für einen deutschsprachigen Anfänger, der mit Duolingo lernt.
 Antworte auf Deutsch, kurz und klar (höchstens 6 Sätze). Schreib japanische Wörter immer als: Japanisch (Kana, Romaji). Kein Markdown, keine Überschriften, keine Sternchen.
 Wenn die Frage nichts mit Japanisch zu tun hat, lenk freundlich zurück zum Lernen.
 Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${c.romaji}, Bedeutung: ${c.de}${c.note?", Hinweis: "+c.note:""}.`;
   function askHtml(){
     return `<div class="ask" data-sensei>
-      <label for="askIn" class="ask-l">🧑‍🏫 Frag den Sensei</label>
-      <div class="ask-row"><input id="askIn" type="text" placeholder="z. B. Was heißt deeto?" autocomplete="off"><button class="btn" id="askBtn" type="button">Fragen</button></div>
+      <label for="askIn" class="ask-l">${T("askL")}</label>
+      <div class="ask-row"><input id="askIn" type="text" placeholder="${T("askPh")}" autocomplete="off"><button class="btn" id="askBtn" type="button">${T("askBtn")}</button></div>
       <div class="ask-log" id="askLog"></div>
     </div>`;
   }
@@ -764,18 +937,18 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     let busy=false;
     async function go(){
       const q=inp.value.trim();if(!q||busy)return;
-      if(!sensei){log.insertAdjacentHTML("beforeend",`<div class="a err">Der Sensei ist hier nicht verfügbar. Öffne die Seite auf claude.ai.</div>`);return;}
+      if(!sensei){log.insertAdjacentHTML("beforeend",`<div class="a err">${T("noSensei")}</div>`);return;}
       busy=true;btn.disabled=true;inp.value="";
       const qe=document.createElement("div");qe.className="q";qe.textContent=q;log.append(qe);
-      const ae=document.createElement("div");ae.className="a";ae.textContent="Denkt nach…";log.append(ae);
+      const ae=document.createElement("div");ae.className="a";ae.textContent=T("thinking");log.append(ae);
       turns.push({role:"user",content:q});
       try{
         const {text}=await sensei(turns,{cache:false,modelTier:"quick",onText:({text})=>{ae.textContent=text;}});
         ae.textContent=text;turns.push({role:"assistant",content:text});
       }catch(e){
         turns.pop();
-        const m={not_granted:"Du hast dem Dojo nicht erlaubt, Claude zu fragen.",rate_limited:"Gerade zu viele Fragen. Versuch es gleich nochmal.",sampling_disabled:"Claude ist für diesen Account nicht verfügbar.",session_expired:"Bitte melde dich neu an.",refused:"Darauf kann der Sensei nicht antworten."};
-        ae.textContent=(e&&e.text)||m[e&&e.code]||"Das hat nicht geklappt. Versuch es nochmal.";ae.classList.add("err");
+        const m={not_granted:T("errNG"),rate_limited:T("errRL"),sampling_disabled:T("errSD"),session_expired:T("errSE"),refused:T("errRF")};
+        ae.textContent=(e&&e.text)||m[e&&e.code]||T("errGen");ae.classList.add("err");
       }finally{busy=false;btn.disabled=false;inp.focus();}
     }
     btn.onclick=go;inp.onkeydown=e=>{if(e.key==="Enter")go();};
@@ -788,19 +961,20 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     ["千里の道も一歩から","せんりのみちもいっぽから","senri no michi mo ippo kara","Auch ein Weg von tausend Meilen beginnt mit einem Schritt."],
     ["猿も木から落ちる","さるもきからおちる","saru mo ki kara ochiru","Auch Affen fallen von Bäumen. Jeder macht mal Fehler."]
   ];
+  const SAYINGS_EN=["Fall down seven times, get up eight.","Perseverance is strength.","A journey of a thousand miles begins with a single step.","Even monkeys fall from trees. Everyone makes mistakes."];
   function showFinale(){
-    const s=rnd(SAYINGS);
-    const c={jp:s[0],kana:s[1],romaji:s[2],de:s[3]};
-    card.innerHTML=`<div class="prompt-label">🏆 Alle ${CAMP.length} Themen geschafft · おめでとう！</div>
+    const i=Math.floor(Math.random()*SAYINGS.length),s=SAYINGS[i];
+    const c={jp:s[0],kana:s[1],romaji:s[2],de:s[3],en:SAYINGS_EN[i]};
+    card.innerHTML=`<div class="prompt-label">${T("finaleLab",{n:CAMP.length})}</div>
       <div class="big">${esc(c.jp)}</div>
       <div class="sub">${esc(c.kana)}</div>
       <div class="romaji">${esc(c.romaji)}</div>
       ${lautHtml(c)}${sayHtml(c)}
-      <div class="meaning"><b>${esc(c.de)}</b></div>
-      <div class="hint">Ein japanisches Sprichwort für dich. Du bist jetzt offiziell 先輩 (senpai) in diesem Dojo.</div>
-      <div class="actions"><button class="btn ghost" id="other">Anderer Spruch</button><button class="btn" id="restart">Alle Themen neu starten</button></div>`;
+      <div class="meaning"><b>${esc(M(c))}</b></div>
+      <div class="hint">${T("finaleHint")}</div>
+      <div class="actions"><button class="btn ghost" id="other">${T("other")}</button><button class="btn" id="restart">${T("restart")}</button></div>`;
     $("#other").onclick=showFinale;
-    $("#restart").onclick=()=>{done={};finale=false;bonus=false;score.streak=0;resetCP();renderLife();deck="num";setMsg("Neue Runde! Schaffe 20 in Folge pro Thema.");save();renderScore();render();};
+    $("#restart").onclick=()=>{done={};finale=false;bonus=false;score.streak=0;resetCP();renderLife();deck="num";setMsg(T("newRound"));save();renderScore();render();};
   }
 
   // ---- Tageshighscore ----
@@ -808,13 +982,13 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   function renderDays(){
     const d=dayRec();
     $("#today").innerHTML=[
-      ["Richtig heute",d.ok],["Beste Serie heute",d.best],["Themen heute",d.topics],["Fehler heute",d.no]
+      [T("tOk"),d.ok],[T("tBest"),d.best],[T("tTopics"),d.topics],[T("tNo"),d.no]
     ].map(([l,v])=>`<div class="tile"><span class="tv">${v}</span><span class="tl">${l}</span></div>`).join("");
     const days=[];for(let i=6;i>=0;i--){const t=new Date();t.setDate(t.getDate()-i);const k=keyOf(t);days.push({k,wd:WD[t.getDay()],date:pad(t.getDate())+"."+pad(t.getMonth()+1)+".",r:hist[k]||{ok:0,best:0}});}
     const max=Math.max(1,...days.map(x=>x.r.ok));
-    $("#week").innerHTML=days.map((x,i)=>`<div class="bcol${i===6?" now":""}"><span class="bv">${x.r.ok}</span><div class="wbar"><div style="height:${x.r.ok/max*100}%"></div></div><span class="bwd">${x.wd}</span><span class="bd">${x.date}</span><span class="bs" title="Beste Serie">🔥${x.r.best}</span></div>`).join("");
+    $("#week").innerHTML=days.map((x,i)=>`<div class="bcol${i===6?" now":""}"><span class="bv">${x.r.ok}</span><div class="wbar"><div style="height:${x.r.ok/max*100}%"></div></div><span class="bwd">${x.wd}</span><span class="bd">${x.date}</span><span class="bs" title="${T("bestStreak")}">🔥${x.r.best}</span></div>`).join("");
     let top=null;for(const k in hist){if(!top||hist[k].best>hist[top].best||(hist[k].best===hist[top].best&&hist[k].ok>hist[top].ok))top=k;}
-    $("#bestday").textContent=top&&hist[top].ok?`Bester Tag: ${top.split("-").reverse().join(".")} mit Serie ${hist[top].best} und ${hist[top].ok} richtigen Antworten`:"Noch kein Eintrag. Leg los!";
+    $("#bestday").textContent=top&&hist[top].ok?T("bestDay",{d:top.split("-").reverse().join("."),s:hist[top].best,n:hist[top].ok}):T("noEntry");
   }
 
   function backHtml(c){
@@ -825,26 +999,26 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
       <div class="romaji">${esc(c.romaji)}</div>
       ${lautHtml(c)}
       ${sayHtml(c)}
-      <div class="meaning"><b>${esc(c.de)}</b>${c.reg?` <span class="reg">${esc(c.reg)}</span>`:""}</div>
-      ${c.calc?`<div class="calc">${esc(c.calc)}</div>`:""}
-      ${c.note?`<div class="hint">${esc(c.note)}</div>`:""}
+      <div class="meaning"><b>${esc(M(c))}</b>${c.reg?` <span class="reg">${esc(REG(c.reg))}</span>`:""}</div>
+      ${c.calc?`<div class="calc">${esc(CALC(c))}</div>`:""}
+      ${N(c)?`<div class="hint">${esc(N(c))}</div>`:""}
       ${bugHtml(c)}
     </div>`;
   }
 
-  const bonusTag=()=>bonus?"⭐ Bonusfrage · ":"";
+  const bonusTag=()=>bonus?T("bonusTag"):"";
   function showCard(){
     if(finale){showFinale();return;}
     cur=pick();flipped=false;
     const front=Math.random()<.5?"jp":"de";
     card.dataset.front=front;
-    card.innerHTML=`<div class="prompt-label">${bonusTag()}${front==="jp"?"Was bedeutet das?":"Wie heißt das auf Japanisch?"}</div>
-      <div class="big ${front==="de"&&cur.deck==="num"?"num":""} ${front==="jp"&&script==="ro"?"ro":""}">${esc(front==="jp"?jpText(cur):cur.de)}</div>
+    card.innerHTML=`<div class="prompt-label">${bonusTag()}${front==="jp"?T("qMean"):T("qJp")}</div>
+      <div class="big ${front==="de"&&cur.deck==="num"?"num":""} ${front==="jp"&&script==="ro"?"ro":""}">${esc(front==="jp"?jpText(cur):M(cur))}</div>
       ${front==="jp"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
       ${front==="jp"&&cur.kanji&&script!=="ro"?`<div class="sub">${esc(cur.kanji)}</div>`:""}
       ${front==="jp"?sayHtml(cur):""}
-      <div class="actions"><button class="btn" id="flip">Umdrehen</button></div>`;
-    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">Nochmal üben</button><button class="btn" id="next">Gewusst · Weiter</button></div>`+askHtml();wireAsk(cur);
+      <div class="actions"><button class="btn" id="flip">${T("flip")}</button></div>`;
+    $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">${T("again")}</button><button class="btn" id="next">${T("knew")}</button></div>`+askHtml();wireAsk(cur);
       $("#next").onclick=()=>{hit();showCard();};
       $("#again").onclick=()=>{miss();showCard();};
     };
@@ -857,10 +1031,10 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     const others=shuffle(pool).slice(0,3);
     const dir=Math.random()<.5?"jp2de":"de2jp";
     const opts=shuffle([cur,...others]);
-    const label=bonusTag()+(dir==="jp2de"?"Was bedeutet das?":"Wähle das richtige Japanisch");
-    const promptTxt=dir==="jp2de"?jpText(cur):cur.de;
+    const label=bonusTag()+(dir==="jp2de"?T("qMean"):T("qPick"));
+    const promptTxt=dir==="jp2de"?jpText(cur):M(cur);
     const showHint=dir==="jp2de"&&script==="jp";
-    const choiceHtml=o=>dir==="jp2de"?esc(o.de):(script==="ro"?esc(o.romaji):script==="both"?`${esc(o.jp)}<span class="cr">${esc(o.romaji)}</span>`:esc(o.jp));
+    const choiceHtml=o=>dir==="jp2de"?esc(M(o)):(script==="ro"?esc(o.romaji):script==="both"?`${esc(o.jp)}<span class="cr">${esc(o.romaji)}</span>`:esc(o.jp));
     card.innerHTML=`<div class="prompt-label">${label}</div>
       <div class="big ${dir==="de2jp"&&cur.deck==="num"?"num":""} ${dir==="jp2de"&&script==="ro"?"ro":""}">${esc(promptTxt)}</div>
       ${dir==="jp2de"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
@@ -868,7 +1042,7 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
       ${dir==="jp2de"?sayHtml(cur):""}
       <div class="choices">${opts.map((o,i)=>`<button class="choice" id="c${i}" data-id="${o.id}">${choiceHtml(o)}</button>`).join("")}</div>
       <div class="feedback" id="fb"></div>
-      <div class="actions">${showHint?`<button class="btn ghost" id="showR">Romaji zeigen</button>`:""}<button class="btn" id="next" hidden>Weiter</button></div>
+      <div class="actions">${showHint?`<button class="btn ghost" id="showR">${T("showR")}</button>`:""}<button class="btn" id="next" hidden>${T("next")}</button></div>
       <div id="askSlot"></div>`;
     const sr=$("#showR"); if(sr) sr.onclick=()=>{$("#rhint").hidden=false;sr.hidden=true;};
     card.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{
@@ -879,13 +1053,13 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
       const fb=$("#fb");
       fb.className="feedback "+(ok?"ok":"no");
       const picked=EVERY.find(x=>x.id===b.dataset.id);
-      let html=`<div>${esc((ok?"Richtig! ":"Leider falsch. ")+`${cur.jp}${cur.kana?" · "+cur.kana:""} · ${cur.romaji} =`)} <span class="ans">${esc(cur.de)}</span></div>`;
+      let html=`<div>${esc((ok?T("right"):T("wrong"))+`${cur.jp}${cur.kana?" · "+cur.kana:""} · ${cur.romaji} =`)} <span class="ans">${esc(M(cur))}</span></div>`;
       html+=lautHtml(cur)+(dir==="de2jp"?sayHtml(cur):"");
-      if(cur.calc) html+=`<div class="calc">So setzt sich ${esc(cur.de)} zusammen: ${esc(cur.calc)}</div>`;
+      if(cur.calc) html+=`<div class="calc">${esc(T("built",{n:M(cur)}))}${esc(CALC(cur))}</div>`;
       if(!ok&&picked){
-        html+=`<div class="calc picked">Du hast gewählt: ${esc(picked.jp)} · ${esc(picked.romaji)} = ${esc(picked.de)}${picked.calc?`<br>${esc(picked.calc)}`:""}</div>`;
+        html+=`<div class="calc picked">${T("picked")}${esc(picked.jp)} · ${esc(picked.romaji)} = ${esc(M(picked))}${picked.calc?`<br>${esc(CALC(picked))}`:""}</div>`;
       }
-      if(cur.note&&!cur.calc) html+=`<div class="calc">${esc(cur.note)}</div>`;
+      if(N(cur)&&!cur.calc) html+=`<div class="calc">${esc(N(cur))}</div>`;
       html+=bugHtml(cur);
       fb.innerHTML=html;
       if(sr)sr.hidden=true; const rh=$("#rhint"); if(rh) rh.hidden=false;
@@ -897,19 +1071,20 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
 
   // ---- Feedback, Fehler melden, Abstimmen (Cloudflare D1) ----
   const VOTES=["Essen bestellen","Uhrzeit","Familie","Hiragana & Katakana","Anime-Sätze","Neuer Song","Eigener Vorschlag"];
-  const FB_T={feedback:"⭐ Bewerten & Feedback",bug:"🐞 Karte melden",vote:"🗳️ Mitbestimmen"};
-  const FB_L={feedback:"Was gefällt dir, was fehlt? (freiwillig)",bug:"Was stimmt nicht an der Karte?",vote:"Eigener Vorschlag oder Kommentar (freiwillig)"};
+  const VOTES_EN=["Ordering food","Telling the time","Family","Hiragana & katakana","Anime lines","A new song","My own idea"];
+  const FB_T={feedback:"fbTF",bug:"fbTB",vote:"fbTV"};
+  const FB_L={feedback:"fbTxtF",bug:"fbTxtB",vote:"fbTxtV"};
   let fbKind="feedback",fbRate=0,fbBack=null;
   function paintStars(){$("#fbStars").querySelectorAll("button").forEach((b,i)=>{b.classList.toggle("on",i<fbRate);b.setAttribute("aria-pressed",i<fbRate);});}
   function openFb(kind,cardTxt){
     if(!API_ON)return;
     fbKind=kind;fbRate=0;fbBack=document.activeElement;
-    $("#fbT").textContent=FB_T[kind];
+    $("#fbT").textContent=T(FB_T[kind]);
     $("#fbCardRow").hidden=kind!=="bug";$("#fbCard").textContent=cardTxt||"–";
     $("#fbStarRow").hidden=kind!=="feedback";$("#fbVoteRow").hidden=kind!=="vote";
     $("#fbStars").innerHTML=[1,2,3,4,5].map(n=>`<button type="button" aria-label="${n}">★</button>`).join("");paintStars();
-    $("#fbVote").innerHTML=VOTES.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
-    $("#fbTextL").textContent=FB_L[kind];
+    $("#fbVote").innerHTML=VOTES.map((v,i)=>`<option value="${esc(v)}">${esc(EN()?VOTES_EN[i]:v)}</option>`).join("");
+    $("#fbTextL").textContent=T(FB_L[kind]);
     $("#fbText").value="";$("#fbMsg").textContent="";$("#fbMsg").className="feedback";$("#fbSend").disabled=false;
     $("#fbDlg").dataset.card=cardTxt||"";
     $("#fbDlg").hidden=false;(kind==="vote"?$("#fbVote"):kind==="bug"?$("#fbText"):$("#fbStars button")).focus();
@@ -921,14 +1096,14 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   $("#fbDlg").addEventListener("keydown",e=>{if(e.key==="Escape")closeFb();});
   $("#fbSend").onclick=async()=>{
     const text=$("#fbText").value.trim(),m=$("#fbMsg");
-    const d={kind:fbKind,text,vid:vid(),lang:"de"};
+    const d={kind:fbKind,text,vid:vid(),lang:LANG};
     if(fbKind==="feedback")d.rating=fbRate;
     if(fbKind==="vote")d.topic=$("#fbVote").value;
     if(fbKind==="bug")d.card=$("#fbDlg").dataset.card;
-    if((fbKind==="feedback"&&!fbRate&&!text)||(fbKind==="bug"&&!text)){m.className="feedback no";m.textContent="Bitte Sterne vergeben oder etwas reinschreiben.";return;}
+    if((fbKind==="feedback"&&!fbRate&&!text)||(fbKind==="bug"&&!text)){m.className="feedback no";m.textContent=T("fbEmpty");return;}
     $("#fbSend").disabled=true;
-    try{const r=await apiPost("/api/feedback",d);if(!r.ok)throw r.status;m.className="feedback ok";m.textContent="Danke! ありがとう！ Ist angekommen. 🙏";setTimeout(closeFb,1400);}
-    catch(err){$("#fbSend").disabled=false;m.className="feedback no";m.textContent=err===429?"Gerade zu viel auf einmal. Probier's später nochmal.":"Senden hat nicht geklappt. Probier's später nochmal.";}
+    try{const r=await apiPost("/api/feedback",d);if(!r.ok)throw r.status;m.className="feedback ok";m.textContent=T("fbThanks");setTimeout(closeFb,1400);}
+    catch(err){$("#fbSend").disabled=false;m.className="feedback no";m.textContent=err===429?T("fbRL"):T("fbFail");}
   };
   if(API_ON){
     $("#feedback").hidden=false;$("#vote").hidden=false;
@@ -941,18 +1116,18 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   function hsMyName(){try{return localStorage.getItem(KEY+"-name")||"";}catch(e){return "";}}
   function renderHs(){
     const me=hsMyName();
-    $("#hsList").innerHTML=hsTop.length?hsTop.map(r=>`<li${r.name===me?' class="me"':""}><span class="nm">${esc(r.name)}</span><span class="sc">🔥 ${r.best}</span></li>`).join(""):`<li class="hint" style="counter-increment:none">Noch kein Eintrag. Sei der Erste!</li>`;
+    $("#hsList").innerHTML=hsTop.length?hsTop.map(r=>`<li${r.name===me?' class="me"':""}><span class="nm">${esc(r.name)}</span><span class="sc">🔥 ${r.best}</span></li>`).join(""):`<li class="hint" style="counter-increment:none">${T("hsNone")}</li>`;
     if(!$("#hsName").value)$("#hsName").value=me;
   }
   async function loadHs(){if(!API_ON)return;try{const r=await fetch(API+"/api/highscore?dojo="+DOJO);const j=await r.json();if(!j.ok)return;hsTop=j.top||[];$("#hs").hidden=false;renderHs();}catch(e){}}
   $("#hsSend").onclick=async()=>{
     const name=$("#hsName").value.trim(),m=$("#hsMsg");
-    if(!best){m.textContent="Erst eine Serie spielen, dann eintragen.";return;}
-    if(!name){m.textContent="Bitte einen Namen eingeben.";$("#hsName").focus();return;}
+    if(!best){m.textContent=T("hsNeed");return;}
+    if(!name){m.textContent=T("hsName");$("#hsName").focus();return;}
     try{localStorage.setItem(KEY+"-name",name);}catch(e){}
     $("#hsSend").disabled=true;
-    try{const r=await apiPost("/api/score",{vid:vid(),name,best});const j=await r.json();if(!j.ok)throw 0;m.textContent=`Eingetragen! Platz ${j.rank} mit Serie ${j.best}. すごい！`;await loadHs();}
-    catch(e){m.textContent="Hat nicht geklappt. Probier's später nochmal.";}
+    try{const r=await apiPost("/api/score",{vid:vid(),name,best});const j=await r.json();if(!j.ok)throw 0;m.textContent=T("hsOk",{r:j.rank,n:j.best});await loadHs();}
+    catch(e){m.textContent=T("hsErr");}
     $("#hsSend").disabled=false;
   };
 
@@ -963,12 +1138,26 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     cur=null; mode==="quiz"?showQuiz():showCard();
   }
   document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
-    if(t.dataset.deck!==deck||finale){deck=t.dataset.deck;finale=false;if(bonus){bonus=false;}score.streak=0;pendingReset=false;resetCP();renderLife();setMsg(`Neues Thema: ${NAMES[deck]}. Die Serie startet bei 0.`);renderScore();}
+    if(t.dataset.deck!==deck||finale){deck=t.dataset.deck;finale=false;if(bonus){bonus=false;}score.streak=0;pendingReset=false;resetCP();renderLife();setMsg(T("newTopic",{t:NAMES[deck]}));renderScore();}
     save();render();
   });
   document.querySelectorAll(".mode[data-mode]").forEach(m=>m.onclick=()=>{mode=m.dataset.mode;save();render();});
   document.querySelectorAll(".mode[data-script]").forEach(m=>m.onclick=()=>{script=m.dataset.script;save();render();});
-  load();if(!CAMP.find(k=>!done[k]))finale=true;renderScore();renderDays();renderLife();render();loadHs();
+  const NOTES_DE=$("#wissenInner").innerHTML;
+  function applyLang(){
+    document.documentElement.lang=LANG;
+    document.querySelectorAll("[data-i18n]").forEach(el=>{const k=el.dataset.i18n;if(k in UI)el.innerHTML=T(k);});
+    document.querySelectorAll("[data-i18n-title]").forEach(el=>{const k=el.dataset.i18nTitle;if(k in UI)el.title=T(k);});
+    document.querySelectorAll("[data-i18n-ph]").forEach(el=>{const k=el.dataset.i18nPh;if(k in UI)el.placeholder=T(k);});
+    Object.assign(NAMES,EN()?NAMES_EN:NAMES_DE);
+    $("#wissenInner").innerHTML=EN()?NOTES_EN:NOTES_DE;
+    const h=$("#hanko");h.title=T("hanko");h.setAttribute("aria-label",EN()?"練習, renshuu, practice":"練習, renshuu, Übung");
+    $("#themeBtn").setAttribute("aria-label",T("themeL"));if(window.__paintTheme)window.__paintTheme();
+    $("#week").setAttribute("aria-label",T("weekL"));
+    const lb=$("#langBtn");lb.textContent=EN()?"DE":"EN";lb.title=T("langTip");lb.setAttribute("aria-label",T("langTip"));
+  }
+  $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("nihongodojo-lang",LANG);}catch(e){}applyLang();setMsg(T("msgStart"));renderScore();renderDays();renderLife();renderHs();render();};
+  load();if(!CAMP.find(k=>!done[k]))finale=true;applyLang();if(EN())setMsg(T("msgStart"));renderScore();renderDays();renderLife();render();loadHs();
 })();
 </script>
 </body>
