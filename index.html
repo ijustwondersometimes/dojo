@@ -74,6 +74,7 @@ h1 small{display:none;font-family:var(--f-body);font-weight:500;font-size:14px;c
 .theme-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;display:grid;place-items:center;padding:0}
 .theme-btn:hover{border-color:var(--gold)}
 .tab18[aria-pressed="false"]{border-style:dashed}
+#gate{z-index:70}
 .gate-bg{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,#000 60%,transparent);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .gate-box{background:var(--surface);color:var(--ink);border:2px solid var(--rot);border-radius:16px;padding:22px 20px;width:100%;max-width:380px;display:flex;flex-direction:column;gap:10px;text-align:left}
 .gate-icon{font-size:40px;line-height:1}
@@ -1168,7 +1169,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       if(!v||v<1900||v>y){msg.textContent=T("gErrYear");return;}
       if(y-v<18){msg.textContent=T("gErrAge");return;}
       try{localStorage.setItem("weanerdojo-18","1");}catch(e){window.__adult=true;}
-      closeGate();renderSpruch();deck="schimpf";bonus=false;cur=null;renderTabs();save();renderScore();render();
+      closeGate();if(!$("#pickDlg").hidden){pDeck="schimpf";paintPick();return;}renderSpruch();deck="schimpf";bonus=false;cur=null;renderTabs();save();renderScore();render();
     };
     ok.onclick=go;yr.onkeydown=e=>{if(e.key==="Enter")go();};
     $("#ageNo").onclick=closeGate;
@@ -1262,12 +1263,12 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   let pDia=dia,pDeck=deck;
   function paintPick(){
     document.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pick===pDia));
-    $("#pickTopics").innerHTML=[...CAMP,"all"].map(k=>`<button type="button" class="tab" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
+    $("#pickTopics").innerHTML=[...CAMP,"schimpf","all"].map(k=>`<button type="button" class="tab${k==="schimpf"?" tab18":""}" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
   }
-  function openStart(){pDia=dia;pDeck=(deck==="schimpf")?deck:deck;if(!DECKS[pDeck]||pDeck==="schimpf")pDeck="greet";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
+  function openStart(){pDia=dia;pDeck=(deck==="schimpf")?deck:deck;if(!DECKS[pDeck]||(pDeck==="schimpf"&&!adult()))pDeck="greet";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
   function renderNow(){$("#heroT").textContent=T(dia==="wien"?"heroWien":"heroNoe");$("#heroS").textContent=T(dia==="wien"?"heroWienS":"heroNoeS");const c=$("#nowChip");c.className="now-chip "+dia;c.innerHTML=document.querySelector((dia==="wien"?"#v-wien":"#v-noe")+" svg").outerHTML+`<span>${esc(T(dia==="wien"?"dWien":"dNoe"))}</span><span class="ch">${esc(T("change"))}</span>`;}
   document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pDia=b.dataset.pick;paintPick();});
-  $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
+  $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;if(t.dataset.pdeck==="schimpf"&&!adult()){openGate();return;}pDeck=t.dataset.pdeck;paintPick();};
   $("#pickGo").onclick=()=>{try{sessionStorage.setItem("weanerdojo-start","1");localStorage.setItem("weanerdojo-dia","1");}catch(e){}
     $("#pickDlg").hidden=true;dia=pDia;const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);save();if(t)t.click();else render();renderNow();window.scrollTo(0,0);};
   $("#nowChip").onclick=openStart;
