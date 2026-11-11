@@ -112,7 +112,20 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .pick{display:flex;gap:14px;align-items:center;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;background:var(--paper);font:inherit;color:var(--ink);cursor:pointer}
 .pick svg{width:30px;height:38px;flex:none}
 .pick b{display:block;font-size:17px}.pick small{display:block;color:var(--muted);font-size:13px}
-.pick.wien:hover,.pick.wien:focus-visible{border-color:var(--rot)}.pick.noe:hover,.pick.noe:focus-visible{border-color:var(--blau)}
+.pick-box{max-height:calc(100vh - 40px);overflow-y:auto}
+.pick-box h2{font-size:30px}
+.pick-lead{font-family:var(--f-word);font-weight:700;font-size:20px!important;color:var(--ink)!important;line-height:1.3}
+.pick-step{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
+.pick[aria-pressed="true"].wien{border-color:var(--rot);background:color-mix(in srgb,var(--rot) 8%,var(--surface))}
+.pick[aria-pressed="true"].noe{border-color:var(--blau);background:color-mix(in srgb,var(--blau) 10%,var(--surface))}
+.pick{position:relative}.pick[aria-pressed="true"]::after{content:"✓";position:absolute;right:14px;font-weight:700}
+.pick-topics{display:flex;flex-wrap:wrap;gap:8px}
+.pick-topics .tab{font-size:14px;padding:7px 12px}
+.pick-go{margin-top:8px;font-size:17px;padding:12px 18px;background:var(--rot);border-color:var(--rot);color:#fff;border-radius:12px}
+.now-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14px;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer}
+.now-chip svg{width:16px;height:20px}
+.now-chip .ch{color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.now-chip.wien{border-color:var(--rot)}.now-chip.noe{border-color:var(--blau)}
 .dia-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .dia{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0;opacity:.6}
 .dia svg{width:34px;height:42px;flex:none}
@@ -351,9 +364,13 @@ section.notes{display:flex;flex-direction:column;gap:12px}
 <div class="pick-bg" id="pickDlg" hidden role="dialog" aria-modal="true" aria-labelledby="pickT">
   <div class="pick-box">
     <h2 id="pickT" data-i18n="pickT">Griaß di! 👋</h2>
-    <p data-i18n="pickP">Welchen Dialekt willst du lernen? Kannst du jederzeit oben ändern.</p>
+    <p class="pick-lead" data-i18n="greet">Lernst heut wieder a bissl Weanerisch?</p>
+    <div class="pick-step" data-i18n="step1">1 · Welchen Dialekt?</div>
     <button class="pick wien" type="button" data-pick="wien"><span class="pk-svg" data-from="#v-wien"></span><span><b data-i18n="dWien">Wienerisch</b><small data-i18n="wienSub">Stadt Wien · haaß, dahaam</small></span></button>
     <button class="pick noe" type="button" data-pick="noe"><span class="pk-svg" data-from="#v-noe"></span><span><b data-i18n="dNoe">Niederösterreichisch</b><small data-i18n="noeSub">Land rund um Wien · hoaß, dahoam</small></span></button>
+    <div class="pick-step" data-i18n="step2">2 · Was willst du heute lernen?</div>
+    <div class="pick-topics" id="pickTopics"></div>
+    <button class="btn pick-go" id="pickGo" type="button" data-i18n="go">Los geht's! 🎯</button>
   </div>
 </div>
 <div class="wrap">
@@ -364,11 +381,11 @@ section.notes{display:flex;flex-direction:column;gap:12px}
       <button class="lang-btn" id="langBtn" type="button" data-i18n-tip="langTip" data-tip="Switch to English">EN</button>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
     </div>
-    <p class="greet" data-i18n="greet">👋 Griaß di! Lernst heut wieder a bissl Weanerisch?</p>
   </header>
 
 
-  <div class="dia-box">
+  <button class="now-chip" id="nowChip" type="button"></button>
+  <div class="dia-box" hidden>
   <span class="dia-q" data-i18n="diaQ">Welchen Dialekt willst du lernen?</span>
   <div class="dia-switch" role="group" aria-label="Dialekt">
     <button class="dia wien" id="v-wien" data-i18n-tip="tipWien" data-tip="Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa." data-dia="wien" aria-pressed="true">
@@ -761,7 +778,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   "fbTxtF":["Was gefällt dir, was fehlt? (freiwillig)","What do you like, what's missing? (optional)"],"fbTxtB":["Was stimmt nicht an der Karte?","What's wrong with this card?"],"fbTxtV":["Eigener Vorschlag oder Kommentar (freiwillig)","Your own idea or a comment (optional)"],
   "fbCancel":["Abbrechen","Cancel"],"fbSend":["Senden","Send"],"fbThanks":["Danke! Is angekommen. 🙏","Thanks! It arrived. 🙏"],"fbEmpty":["Bitte Sterne vergeben oder was reinschreiben.","Please give stars or write something."],
   "fbFail":["Senden hat ned geklappt.","Sending didn't work."],"fbAlt":["Stattdessen das Formular öffnen ↗","Open the form instead ↗"],"fbRL":["Grad zu viel auf einmal. Probier's später nochmal.","Too much at once. Please try again later."]});
-  Object.assign(UI,{"greet":["👋 Griaß di! Lernst heut wieder a bissl Weanerisch?","👋 Servus! Ready to learn a bit of Viennese today?"],"spLab":["📜 Spruch des Tages","📜 Saying of the day"],
+  Object.assign(UI,{"greet":["Lernst heut wieder a bissl Weanerisch?","Ready to learn a bit of Viennese today?"],"step1":["1 · Welchen Dialekt?","1 · Which dialect?"],"step2":["2 · Was willst du heute lernen?","2 · What do you want to learn today?"],"go":["Los geht's! 🎯","Let's go! 🎯"],"change":["ändern","change"],"spLab":["📜 Spruch des Tages","📜 Saying of the day"],
   "diaQ":["Welchen Dialekt willst du lernen?","Which dialect do you want to learn?"],"diaHint":["Wien = Stadt Wien (haaß) · NÖ = Niederösterreich, das Land rund um Wien (hoaß)","Vienna = the city (haaß) · Lower Austria = the state around Vienna (hoaß)"],
   "wienName":["Wienerisch","Viennese"],"wienKurz":["Wien","Vienna"],"wienSub":["Stadt Wien · haaß, dahaam","City of Vienna · haaß, dahaam"],
   "noeName":["Niederösterreichisch","Lower Austrian"],"noeKurz":["NÖ","L. Austria"],"noeSub":["Land rund um Wien · hoaß, dahoam","State around Vienna · hoaß, dahoam"],
@@ -1228,18 +1245,30 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     $("#langBtn").textContent=EN()?"DE":"EN";
     $("#langBtn").setAttribute("aria-label",EN()?"Auf Deutsch umschalten":"Switch to English");
   }
-  $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(T("msgStart"));render();renderHs();};
+  $("#langBtn").onclick=()=>{setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0);LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(T("msgStart"));render();renderHs();};
   $("#spruch").onclick=nextSpruch;
   $("#witzBtn").onclick=openAlbum;
   $("#albumX").onclick=()=>{$("#album").hidden=true;$("#spruch").focus();};
   $("#album").addEventListener("click",e=>{if(e.target.id==="album")$("#album").hidden=true;});
   $("#album").addEventListener("keydown",e=>{if(e.key==="Escape")$("#album").hidden=true;});
   (function(){const h=$("#hCrests");["#v-wien svg","#v-noe svg"].forEach(q=>{const v=document.querySelector(q);if(v)h.appendChild(v.cloneNode(true));});})();
-  let firstVisit=false;try{firstVisit=!localStorage.getItem("weanerdojo")&&!localStorage.getItem("weanerdojo-dia");}catch(e){}
+  // ---- Start-Pop-up: Dialekt + Thema wählen (einmal pro Besuch) ----
+  let showStart=false;try{showStart=!sessionStorage.getItem("weanerdojo-start");}catch(e){showStart=true;}
   document.querySelectorAll(".pk-svg").forEach(x=>{x.outerHTML=document.querySelector(x.dataset.from+" svg").outerHTML;});
-  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{dia=b.dataset.pick;try{localStorage.setItem("weanerdojo-dia","1");}catch(e){}$("#pickDlg").hidden=true;save();render();});
+  let pDia=dia,pDeck=deck;
+  function paintPick(){
+    document.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pick===pDia));
+    $("#pickTopics").innerHTML=[...CAMP,"all"].map(k=>`<button type="button" class="tab" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
+  }
+  function openStart(){pDia=dia;pDeck=(deck==="schimpf")?deck:deck;if(!DECKS[pDeck]||pDeck==="schimpf")pDeck="greet";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
+  function renderNow(){const c=$("#nowChip");c.className="now-chip "+dia;c.innerHTML=document.querySelector((dia==="wien"?"#v-wien":"#v-noe")+" svg").outerHTML+`<span>${esc(T(dia==="wien"?"dWien":"dNoe"))}</span><span class="ch">${esc(T("change"))}</span>`;}
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pDia=b.dataset.pick;paintPick();});
+  $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
+  $("#pickGo").onclick=()=>{try{sessionStorage.setItem("weanerdojo-start","1");localStorage.setItem("weanerdojo-dia","1");}catch(e){}
+    $("#pickDlg").hidden=true;dia=pDia;const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);save();if(t)t.click();else render();renderNow();window.scrollTo(0,0);};
+  $("#nowChip").onclick=openStart;
   load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();loadHs();
-  if(firstVisit){$("#pickDlg").hidden=false;$(".pick.wien").focus();}
+  renderNow();if(showStart)openStart();
 })();
 </script>
 
