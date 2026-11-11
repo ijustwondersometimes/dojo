@@ -166,6 +166,10 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .copy a{color:var(--ai)}
 .stat-opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .stat-opt input{accent-color:var(--shu);width:15px;height:15px;margin:0}
+[data-tip]{position:relative}
+[data-tip]:hover::after,[data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:12px;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;padding:7px 10px;border-radius:8px;width:max-content;max-width:240px;white-space:normal;text-align:left;z-index:30;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+.head-r [data-tip]:hover::after,.head-r [data-tip]:focus-visible::after{left:auto;right:0;transform:none}
+@media (hover:none){[data-tip]:hover::after{display:none}}
 .lang-btn{font:inherit;font-weight:700;font-size:13px;letter-spacing:.04em;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;width:40px;height:40px;padding:0;cursor:pointer}
 .lang-btn:hover{border-color:var(--shu)}
 /* ---- Wissen zum Aufklappen (wie im Wien / NÖ Dojo) ---- */
@@ -188,42 +192,42 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   <header>
     <h1>Nihongo Dojo<small data-i18n="sub">Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
     <div class="head-r">
-      <div class="hanko" id="hanko" title="練習 (renshuu) = Übung" aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
-      <button class="lang-btn" id="langBtn" type="button" title="Switch to English" aria-label="Switch to English">EN</button>
-      <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
+      <div class="hanko" id="hanko" data-tip="練習 (renshuu) = Übung. Der rote Stempel steht für dein tägliches Üben." aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
+      <button class="lang-btn" id="langBtn" type="button" data-tip="Switch to English" aria-label="Switch to English">EN</button>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten" data-tip="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
 
   <div class="tabs" role="group" aria-label="Thema">
-    <button class="tab" id="t-num" data-deck="num" aria-pressed="true">Zahlen 0–100</button>
-    <button class="tab" id="t-day" data-deck="day" aria-pressed="false">Wochentage</button>
-    <button class="tab" id="t-greet" data-deck="greet" aria-pressed="false">Begrüßen &amp; Vorstellen</button>
-    <button class="tab" id="t-date" data-deck="date" aria-pressed="false">Small Talk &amp; Date</button>
-    <button class="tab" id="t-pol" data-deck="pol" aria-pressed="false">Höflich &amp; Unterwegs</button>
-    <button class="tab" id="t-phr" data-deck="phr" aria-pressed="false">Aus deinem Ordner</button>
-    <button class="tab" id="t-song" data-deck="song" aria-pressed="false">♪ 修羅の花 · Flower of Carnage</button>
-    <button class="tab" id="t-mosi" data-deck="mosi" aria-pressed="false">♪ もしもし？ · Hello?</button>
-    <button class="tab" id="t-abuku" data-deck="abuku" aria-pressed="false">♪ あぶく · Bubble</button>
-    <button class="tab" id="t-sil" data-deck="sil" aria-pressed="false">♪ シルエット · Silhouette</button>
-    <button class="tab" id="t-all" data-deck="all" aria-pressed="false">Alles gemischt</button>
+    <button class="tab" id="t-num" data-deck="num" data-tip-k="tip_num" aria-pressed="true">Zahlen 0–100</button>
+    <button class="tab" id="t-day" data-deck="day" data-tip-k="tip_day" aria-pressed="false">Wochentage</button>
+    <button class="tab" id="t-greet" data-deck="greet" data-tip-k="tip_greet" aria-pressed="false">Begrüßen &amp; Vorstellen</button>
+    <button class="tab" id="t-date" data-deck="date" data-tip-k="tip_date" aria-pressed="false">Small Talk &amp; Date</button>
+    <button class="tab" id="t-pol" data-deck="pol" data-tip-k="tip_pol" aria-pressed="false">Höflich &amp; Unterwegs</button>
+    <button class="tab" id="t-phr" data-deck="phr" data-tip-k="tip_phr" aria-pressed="false">Aus deinem Ordner</button>
+    <button class="tab" id="t-song" data-deck="song" data-tip-k="tip_song" aria-pressed="false">♪ 修羅の花 · Flower of Carnage</button>
+    <button class="tab" id="t-mosi" data-deck="mosi" data-tip-k="tip_mosi" aria-pressed="false">♪ もしもし？ · Hello?</button>
+    <button class="tab" id="t-abuku" data-deck="abuku" data-tip-k="tip_abuku" aria-pressed="false">♪ あぶく · Bubble</button>
+    <button class="tab" id="t-sil" data-deck="sil" data-tip-k="tip_sil" aria-pressed="false">♪ シルエット · Silhouette</button>
+    <button class="tab" id="t-all" data-deck="all" data-tip-k="tip_all" aria-pressed="false">Alles gemischt</button>
   </div>
 
   <div class="bar">
     <div class="modes" role="group" aria-label="Lernmodus">
-      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true" data-i18n="quiz">Quiz</button>
-      <button class="mode" id="m-card" data-mode="card" aria-pressed="false" data-i18n="card">Karteikarten</button>
+      <button class="mode" id="m-quiz" data-mode="quiz" aria-pressed="true" data-i18n="quiz" data-tip-k="tipQuiz">Quiz</button>
+      <button class="mode" id="m-card" data-mode="card" aria-pressed="false" data-i18n="card" data-tip-k="tipCard">Karteikarten</button>
     </div>
     <div class="modes" role="group" aria-label="Schrift">
       <span class="lbl" data-i18n="script">Schrift</span>
-      <button class="mode" id="s-jp" data-script="jp" aria-pressed="true">日本語</button>
-      <button class="mode" id="s-both" data-script="both" aria-pressed="false" data-i18n="both">Beides</button>
-      <button class="mode" id="s-ro" data-script="ro" aria-pressed="false">Romaji</button>
+      <button class="mode" id="s-jp" data-script="jp" aria-pressed="true" data-tip-k="tipJp">日本語</button>
+      <button class="mode" id="s-both" data-script="both" aria-pressed="false" data-i18n="both" data-tip-k="tipBoth">Beides</button>
+      <button class="mode" id="s-ro" data-script="ro" aria-pressed="false" data-tip-k="tipRo">Romaji</button>
     </div>
     <div class="score" id="score">Richtig 0 · Falsch 0 · Serie 0</div>
   </div>
 
   <div class="streak" id="streak">
-    <div class="st-top">
+    <div class="st-top" data-tip-k="tipStreak">
       <span class="st-num"><b id="stNum">0</b> <span data-i18n="inRow">/ 20 in Folge</span></span>
       <span class="st-meta" id="stMeta">Rekord 0 · Ziele 0</span>
     </div>
@@ -340,7 +344,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 (function(){
   const root=document.documentElement,tb=document.getElementById("themeBtn");
   const isDark=()=>root.dataset.theme?root.dataset.theme==="dark":matchMedia("(prefers-color-scheme: dark)").matches;
-  const paintBtn=()=>{const d=isDark(),en=document.documentElement.lang==="en";tb.textContent=d?"☀️":"🌙";tb.title=d?(en?"Light":"Hell"):(en?"Dark":"Dunkel");};
+  const paintBtn=()=>{const d=isDark(),en=document.documentElement.lang==="en";tb.textContent=d?"☀️":"🌙";};
   window.__paintTheme=paintBtn;
   try{const t=localStorage.getItem("nihongodojo-theme");if(t)root.dataset.theme=t;}catch(e){}
   paintBtn();
@@ -624,6 +628,24 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     statLab:["Anonyme Statistik senden","Send anonymous stats"],statTip:["Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet.","Helps improve the Dojo. Only topics, points, streak and settings are sent, no names. Untick = nothing is sent."],
     wTitle:["📖 Wissen zum Nachlesen","📖 Background reading"],wSub:["Song-Lektionen: Silhouette, Bubble, mosi mosi? · Aussprache-Regeln · Merkhilfe Wochentage","Song lessons: Silhouette, Bubble, mosi mosi? · Pronunciation rules · Weekday memory aid"],
     langTip:["Switch to English","Auf Deutsch umschalten"],
+    hankoTip:["練習 (renshuu) = Übung. Der rote Stempel steht für dein tägliches Üben.","練習 (renshuu) = practice. The red stamp stands for your daily practice."],
+    tipQuiz:["Vier Antworten zur Auswahl, eine davon ist richtig.","Four answers to choose from, one of them is right."],
+    tipCard:["Karte umdrehen und selbst einschätzen, ob du es gewusst hast.","Flip the card and judge for yourself whether you knew it."],
+    tipJp:["Nur japanische Schrift. Romaji kannst du im Quiz bei Bedarf einblenden.","Japanese script only. In the quiz you can reveal the romaji if needed."],
+    tipBoth:["Japanische Schrift und darunter die Umschrift in lateinischen Buchstaben (Romaji).","Japanese script with the romanisation (romaji) underneath."],
+    tipRo:["Nur Romaji, also Japanisch in lateinischen Buchstaben. Gut für den Anfang.","Romaji only, Japanese in Latin letters. Good for getting started."],
+    tipStreak:["Schaffe 20 richtige Antworten in Folge. Bei 5, 10 und 15 gibt's einen 🛡️ Joker, danach eine ⭐ Bonusfrage.","Get 20 right answers in a row. At 5, 10 and 15 you get a 🛡️ joker, then a ⭐ bonus question."],
+    tip_num:["Zahlen von 0 bis 100, mit Rechenweg wie sie zusammengesetzt sind.","Numbers from 0 to 100, with how each one is built."],
+    tip_day:["Die sieben Wochentage. Jeder steht für ein Element oder Himmelskörper.","The seven weekdays. Each one stands for an element or a heavenly body."],
+    tip_greet:["Hallo sagen, dich vorstellen, nach Namen und Herkunft fragen.","Saying hello, introducing yourself, asking names and where people are from."],
+    tip_date:["Small Talk, Hobbys und Sätze fürs erste Date.","Small talk, hobbies and lines for a first date."],
+    tip_pol:["Danke, Entschuldigung und Sätze für Restaurant, Laden und Reise.","Thanks, apologies and phrases for restaurants, shops and travel."],
+    tip_phr:["Deine eigenen Lieblingssätze und Wörter.","Your own favourite phrases and words."],
+    tip_song:["Vokabeln aus „Flower of Carnage“ von Meiko Kaji (Kill Bill).","Vocabulary from “Flower of Carnage” by Meiko Kaji (Kill Bill)."],
+    tip_mosi:["Vokabeln aus „mosi mosi?“ von 楽音 Sasane. Erklärung unten bei Wissen zum Nachlesen.","Vocabulary from “mosi mosi?” by 楽音 Sasane. Explained below in Background reading."],
+    tip_abuku:["Vokabeln aus „あぶく“ (Bubble) von ヨルシカ. Erklärung unten bei Wissen zum Nachlesen.","Vocabulary from “あぶく” (Bubble) by ヨルシカ. Explained below in Background reading."],
+    tip_sil:["Vokabeln aus „Silhouette“ von KANA-BOON (Naruto). Erklärung unten bei Wissen zum Nachlesen.","Vocabulary from “Silhouette” by KANA-BOON (Naruto). Explained below in Background reading."],
+    tip_all:["Eine Mischung aus allen Themen.","A mix of all topics."],
     hanko:["練習 (renshuu) = Übung","練習 (renshuu) = practice"],
     themeL:["Hell oder dunkel umschalten","Switch light or dark"],light:["Hell","Light"],dark:["Dunkel","Dark"],
     msgStart:["Schaffe 20 in Folge, dann kommt eine Bonusfrage aus allen Themen. Bei 5, 10 und 15 bekommst du einen 🛡️ Joker: Ein Fehler wirft dich nur auf diesen Checkpoint zurück.","Get 20 in a row to unlock a bonus question from all topics. At 5, 10 and 15 you get a 🛡️ joker: a mistake only sends you back to that checkpoint."],
@@ -1151,10 +1173,11 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     document.querySelectorAll("[data-i18n-ph]").forEach(el=>{const k=el.dataset.i18nPh;if(k in UI)el.placeholder=T(k);});
     Object.assign(NAMES,EN()?NAMES_EN:NAMES_DE);
     $("#wissenInner").innerHTML=EN()?NOTES_EN:NOTES_DE;
-    const h=$("#hanko");h.title=T("hanko");h.setAttribute("aria-label",EN()?"練習, renshuu, practice":"練習, renshuu, Übung");
-    $("#themeBtn").setAttribute("aria-label",T("themeL"));if(window.__paintTheme)window.__paintTheme();
+    document.querySelectorAll("[data-tip-k]").forEach(el=>{el.dataset.tip=T(el.dataset.tipK);});
+    const h=$("#hanko");h.dataset.tip=T("hankoTip");h.setAttribute("aria-label",EN()?"練習, renshuu, practice":"練習, renshuu, Übung");
+    $("#themeBtn").setAttribute("aria-label",T("themeL"));$("#themeBtn").dataset.tip=T("themeL");if(window.__paintTheme)window.__paintTheme();
     $("#week").setAttribute("aria-label",T("weekL"));
-    const lb=$("#langBtn");lb.textContent=EN()?"DE":"EN";lb.title=T("langTip");lb.setAttribute("aria-label",T("langTip"));
+    const lb=$("#langBtn");lb.textContent=EN()?"DE":"EN";lb.dataset.tip=T("langTip");lb.setAttribute("aria-label",T("langTip"));
   }
   $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("nihongodojo-lang",LANG);}catch(e){}applyLang();setMsg(T("msgStart"));renderScore();renderDays();renderLife();renderHs();render();};
   load();if(!CAMP.find(k=>!done[k]))finale=true;applyLang();if(EN())setMsg(T("msgStart"));renderScore();renderDays();renderLife();render();loadHs();
