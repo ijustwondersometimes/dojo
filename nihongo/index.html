@@ -11,19 +11,19 @@
 <style>
 /* Layout: one study column — mode tabs, a big card (flip or quiz), score line, notes below */
 :root{
-  --paper:#eef1f4; --surface:#ffffff; --ink:#1b2433; --muted:#5d6878;
-  --ai:#24407a; --ai-soft:#dfe6f3; --shu:#c8483a; --ok:#2f7d4f; --line:#d3dae4; --gold:#d4a017;
+  --paper:#eceeee; --surface:#ffffff; --ink:#1c1f23; --muted:#5c646c; --side:#f3f4f5; --sign1:#ffffff; --sign2:#f1f2f4; --signline:#d5d9dc;
+  --ai:#24407a; --ai-soft:#e3e7ee; --shu:#c8102e; --ok:#2e7a4c; --line:#d5d9dc; --gold:#d4a017;
   --f-display:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;
   --f-body:"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
   --f-mono:"M PLUS Rounded 1c","Noto Sans JP",system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --paper:#11151c; --surface:#1a202a; --ink:#e8ecf2; --muted:#9aa5b5;
-  --ai:#8fa9e0; --ai-soft:#24314a; --shu:#e57466; --ok:#6cc08f; --line:#2c3544; color-scheme:dark}}
+  --paper:#131517; --surface:#1c1f22; --ink:#ebeeef; --muted:#9aa2a9; --side:#181a1d; --sign1:#2b3036; --sign2:#24282d; --signline:#3d444b;
+  --ai:#7fa6ea; --ai-soft:#262b31; --shu:#ef5b6e; --ok:#6cc08f; --line:#2e3338; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --paper:#11151c; --surface:#1a202a; --ink:#e8ecf2; --muted:#9aa5b5;
-  --ai:#8fa9e0; --ai-soft:#24314a; --shu:#e57466; --ok:#6cc08f; --line:#2c3544; color-scheme:dark}
+  --paper:#131517; --surface:#1c1f22; --ink:#ebeeef; --muted:#9aa2a9; --side:#181a1d; --sign1:#2b3036; --sign2:#24282d; --signline:#3d444b;
+  --ai:#7fa6ea; --ai-soft:#262b31; --shu:#ef5b6e; --ok:#6cc08f; --line:#2e3338; color-scheme:dark}
 *{box-sizing:border-box}
 html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
@@ -185,6 +185,47 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .wissen .inner{padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
 .wissen .inner h3{font-family:var(--f-display);font-weight:700;font-size:18px;margin:8px 0 0}
 .fix p b{color:var(--ink)}
+
+/* ---- Spielfeld wie im Wien / NÖ Dojo: Seitenleiste + Karte ---- */
+.play{display:grid;grid-template-columns:170px minmax(0,1fr);background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.side{background:var(--side);border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;gap:18px;font-size:13px;color:var(--muted)}
+.side .lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.side .val{color:var(--ink);margin-top:3px;font-size:14px}
+.side .sbig{font-size:36px;color:var(--ink);font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.side .serie.hot .sbig{color:var(--gold)}
+.side .sub2{font-size:12px;color:var(--muted);margin-top:4px}
+.ring{--p:0;width:88px;height:88px;border-radius:50%;background:conic-gradient(var(--shu) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center}
+.ring>span{width:70px;height:70px;border-radius:50%;background:var(--side);display:flex;align-items:center;justify-content:center;color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.side .st-life{font-size:12px;color:var(--gold);font-weight:700}
+.side-bug{margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+.play .card{border:0;border-radius:0;min-height:0}
+.play.win{box-shadow:0 0 0 2px var(--gold)}
+@media (prefers-reduced-motion:no-preference){.play.win{animation:glow 1.2s ease 2}.play.lost{animation:shake .35s ease}.ring{transition:background .3s}}
+.sign{position:relative;background:linear-gradient(180deg,var(--sign1),var(--sign2));border:1px solid var(--signline);border-radius:12px;padding:14px 28px 14px 36px;text-align:center;box-shadow:0 10px 24px rgba(0,0,0,.28);max-width:100%;min-width:min(100%,360px)}
+.sign:before{content:"";position:absolute;left:0;top:0;bottom:0;width:8px;border-radius:12px 0 0 12px;background:var(--shu)}
+.sign .slab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.sign .big{font-size:clamp(40px,9vw,62px);line-height:1.15}
+.sign .big.ro{font-size:clamp(28px,6.5vw,42px)}
+.sign .to{margin-top:8px;padding-top:8px;border-top:1px solid var(--signline);font-size:14px;color:var(--muted)}
+.sign .to b{color:var(--ink);font-weight:600}
+.choices{grid-template-columns:1fr;max-width:560px}
+.choice{display:flex;align-items:center;gap:14px;text-align:left;background:var(--sign2);padding:12px 16px}
+.choice .k{width:30px;height:30px;border-radius:50%;border:1px solid var(--signline);color:var(--muted);display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.choice .t{flex:1;min-width:0}
+.choice:hover:not(:disabled){border-color:var(--shu)}
+.choice:hover:not(:disabled) .k{background:var(--shu);border-color:var(--shu);color:#fff}
+.choice.right .k{background:var(--ok);border-color:var(--ok);color:#fff}
+.choice.wrong .k{background:var(--shu);border-color:var(--shu);color:#fff}
+.say{border-color:var(--gold);background:transparent;color:var(--gold)}
+.say:hover{background:var(--gold);color:var(--surface)}
+@media (max-width:640px){
+  .play{grid-template-columns:1fr}
+  .side{border-right:0;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:nowrap;align-items:center;gap:8px 20px;padding:8px 14px}
+  .side .s-topic,.side .s-today,.side .sub2{display:none}
+  .side .lab{font-size:10px}.side .sbig{font-size:20px}.side .val{font-size:15px;font-weight:700;margin-top:1px}
+  .ring{width:42px;height:42px}.ring>span{width:33px;height:33px;font-size:10px}
+  .side-bug{margin:0 0 0 auto;padding:0;border:0;font-size:12px;text-align:right}
+}
 </style>
 </head>
 <body>
@@ -223,26 +264,22 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       <button class="mode" id="s-both" data-script="both" aria-pressed="false" data-i18n="both" data-tip-k="tipBoth">Beides</button>
       <button class="mode" id="s-ro" data-script="ro" aria-pressed="false" data-tip-k="tipRo">Romaji</button>
     </div>
-    <div class="score" id="score">Richtig 0 · Falsch 0 · Serie 0</div>
   </div>
 
-  <div class="streak" id="streak">
-    <div class="st-top" data-tip-k="tipStreak">
-      <span class="st-num"><b id="stNum">0</b> <span data-i18n="inRow">/ 20 in Folge</span></span>
-      <span class="st-meta" id="stMeta">Rekord 0 · Ziele 0</span>
-    </div>
-    <div class="track" aria-hidden="true">
-      <div class="fill" id="stFill"></div>
-      <span class="ms" data-at="5" style="left:25%">5</span>
-      <span class="ms" data-at="10" style="left:50%">10</span>
-      <span class="ms" data-at="15" style="left:75%">15</span>
-      <span class="ms goal" data-at="20" style="left:100%">20</span>
-    </div>
-    <div class="st-life" id="stLife"></div>
-    <div class="st-msg" id="stMsg" aria-live="polite">Schaffe 20 in Folge, dann kommt eine Bonusfrage aus allen Themen. Bei 5, 10 und 15 bekommst du einen 🛡️ Joker: Ein Fehler wirft dich nur auf diesen Checkpoint zurück.</div>
+  <div class="play" id="streak">
+    <aside class="side" aria-label="Fortschritt">
+      <div class="s-topic"><div class="lab" data-i18n="sTopic">Thema</div><div class="val" id="stTopic">–</div></div>
+      <div class="ring" id="stRing" title="Fortschritt im Thema"><span><span id="stNum">0</span>/20</span></div>
+      <div class="serie" id="stSerie"><div class="lab" data-i18n="sSerie">🔥 Serie</div><div class="sbig" id="stSerieN">0</div></div>
+      <div><div class="lab" data-i18n="sRekord">Rekord</div><div class="val" id="stMeta">0</div><div class="sub2" id="stTopics"></div></div>
+      <div class="s-today"><div class="lab" data-i18n="sHeute">Heute</div><div class="val" id="score">Richtig 0 · Falsch 0</div></div>
+      <div class="st-life" id="stLife"></div>
+      <div class="side-bug" id="sideBugWrap" hidden><button class="bug" id="sideBug" type="button" data-i18n="sBug">⚑ Diese Karte melden</button></div>
+    </aside>
+    <div class="card" id="card" aria-live="polite"></div>
   </div>
+  <div class="st-msg" id="stMsg" aria-live="polite">Schaffe 20 in Folge, dann kommt eine Bonusfrage aus allen Themen. Bei 5, 10 und 15 bekommst du einen 🛡️ Joker: Ein Fehler wirft dich nur auf diesen Checkpoint zurück.</div>
 
-  <div class="card" id="card" aria-live="polite"></div>
 
   <section class="days">
     <h2 data-i18n="days">Tageshighscore</h2>
@@ -679,6 +716,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     noJa:["Keine japanische Stimme gefunden. Am Handy klappt es meist.","No Japanese voice found. It usually works on phones."],
     noSound:["Kein Ton auf diesem Gerät","No sound on this device"],soundNA:["Ton nicht verfügbar","Sound not available"],
     sayRough:["Sprich etwa:","Say roughly:"],bug:["🐞 Fehler bei dieser Karte melden","🐞 Report a mistake on this card"],
+    sTopic:["Thema","Topic"],sSerie:["🔥 Serie","🔥 Streak"],sRekord:["Rekord","Record"],sHeute:["Heute","Today"],sBug:["⚑ Diese Karte melden","⚑ Report this card"],topicsN:["Themen {a}/{b} bestanden","Topics passed: {a}/{b}"],signJa:["🇯🇵 Japanisch","🇯🇵 Japanese"],signDe:["Deutsch","English"],
     qMean:["Was bedeutet das?","What does this mean?"],qJp:["Wie heißt das auf Japanisch?","How do you say this in Japanese?"],qPick:["Wähle das richtige Japanisch","Pick the right Japanese"],
     bonusTag:["⭐ Bonusfrage · ","⭐ Bonus question · "],
     flip:["Umdrehen","Flip"],again:["Nochmal üben","Practise again"],knew:["Gewusst · Weiter","Knew it · Next"],
@@ -862,7 +900,8 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   const sayHtml=c=>`<div class="sayrow"><button class="say" type="button" data-say="${esc(c.kana||c.jp)}" aria-label="${T("listenL")}">${T("listen")}</button><span class="nov hint" hidden>${T("noJa")}</span></div>`;
   const lautHtml=c=>`<div class="laut">${T("sayRough")} <b>${esc(EN()?lautEn(c.romaji):laut(c.romaji))}</b></div>`;
   // Fehler bei einer Karte melden (nur in der Online-Version)
-  const bugHtml=c=>API_ON?`<div class="sayrow"><button class="bug" type="button" data-card="${esc(c.jp+(c.kana?" ("+c.kana+")":"")+" · "+c.romaji+" = "+c.de)}">${T("bug")}</button></div>`:"";
+  const bugHtml=c=>false?`<div class="sayrow"><button class="bug" type="button" data-card="${esc(c.jp+(c.kana?" ("+c.kana+")":"")+" · "+c.romaji+" = "+c.de)}">${T("bug")}</button></div>`:"";
+  if(API_ON){$("#sideBugWrap").hidden=false;$("#sideBug").onclick=()=>{if(cur)openFb("bug",cur.jp+(cur.kana?" ("+cur.kana+")":"")+" · "+cur.romaji+" = "+cur.de);};}
   card.addEventListener("click",e=>{const b=e.target.closest(".say");if(b)speak(b.dataset.say,b);const g=e.target.closest(".bug");if(g)openFb("bug",g.dataset.card);});
 
   function pick(){const list=bonus?DECKS.all:DECKS[deck];let c;do{c=rnd(list)}while(list.length>1&&cur&&c.id===cur.id);return c;}
@@ -870,10 +909,13 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   function renderScore(){
     $("#score").textContent=T("score",{a:score.ok,b:score.no});
     const s=score.streak;
-    $("#stNum").textContent=bonus?"⭐":s;
-    $("#stFill").style.width=(bonus?100:Math.min(s,20)/20*100)+"%";
-    $("#stMeta").textContent=T("meta",{a:best,b:doneCount(),c:CAMP.length});
-    document.querySelectorAll(".ms").forEach(m=>m.classList.toggle("hit",bonus||s>=+m.dataset.at));
+    $("#stNum").textContent=bonus?"⭐":Math.min(s,20);
+    $("#stRing").style.setProperty("--p",bonus?100:Math.min(s,20)/20*100);
+    $("#stSerieN").textContent=s;
+    $("#stSerie").classList.toggle("hot",s>=5);
+    $("#stMeta").textContent=best;
+    $("#stTopics").textContent=T("topicsN",{a:doneCount(),b:CAMP.length});
+    $("#stTopic").textContent=bonus?T("bonusTag").trim()||"⭐":NAMES[deck];
     $("#hsSend").textContent=T("hsBtn",{n:best});
   }
   function renderTabs(){
@@ -1034,10 +1076,11 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     cur=pick();flipped=false;
     const front=Math.random()<.5?"jp":"de";
     card.dataset.front=front;
-    card.innerHTML=`<div class="prompt-label">${bonusTag()}${front==="jp"?T("qMean"):T("qJp")}</div>
+    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${front==="jp"?T("signJa"):T("signDe")}</div>
       <div class="big ${front==="de"&&cur.deck==="num"?"num":""} ${front==="jp"&&script==="ro"?"ro":""}">${esc(front==="jp"?jpText(cur):M(cur))}</div>
       ${front==="jp"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
       ${front==="jp"&&cur.kanji&&script!=="ro"?`<div class="sub">${esc(cur.kanji)}</div>`:""}
+      <div class="to">${front==="jp"?T("qMean"):T("qJp")}</div></div>
       ${front==="jp"?sayHtml(cur):""}
       <div class="actions"><button class="btn" id="flip">${T("flip")}</button></div>`;
     $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">${T("again")}</button><button class="btn" id="next">${T("knew")}</button></div>`+askHtml();wireAsk(cur);
@@ -1053,16 +1096,16 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     const others=shuffle(pool).slice(0,3);
     const dir=Math.random()<.5?"jp2de":"de2jp";
     const opts=shuffle([cur,...others]);
-    const label=bonusTag()+(dir==="jp2de"?T("qMean"):T("qPick"));
-    const promptTxt=dir==="jp2de"?jpText(cur):M(cur);
+        const promptTxt=dir==="jp2de"?jpText(cur):M(cur);
     const showHint=dir==="jp2de"&&script==="jp";
     const choiceHtml=o=>dir==="jp2de"?esc(M(o)):(script==="ro"?esc(o.romaji):script==="both"?`${esc(o.jp)}<span class="cr">${esc(o.romaji)}</span>`:esc(o.jp));
-    card.innerHTML=`<div class="prompt-label">${label}</div>
+    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${dir==="jp2de"?T("signJa"):T("signDe")}</div>
       <div class="big ${dir==="de2jp"&&cur.deck==="num"?"num":""} ${dir==="jp2de"&&script==="ro"?"ro":""}">${esc(promptTxt)}</div>
       ${dir==="jp2de"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
       ${showHint?`<div class="romaji" id="rhint" hidden>${esc(cur.romaji)}</div>`:""}
+      <div class="to">${dir==="jp2de"?T("qMean"):T("qPick")}</div></div>
       ${dir==="jp2de"?sayHtml(cur):""}
-      <div class="choices">${opts.map((o,i)=>`<button class="choice" id="c${i}" data-id="${o.id}">${choiceHtml(o)}</button>`).join("")}</div>
+      <div class="choices">${opts.map((o,i)=>`<button class="choice" id="c${i}" data-id="${o.id}"><span class="k">${"ABCD"[i]}</span><span class="t">${choiceHtml(o)}</span></button>`).join("")}</div>
       <div class="feedback" id="fb"></div>
       <div class="actions">${showHint?`<button class="btn ghost" id="showR">${T("showR")}</button>`:""}<button class="btn" id="next" hidden>${T("next")}</button></div>
       <div id="askSlot"></div>`;
