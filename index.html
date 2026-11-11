@@ -26,7 +26,7 @@ header{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;g
 header .head-r{flex-wrap:nowrap;gap:8px;padding-top:6px}
 header .greet{grid-column:1/-1;margin:-4px 0 0;font-size:15px;color:var(--muted)}
 .sp-wrap .spruch{max-width:none;width:100%;padding:12px 16px}
-.opts .dia-box{padding-bottom:10px;border-bottom:1px solid var(--line)}
+
 @media (max-width:520px){
   header h1 small{display:none}
   header .greet{font-size:14px}
@@ -87,9 +87,28 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 [data-tip]{position:relative}
 [data-tip]:hover::after,[data-tip]:focus-visible::after{content:attr(data-tip);position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);font-family:var(--f-body);font-size:12px;font-weight:500;line-height:1.4;padding:7px 10px;border-radius:8px;width:max-content;max-width:240px;white-space:normal;text-align:left;z-index:30;pointer-events:none;box-shadow:0 6px 16px rgba(0,0,0,.3)}
 @media (hover:none){[data-tip]:hover::after{display:none}}
-.dia-box{display:flex;flex-direction:column;gap:8px}
-.dia-q{font-size:14px;color:var(--muted);line-height:1.45}
-.dia-q b{color:var(--ink)}
+.dia-box{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:6px 12px}
+.dia-q{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.dia-hint{grid-column:1/-1;margin:0;font-size:13px;color:var(--muted)}
+.dia-box .dia-switch{display:inline-grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;max-width:420px}
+.dia-box .dia{border:0;border-radius:9px;padding:7px 12px;gap:8px;opacity:1;background:transparent;justify-content:center;color:var(--muted)}
+.dia-box .dia svg{width:18px;height:23px}
+.dia-box .dia-txt small{display:none}
+.dia-box .dia-txt b{font-family:var(--f-body);font-weight:700;font-size:15px}
+.dia-box .dia .lang{display:none}.dia-box .dia .kurz{display:inline}
+.dia-box .dia.wien[aria-pressed="true"]{background:var(--rot);color:#fff}
+.dia-box .dia.noe[aria-pressed="true"]{background:var(--blau);color:#fff}
+.dia-box .dia[aria-pressed="false"] svg{opacity:.55}
+@media (max-width:520px){.dia-box{grid-template-columns:1fr}.dia-q{display:none}.dia-box .dia-switch{max-width:none}}
+/* Erste Wahl Wien / NÖ beim ersten Besuch */
+.pick-bg{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,#000 55%,transparent);display:grid;place-items:center;padding:20px}
+.pick-box{background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px}
+.pick-box h2{margin:0;font-family:var(--f-word);font-size:26px}
+.pick-box p{margin:0;color:var(--muted);font-size:14px}
+.pick{display:flex;gap:14px;align-items:center;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;background:var(--paper);font:inherit;color:var(--ink);cursor:pointer}
+.pick svg{width:30px;height:38px;flex:none}
+.pick b{display:block;font-size:17px}.pick small{display:block;color:var(--muted);font-size:13px}
+.pick.wien:hover,.pick.wien:focus-visible{border-color:var(--rot)}.pick.noe:hover,.pick.noe:focus-visible{border-color:var(--blau)}
 .dia-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .dia{display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 14px;min-width:0;opacity:.6}
 .dia svg{width:34px;height:42px;flex:none}
@@ -275,7 +294,6 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
   .side .lab{font-size:10px}.side .big{font-size:20px!important}.side .val{font-size:15px;font-weight:700;margin-top:1px}
   .ring{width:42px!important;height:42px!important}.ring>span{width:33px!important;height:33px!important;font-size:10px!important}
   .side-bug{width:auto!important;margin:0 0 0 auto!important;padding:0!important;border:0!important;font-size:12px;text-align:right}
-  .opts .dia-switch{grid-template-columns:1fr}
   .side-bug{width:100%;margin:0;padding-top:8px}
   .play{grid-template-columns:1fr}
   .side{border-right:0;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:12px 14px}
@@ -328,6 +346,14 @@ section.notes{display:flex;flex-direction:column;gap:12px}
 @media (max-width:420px){.choice{font-size:16px}}
 </style>
 
+<div class="pick-bg" id="pickDlg" hidden role="dialog" aria-modal="true" aria-labelledby="pickT">
+  <div class="pick-box">
+    <h2 id="pickT" data-i18n="pickT">Griaß di! 👋</h2>
+    <p data-i18n="pickP">Welchen Dialekt willst du lernen? Kannst du jederzeit oben ändern.</p>
+    <button class="pick wien" type="button" data-pick="wien"><span class="pk-svg" data-from="#v-wien"></span><span><b data-i18n="dWien">Wienerisch</b><small data-i18n="wienSub">Stadt Wien · haaß, dahaam</small></span></button>
+    <button class="pick noe" type="button" data-pick="noe"><span class="pk-svg" data-from="#v-noe"></span><span><b data-i18n="dNoe">Niederösterreichisch</b><small data-i18n="noeSub">Land rund um Wien · hoaß, dahoam</small></span></button>
+  </div>
+</div>
 <div class="wrap">
   <header>
     <h1><span class="h-crests" aria-hidden="true" id="hCrests"></span>Wien / NÖ Dojo<small data-i18n="sub">Wienerisch &amp; Niederösterreichisch lernen</small></h1>
@@ -339,6 +365,21 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     <p class="greet" data-i18n="greet">👋 Griaß di! Lernst heut wieder a bissl Weanerisch?</p>
   </header>
 
+
+  <div class="dia-box">
+  <span class="dia-q" data-i18n="diaQ">Ich lerne</span>
+  <div class="dia-switch" role="group" aria-label="Dialekt">
+    <button class="dia wien" id="v-wien" data-i18n-tip="tipWien" data-tip="Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa." data-dia="wien" aria-pressed="true">
+      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#c8102e"/><path d="M17 4 H23 V45.3 C21.9 45.6 20.9 46 20 46 C19.1 46 18.1 45.6 17 45.3 Z M4 18 H36 V24 H4 Z" fill="#fff"/><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
+      <span class="dia-txt"><b><span class="lang" data-i18n="wienName">Wienerisch</span><span class="kurz" data-i18n="wienKurz">Wien</span></b><small data-i18n="wienSub">Stadt Wien · haaß, dahaam</small></span>
+    </button>
+    <button class="dia noe" id="v-noe" data-i18n-tip="tipNoe" data-tip="Niederösterreichisch: altes ei wird zu oa, z. B. hoaß, dahoam, Stoa. Wo es keinen Unterschied gibt, steht „wie in Wien“." data-dia="noe" aria-pressed="false">
+      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#1d4f9c"/><g fill="#f2c230"><g transform="translate(14 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(14 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(20 35)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g></g><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
+      <span class="dia-txt"><b><span class="lang" data-i18n="noeName">Niederösterreichisch</span><span class="kurz" data-i18n="noeKurz">NÖ</span></b><small data-i18n="noeSub">Land rund um Wien · hoaß, dahoam</small></span>
+    </button>
+  </div>
+  <p class="dia-hint" data-i18n="diaHint">Wien = Stadt Wien (haaß) · NÖ = Niederösterreich, das Land rund um Wien (hoaß)</p>
+  </div>
 
   <div class="tabs" role="group" aria-label="Thema">
     <button class="tab" id="t-greet" data-deck="greet" aria-pressed="true">Begrüßen &amp; Alltag</button>
@@ -365,21 +406,8 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   <div class="st-msg" id="stMsg" aria-live="polite" data-i18n="msgStart">Schaff 20 in Folge im Thema, dann kommt a Bonusfrage aus allen Themen. Die 🔥 Serie läuft über alle Themen weiter, bis zum ersten Fehler. Bei 5, 10 und 15 kriagst an 🛡️ Joker.</div>
 
   <details class="opts" id="opts">
-    <summary data-i18n="optsSum">⚙ Einstellungen: Dialekt Wien / NÖ, Karteikarten, Richtung</summary>
+    <summary data-i18n="optsSum">⚙ Mehr Optionen: Karteikarten statt Quiz, Abfrage-Richtung</summary>
     <div class="opts-in">
-  <div class="dia-box">
-  <div class="dia-q"><b data-i18n="diaQ">Welchen Dialekt willst du lernen?</b> <span data-i18n="diaHint">Fast gleich, der Unterschied liegt meist im „ei“: Wien sagt haaß, Niederösterreich hoaß (heiß).</span></div>
-  <div class="dia-switch" role="group" aria-label="Dialekt">
-    <button class="dia wien" id="v-wien" data-i18n-tip="tipWien" data-tip="Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa." data-dia="wien" aria-pressed="true">
-      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#c8102e"/><path d="M17 4 H23 V45.3 C21.9 45.6 20.9 46 20 46 C19.1 46 18.1 45.6 17 45.3 Z M4 18 H36 V24 H4 Z" fill="#fff"/><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
-      <span class="dia-txt"><b><span class="lang" data-i18n="wienName">Wienerisch</span><span class="kurz" data-i18n="wienKurz">Wien</span></b><small data-i18n="wienSub">Stadt Wien · haaß, dahaam</small></span>
-    </button>
-    <button class="dia noe" id="v-noe" data-i18n-tip="tipNoe" data-tip="Niederösterreichisch: altes ei wird zu oa, z. B. hoaß, dahoam, Stoa. Wo es keinen Unterschied gibt, steht „wie in Wien“." data-dia="noe" aria-pressed="false">
-      <svg viewBox="0 0 40 50" aria-hidden="true"><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="#1d4f9c"/><g fill="#f2c230"><g transform="translate(14 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 13)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(14 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(26 24)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g><g transform="translate(20 35)"><path d="M0 -3 L1.2 -1.4 L4 -2.6 L2.4 0.4 L1 0.2 L1.4 3 L0 2 L-1.4 3 L-1 0.2 L-2.4 0.4 L-4 -2.6 L-1.2 -1.4 Z"/></g></g><path d="M4 4 H36 V24 C36 36 28 42 20 46 C12 42 4 36 4 24 Z" fill="none" stroke="var(--line)" stroke-width="1"/></svg>
-      <span class="dia-txt"><b><span class="lang" data-i18n="noeName">Niederösterreichisch</span><span class="kurz" data-i18n="noeKurz">Niederösterreich</span></b><small data-i18n="noeSub">Land rund um Wien · hoaß, dahoam</small></span>
-    </button>
-  </div>
-  </div>
     <div class="opt-row"><span class="opt-l" data-i18n="optMode">Lernmodus</span><div class="modes" role="group" aria-label="Lernmodus">
       <button class="mode" id="m-quiz" data-i18n="quiz" data-i18n-tip="tipQuiz" data-tip="Vier Antworten zur Auswahl, eine davon ist richtig." data-mode="quiz" aria-pressed="true">Quiz</button>
       <button class="mode" id="m-card" data-i18n="card" data-i18n-tip="tipCard" data-tip="Karte umdrehen und selbst einschätzen, ob du es gewusst hast." data-mode="card" aria-pressed="false">Karteikarten</button>
@@ -733,10 +761,10 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   "fbCancel":["Abbrechen","Cancel"],"fbSend":["Senden","Send"],"fbThanks":["Danke! Is angekommen. 🙏","Thanks! It arrived. 🙏"],"fbEmpty":["Bitte Sterne vergeben oder was reinschreiben.","Please give stars or write something."],
   "fbFail":["Senden hat ned geklappt.","Sending didn't work."],"fbAlt":["Stattdessen das Formular öffnen ↗","Open the form instead ↗"],"fbRL":["Grad zu viel auf einmal. Probier's später nochmal.","Too much at once. Please try again later."]});
   Object.assign(UI,{"greet":["👋 Griaß di! Lernst heut wieder a bissl Weanerisch?","👋 Servus! Ready to learn a bit of Viennese today?"],"spLab":["📜 Spruch des Tages","📜 Saying of the day"],
-  "diaQ":["Welchen Dialekt willst du lernen?","Which dialect do you want to learn?"],"diaHint":["Fast gleich, der Unterschied liegt meist im „ei“: Wien sagt haaß, Niederösterreich hoaß (heiß).","Almost the same, the difference is mostly the “ei” sound: Vienna says haaß, Lower Austria (the state around Vienna) says hoaß (hot)."],
+  "diaQ":["Ich lerne","I'm learning"],"diaHint":["Wien = Stadt Wien (haaß) · NÖ = Niederösterreich, das Land rund um Wien (hoaß)","Vienna = the city (haaß) · Lower Austria = the state around Vienna (hoaß)"],
   "wienName":["Wienerisch","Viennese"],"wienKurz":["Wien","Vienna"],"wienSub":["Stadt Wien · haaß, dahaam","City of Vienna · haaß, dahaam"],
-  "noeName":["Niederösterreichisch","Lower Austrian"],"noeKurz":["Niederösterreich","Lower Austria"],"noeSub":["Land rund um Wien · hoaß, dahoam","State around Vienna · hoaß, dahoam"],
-  "optsSum":["⚙ Einstellungen: Dialekt Wien / NÖ, Karteikarten, Richtung","⚙ Settings: Vienna / Lower Austria dialect, flashcards, direction"],"optMode":["Lernmodus","Mode"],"optDir":["Richtung","Direction"]});
+  "noeName":["Niederösterreichisch","Lower Austrian"],"noeKurz":["NÖ","L. Austria"],"noeSub":["Land rund um Wien · hoaß, dahoam","State around Vienna · hoaß, dahoam"],
+  "optsSum":["⚙ Mehr Optionen: Karteikarten statt Quiz, Abfrage-Richtung","⚙ More options: flashcards instead of quiz, question direction"],"optMode":["Lernmodus","Mode"],"pickT":["Griaß di! 👋","Servus! 👋"],"pickP":["Welchen Dialekt willst du lernen? Kannst du jederzeit oben ändern.","Which dialect do you want to learn? You can change it at the top any time."],"optDir":["Richtung","Direction"]});
   const MEAN_EN={"g0": "Hi! / Bye! (Servus)", "g1": "Hi there!", "g2": "Good day! (formal)", "g3": "Bye!", "g4": "dude, mate", "g5": "Listen! / Hey!", "g6": "great, awesome", "g7": "very, totally", "g8": "It's fine. / OK.", "g9": "Sure. / Of course.", "g10": "Oh come on! / Stop it!", "g11": "What's up?", "g12": "I have no idea.", "g13": "at home", "g14": "I don't know.", "g15": "two", "g16": "hot", "g17": "I don't care.", "g18": "to work", "g19": "buddy, friend", "g20": "a little", "g21": "today / yesterday", "g22": "January", "g23": "February", "g24": "the bag", "g25": "the cupboard", "g26": "Let's go!", "g27": "We'll see.", "f0": "the tomato", "f1": "the potatoes", "f2": "the cauliflower", "f3": "horseradish", "f4": "green beans", "f5": "apricots", "f6": "redcurrants", "f7": "curd cheese (quark)", "f8": "whipped cream", "f9": "minced meat", "f10": "the bread roll", "f11": "the crescent roll", "f12": "thin pancakes (crêpes)", "f13": "a cheese sausage (Käsekrainer)", "f14": "a hot sausage", "f15": "the meat", "f16": "half a litre of beer", "f17": "0.3 litres of beer", "f18": "0.2 litres of beer", "f19": "a wine spritzer", "f20": "a Viennese milky coffee", "f21": "the big mug", "f22": "the snack, light meal", "f23": "to fancy something", "f24": "The bill, please!", "f25": "the shot glass", "f26": "the pub, simple inn", "f27": "wine tavern with its own wine", "s0": "wit, charm, also fibbing", "s1": "to crack jokes", "s2": "the bad mood", "s3": "grumpy", "s4": "to moan, to grumble", "s5": "to whine constantly", "s6": "unpleasant, annoying", "s7": "fuss, unnecessary hassle", "s8": "the idiot", "s9": "the idiot", "s10": "the crook, rascal", "s11": "the meanie, rascal", "s12": "Get lost!", "s13": "Are you crazy?", "s14": "Hey, how are you talking to me?", "s15": "That won't be enough. / Won't work.", "s16": "Nothing is certain.", "s17": "You'll be amazed! / Crazy!", "s18": "Nonsense!", "s19": "whatever, doesn't matter", "s20": "polite old greeting (to ladies)", "s21": "Your humble servant!", "s22": "No rush.", "w0": "the tram", "w1": "the stone", "w2": "to go home", "w3": "public transport", "w4": "the ticket inspector", "w5": "the neighbourhood", "w6": "the small park", "w7": "the sausage stand", "w8": "the kiosk (papers, tobacco, tickets)", "w9": "the corner grocery", "w10": "the horse-drawn carriage", "w11": "St. Stephen's Cathedral", "w12": "the amusement park (with Ferris wheel)", "w13": "in the 10th district", "w14": "the caretaker", "w15": "the hallway", "w16": "the staircase", "w17": "the sticker, toll vignette", "w18": "the pavement café terrace", "w19": "the pavement", "w20": "the big ring road around the inner districts", "w21": "Stand back, please!", "w22": "Where is the underground here?", "w23": "to go in / to go out", "a0": "the water basin in the hallway of old tenements", "a1": "the pavement", "a2": "the washbasin", "a3": "the sofa", "a4": "the umbrella", "a5": "the crook, swindler", "a6": "to go out on the town", "a7": "slowly, leisurely", "a8": "the ceiling", "a9": "the armchair", "a10": "the shelf, rack", "a11": "to annoy, to pester", "a12": "nuisance, hassle", "a13": "the mess, nonsense", "a14": "shabby, mean", "a15": "trouble, squabbling", "a16": "luck", "a17": "the rogue, also pimp", "a18": "the carefree playboy", "a19": "the love affair, also sweetheart", "a20": "the costume party", "a21": "the lackey, servant", "a22": "the small, simple café", "a23": "the lemonade", "a24": "the steep stony meadow", "a25": "the rabble, the bunch", "x0": "Hey, you idiot!", "x1": "Get lost!", "x2": "Arse! (also: get lost!)", "x3": "the arsehole", "x4": "Now everything's screwed.", "x5": "I couldn't care less.", "x6": "the damn cop", "x7": "He's blown it with me.", "x8": "I'll smack you one!", "x9": "You're about to get slapped!", "x10": "Turn around and go, you dummy!", "x11": "the fool, naive person", "x12": "boring conformist", "x13": "the cop (derogatory)", "x14": "the cop (derogatory)", "x15": "Shut your mouth!", "x16": "Shut up!", "x17": "an ugly, grumpy face", "x18": "the wimp", "x19": "the weakling, crybaby", "x20": "He's scared!", "x21": "That drives me mad!", "x22": "a fat person", "x23": "someone with big ears", "x24": "the small, scrawny person", "x25": "the shirker, slacker", "x26": "someone who's been in prison", "x27": "Disappear!", "x28": "Get lost! (jokingly)", "x29": "to look stupid and clueless", "x30": "the idiot", "x31": "Damn it!"};
   const SP_EN={"s1": "Bye, kisses, see you soon!", "s2": "Will you give grandma a kiss?", "s3": "Don't get so worked up! (from the TV series “Muttertag”)", "s4": "I'm telling you right away, it wasn't me! (from “Muttertag”)", "s5": "There's still time for one more beer.", "s6": "No schnitzel today, big occasion. (from “Kaisermühlen Blues”)", "s7": "Don't insult my beer! (from “Ein echter Wiener geht nicht unter”)", "s8": "The schnitzel was really good.", "s9": "Shall we have one last glass of wine before we go?", "s10": "Don't talk nonsense!", "s11": "That drives me mad!", "s12": "He's scared.", "s13": "You're about to get slapped!", "s14": "I won't watch such rubbish.", "s15": "Shall we have a wine spritzer at the little pub on the corner?", "s16": "We haven't been to a wine tavern at all this year.", "s17": "That's a really tough job.", "s18": "Get lost! (usually jokingly)", "s19": "He kicked the bucket (he died).", "s20": "Today we party hard!", "s21": "Today I'm getting properly drunk.", "s22": "Put on your Sunday best!", "s23": "I couldn't care less.", "s24": "Shut your mouth!", "s25": "Hey, you idiot, get lost!", "s26": "Now everything's screwed."};
   const WZ_EN={"w1": "“Grüß Gott” (literally “greet God”) taken literally.", "w2": "Oida is the all-purpose way to address someone.", "w3": "Baba means bye, not dad.", "w4": "Classic Viennese waiter humour.", "w5": "Gspritzter = wine spritzer, Bim = tram.", "w6": "Eitrige = cheese sausage.", "w7": "Raunzen = moaning, the Viennese national sport.", "w8": "Viennese grumpiness beats any pessimist.", "w9": "Grumpiness as proof of identity.", "w10": "“Free” as in costing nothing.", "w11": "Short ways, short answers.", "w12": "Schwarzkappler = ticket inspector.", "w13": "Old Viennese wisdom.", "w14": "Gspusi = love affair.", "w15": "Bassena = old shared water basin in the hallway, a gossip spot.", "w16": "Koffer (suitcase) = idiot.", "w17": "Schleich di = get lost.", "w18": "Watschenbaum = the tree slaps fall from."};
@@ -1206,7 +1234,11 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   $("#album").addEventListener("click",e=>{if(e.target.id==="album")$("#album").hidden=true;});
   $("#album").addEventListener("keydown",e=>{if(e.key==="Escape")$("#album").hidden=true;});
   (function(){const h=$("#hCrests");["#v-wien svg","#v-noe svg"].forEach(q=>{const v=document.querySelector(q);if(v)h.appendChild(v.cloneNode(true));});})();
+  let firstVisit=false;try{firstVisit=!localStorage.getItem("weanerdojo")&&!localStorage.getItem("weanerdojo-dia");}catch(e){}
+  document.querySelectorAll(".pk-svg").forEach(x=>{x.outerHTML=document.querySelector(x.dataset.from+" svg").outerHTML;});
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{dia=b.dataset.pick;try{localStorage.setItem("weanerdojo-dia","1");}catch(e){}$("#pickDlg").hidden=true;save();render();});
   load();if(deck==="schimpf"&&!adult())deck="greet";if(mode==="card")$("#opts").open=true;applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();loadHs();
+  if(firstVisit){$("#pickDlg").hidden=false;$(".pick.wien").focus();}
 })();
 </script>
 
