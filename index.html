@@ -363,6 +363,12 @@ section.notes{display:flex;flex-direction:column;gap:12px}
 .fix p{margin:0;color:var(--muted);font-size:15px;max-width:65ch}
 .fix b{color:var(--ink)}
 @media (max-width:420px){.choice{font-size:16px}}
+
+/* ---- Was ist neu? ---- */
+.news-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.news-list li{font-size:15px;line-height:1.45;padding-left:18px;position:relative}
+.news-list li::before{content:"•";position:absolute;left:4px;color:var(--gold)}
+.news-day{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
 </style>
 
 <div class="pick-bg" id="pickDlg" hidden role="dialog" aria-modal="true" aria-labelledby="pickT">
@@ -455,6 +461,10 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     <p class="hint" id="bestday"></p>
   </section>
 
+  <details class="wissen" id="newsBox">
+    <summary><span class="wt"><h2 data-i18n="newsH">🆕 Was ist neu?</h2><p data-i18n="newsS">Alle Neuerungen im Dojo, die neuesten zuerst</p></span><span class="chev" aria-hidden="true">›</span></summary>
+    <div class="inner" id="newsAll"></div>
+  </details>
   <details class="wissen" id="wissen">
     <summary><span class="wt"><h2 data-i18n="wTitle">📖 Wissen zum Nachlesen</h2><p data-i18n="wSub">Kleine Wiener Grammatik · Unterschiede Wien und Niederösterreich · Was man nur in Österreich sagt, Alt-Wienerisch und „derb“</p></span><span class="chev" aria-hidden="true">›</span></summary>
     <div class="inner" id="wissenInner">
@@ -1308,9 +1318,16 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;if(t.dataset.pdeck==="schimpf"&&!adult()){openGate();return;}pDeck=t.dataset.pdeck;paintPick();};
   $("#pickGo").onclick=()=>{try{sessionStorage.setItem("weanerdojo-start","1");localStorage.setItem("weanerdojo-dia","1");}catch(e){}
     $("#pickDlg").hidden=true;dia=pDia;const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);save();if(t)t.click();else render();renderNow();window.scrollTo(0,0);};
+  // ---- Was ist neu? (Changelog) ----
+  const NEWS=[{"d": "2026-11-11", "i": [["Neuer Reiter <b>Jugendsprache</b>: 30 Wörter wie Bruda, Wallah, Gemma Billa! und cringe, dazu 3 neue Witze.", "New tab <b>Youth slang</b>: 30 words like Bruda, Wallah, Gemma Billa! and cringe, plus 3 new jokes."], ["<b>🔞 Schimpfen</b> kannst du jetzt auch im Start-Pop-up wählen.", "You can now pick <b>🔞 Swearing</b> in the start pop-up too."], ["<b>Start-Pop-up</b>: Dialekt und Thema gleich zu Beginn wählen.", "<b>Start pop-up</b>: choose dialect and topic right away."], ["Aufgeräumter Kopf: „Red wia a Weana!“ ist jetzt die große Überschrift.", "Tidier header: “Red wia a Weana!” is now the main heading."], ["<b>🆕 Was ist neu?</b> Diese Liste zeigt dir ab jetzt alle Neuerungen.", "<b>🆕 What's new?</b> This list now shows you every update."]]}, {"d": "2026-11-10", "i": [["<b>🏆 Bestenliste</b>: deine längste Serie eintragen, ohne Anmeldung.", "<b>🏆 Leaderboard</b>: submit your longest streak, no account needed."], ["Bewerten, Karte melden und Mitbestimmen jetzt direkt im Dojo.", "Rate, report cards and vote right inside the Dojo."]]}];
+  Object.assign(UI,{newsT:["🆕 Neu im Dojo","🆕 New in the Dojo"],newsP:["Seit deinem letzten Besuch ist dazugekommen:","New since your last visit:"],newsOk:["Leiwand, weiter! 👍","Great, let's go! 👍"],newsH:["🆕 Was ist neu?","🆕 What's new?"],newsS:["Alle Neuerungen im Dojo, die neuesten zuerst","Every Dojo update, newest first"]});
+  const fmtD=d=>d.split("-").reverse().join(".");
+  const newsHtml=list=>list.map(n=>`<div class="news-day">${fmtD(n.d)}</div><ul class="news-list">${n.i.map(x=>`<li>${EN()?x[1]:x[0]}</li>`).join("")}</ul>`).join("");
+  function renderNews(){$("#newsAll").innerHTML=newsHtml(NEWS);}
+  $("#langBtn").addEventListener("click",()=>setTimeout(renderNews,0));
   $("#nowChip").onclick=openStart;
   load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();loadHs();
-  renderNow();if(showStart)openStart();
+  renderNow();document.querySelectorAll("#newsBox [data-i18n]").forEach(el=>{el.innerHTML=T(el.dataset.i18n);});renderNews();if(showStart)openStart();
 })();
 </script>
 

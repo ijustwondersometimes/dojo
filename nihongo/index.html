@@ -252,6 +252,12 @@ h1 small{display:none}
 .pick-topics{display:flex;flex-wrap:wrap;gap:8px}
 .pick-topics .tab{font-size:14px;padding:7px 12px}
 .pick-go{margin-top:8px;font-size:17px;padding:12px 18px;border-radius:12px}
+
+/* ---- Was ist neu? ---- */
+.news-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.news-list li{font-size:15px;line-height:1.45;padding-left:18px;position:relative}
+.news-list li::before{content:"•";position:absolute;left:4px;color:var(--gold)}
+.news-day{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
 </style>
 </head>
 <body>
@@ -359,6 +365,10 @@ h1 small{display:none}
     </div>
   </div>
 
+  <details class="wissen" id="newsBox">
+    <summary><span class="wt"><h2 data-i18n="newsH">🆕 Was ist neu?</h2><p data-i18n="newsS">Alle Neuerungen im Dojo, die neuesten zuerst</p></span><span class="chev" aria-hidden="true">›</span></summary>
+    <div class="inner" id="newsAll"></div>
+  </details>
   <details class="wissen" id="wissen">
     <summary><span class="wt"><h2 data-i18n="wTitle">📖 Wissen zum Nachlesen</h2><p data-i18n="wSub">Song-Lektionen: Silhouette, Bubble, mosi mosi? · Aussprache-Regeln · Merkhilfe Wochentage</p></span><span class="chev" aria-hidden="true">›</span></summary>
     <div class="inner" id="wissenInner">
@@ -1279,11 +1289,18 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
   $("#pickGo").onclick=()=>{try{sessionStorage.setItem("nihongodojo-start","1");}catch(e){}
     $("#pickDlg").hidden=true;const sb=document.querySelector(`.mode[data-script="${pScript}"]`);if(sb)sb.click();const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);if(t&&pDeck!==deck)t.click();save();renderNow();window.scrollTo(0,0);};
+  // ---- Was ist neu? (Changelog) ----
+  const NEWS=[{"d": "2026-11-11", "i": [["<b>Neues Design</b> wie im Wien / NÖ Dojo: Seitenleiste mit Fortschritt, Frage als Schild, Antworten A–D.", "<b>New design</b> like the Vienna Dojo: progress sidebar, question sign, answers A–D."], ["<b>Start-Pop-up</b>: Schrift (日本語, Beides, Romaji) und Thema gleich zu Beginn wählen.", "<b>Start pop-up</b>: choose script (日本語, both, romaji) and topic right away."], ["<b>🆕 Was ist neu?</b> Diese Liste zeigt dir ab jetzt alle Neuerungen.", "<b>🆕 What's new?</b> This list now shows you every update."]]}, {"d": "2026-11-10", "i": [["<b>🏆 Bestenliste</b>: deine längste Serie eintragen, ohne Anmeldung.", "<b>🏆 Leaderboard</b>: submit your longest streak, no account needed."], ["Bewerten, Karte melden und Mitbestimmen jetzt direkt im Dojo.", "Rate, report cards and vote right inside the Dojo."]]}];
+  Object.assign(UI,{newsT:["🆕 Neu im Dojo","🆕 New in the Dojo"],newsP:["Seit deinem letzten Besuch ist dazugekommen:","New since your last visit:"],newsOk:["Super, weiter! 👍","Great, let's go! 👍"],newsH:["🆕 Was ist neu?","🆕 What's new?"],newsS:["Alle Neuerungen im Dojo, die neuesten zuerst","Every Dojo update, newest first"]});
+  const fmtD=d=>d.split("-").reverse().join(".");
+  const newsHtml=list=>list.map(n=>`<div class="news-day">${fmtD(n.d)}</div><ul class="news-list">${n.i.map(x=>`<li>${EN()?x[1]:x[0]}</li>`).join("")}</ul>`).join("");
+  function renderNews(){$("#newsAll").innerHTML=newsHtml(NEWS);}
+  $("#langBtn").addEventListener("click",()=>setTimeout(renderNews,0));
   $("#nowChip").onclick=openStart;
   document.querySelectorAll(".mode[data-script]").forEach(m=>m.addEventListener("click",()=>setTimeout(renderNow,0)));
   $("#langBtn").addEventListener("click",()=>setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0));
   load();if(!CAMP.find(k=>!done[k]))finale=true;applyLang();if(EN())setMsg(T("msgStart"));renderScore();renderDays();renderLife();render();loadHs();
-  renderNow();if(showStart)openStart();
+  renderNow();document.querySelectorAll("#newsBox [data-i18n]").forEach(el=>{el.innerHTML=T(el.dataset.i18n);});renderNews();if(showStart)openStart();
 })();
 </script>
 </body>
