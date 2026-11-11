@@ -166,6 +166,12 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .copy a{color:var(--ai)}
 .stat-opt{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 .stat-opt input{accent-color:var(--shu);width:15px;height:15px;margin:0}
+.fold summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px}
+.fold summary::-webkit-details-marker{display:none}
+.fold summary::before{content:"▸";color:var(--shu);font-size:18px}
+.fold[open] summary::before{content:"▾"}
+.fold[open] summary{margin-bottom:10px}
+.fold .fix+.fix{margin-top:10px}
 </style>
 </head>
 <body>
@@ -262,7 +268,8 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   </div>
 
   <section class="notes">
-    <h2>Song-Lektion: シルエット (Silhouette, KANA-BOON)</h2>
+    <details class="fold">
+    <summary><h2>Song-Lektion: シルエット (Silhouette, KANA-BOON)</h2></summary>
     <div class="fix" style="border-left-color:var(--ok)">
       <p><b style="color:var(--ink)">Worum geht's:</b> Erwachsenwerden. Die Zeit läuft weiter, Erinnerungen verblassen, Menschen werden zu Schattenrissen. Aber jemand hat gezeigt, dass manches sich nie ändert. Das will der Sänger festhalten, wenn er erwachsen wird. Passt perfekt zu Naruto, Opening 16 von Shippuden.</p>
       <p><b style="color:var(--ink)">Grammatik 1 – alte Verneinung ～ぬ:</b> 知らぬ, 消えぬ, やまぬ = 知らない, 消えない, やまない. Klingt poetisch und altmodisch.</p>
@@ -270,7 +277,9 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       <p><b style="color:var(--ink)">Grammatik 3 – ～てく:</b> kurz für ～ていく, etwas geht weiter oder entfernt sich. 奪ってく = nimmt immer weiter weg.</p>
       <p><b style="color:var(--ink)">Easter Egg:</b> 木の葉 (konoha, Baumblatt) ist auch der Name von Narutos Dorf Konoha. Die fallenden Blätter am Ende sind ein Gruß an die Serie.</p>
     </div>
-    <h2>Song-Lektion: あぶく (Bubble, ヨルシカ)</h2>
+    </details>
+    <details class="fold">
+    <summary><h2>Song-Lektion: あぶく (Bubble, ヨルシカ)</h2></summary>
     <div class="fix" style="border-left-color:var(--ai)">
       <p><b style="color:var(--ink)">Worum geht's:</b> Ein „Tier“ in ihr – Traurigkeit, Wut, Schaffensdrang – lässt sie nicht los. Gedanken steigen wie Blasen auf und zerplatzen. Sie will ein Feuer der Freude entzünden und mit beiden Händen festhalten, was nicht ausbrennt. Kunst, Fantasie oder Flucht aus der Realität: Hauptsache, etwas bringt sie wieder zum Brennen.</p>
       <p><b style="color:var(--ink)">Grammatik 1 – ～たいだけ:</b> „ich will nur …“. 掬いたいだけ = „ich will es nur auffangen“.</p>
@@ -278,7 +287,9 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       <p><b style="color:var(--ink)">Grammatik 3 – ～ておくれ:</b> sanfte, etwas altmodische Bitte an jemanden: „tu das bitte für mich“.</p>
       <p><b style="color:var(--ink)">Wortspiele:</b> あぶく (Blase) steckt auch in 泡銭 (Geld, das zerrinnt). 悠々, 想想 und 夕夕 spielen mit gleichen Silben. 掬う (schöpfen) klingt wie 救う (retten).</p>
     </div>
-    <h2>Song-Lektion: mosi mosi? (楽音 Sasane)</h2>
+    </details>
+    <details class="fold">
+    <summary><h2>Song-Lektion: mosi mosi? (楽音 Sasane)</h2></summary>
     <div class="fix" style="border-left-color:var(--shu)">
       <p><b style="color:var(--ink)">Worum geht's:</b> Ein Mädchen „funkt“ ins Weltall, weil sie sich in ein Alien bzw. einen Unbekannten verguckt hat. Liebe wird als Funksignal erzählt: Sie sendet, wartet auf Antwort, hat mal kein Netz – und will ihn trotzdem finden.</p>
       <p><b style="color:var(--ink)">Grammatik 1 – ～中 (chuu):</b> „gerade dabei“. 交信中 = gerade in Funkkontakt, 送信中 = wird gesendet.</p>
@@ -287,7 +298,9 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
       <p><b style="color:var(--ink)">Wortspiele:</b> 電波 heißt Funkwelle, ist aber auch Slang für „abgedreht“. ないしらせ/お知らせ spielt mit „keine Nachricht = gute Nachricht“, und しらせ ist zugleich der Name des japanischen Antarktis-Eisbrechers. ニッチ (Nische) klingt wie にっち aus „weder vor noch zurück“.</p>
       <p><b style="color:var(--ink)">So übst du:</b> Erst das Deck lernen, dann den Text auf Genius mitlesen und markieren, welche Wörter du schon erkennst.</p>
     </div>
-    <h2>Aussprache-Regeln</h2>
+    </details>
+    <details class="fold">
+    <summary><h2>Aussprache-Regeln</h2></summary>
     <div class="fix" style="border-left-color:var(--ok)">
       <div class="tbl"><table>
         <thead><tr><th>Romaji</th><th>Sprich wie</th><th>Beispiel</th></tr></thead>
@@ -308,6 +321,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     <div class="fix" style="border-left-color:var(--ai)">
       <p><b style="color:var(--ink)">Merkhilfe Wochentage:</b> Mo = Mond = 月, So = Sonne = 日. Danach die fünf Elemente in fester Reihenfolge: Feuer 火, Wasser 水, Holz 木, Metall 金, Erde 土. Alle enden auf 曜日 (ようび).</p>
     </div>
+    </details>
   </section>
 
   <footer class="copy">
