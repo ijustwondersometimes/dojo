@@ -39,7 +39,8 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .tabs,.modes{display:flex;gap:8px;flex-wrap:wrap}
 button{font:inherit;cursor:pointer;color:inherit}
 .tab{border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:999px;font-weight:500}
-.tab[aria-pressed="true"]{background:var(--ai);border-color:var(--ai);color:var(--surface)}
+.tab{font-weight:600}
+.tab[aria-pressed="true"]{background:var(--shu);border-color:var(--shu);color:var(--surface)}
 .mode{border:none;background:none;padding:6px 2px;color:var(--muted);font-weight:500;border-bottom:2px solid transparent}
 .mode[aria-pressed="true"]{color:var(--ink);border-bottom-color:var(--shu)}
 button:focus-visible,a:focus-visible{outline:2px solid var(--shu);outline-offset:2px}
@@ -67,8 +68,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--shu);outline-offset
 .choice.wrong{border-color:var(--shu);background:color-mix(in srgb,var(--shu) 14%,var(--surface));}
 .choice:disabled{cursor:default}
 .actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.btn{border:1px solid var(--ai);background:var(--ai);color:var(--surface);padding:10px 18px;border-radius:10px;font-weight:700}
-.btn.ghost{background:transparent;color:var(--ai)}
+.btn{border:1px solid var(--shu);background:var(--shu);color:var(--surface);padding:10px 18px;border-radius:10px;font-weight:700}
+.btn.ghost{background:transparent;color:var(--shu)}
 .btn:disabled{opacity:.6;cursor:default}
 .feedback{min-height:24px;font-weight:500;display:flex;flex-direction:column;gap:6px;align-items:center;max-width:560px}
 .feedback.ok{color:var(--ok)} .feedback.no{color:var(--shu)}
@@ -226,18 +227,58 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   .ring{width:42px;height:42px}.ring>span{width:33px;height:33px;font-size:10px}
   .side-bug{margin:0 0 0 auto;padding:0;border:0;font-size:12px;text-align:right}
 }
+
+/* ---- Kopf, Hero, Start-Pop-up wie im Wien / NÖ Dojo ---- */
+header{align-items:center}
+h1{font-size:22px;line-height:1.2;display:flex;align-items:center;gap:10px}
+h1 small{display:none}
+.jp-flag{width:24px;height:16px;flex:none;border-radius:2px;box-shadow:0 0 0 1px var(--line)}
+.hero{display:flex;flex-direction:column;gap:4px;margin:18px 0 -8px}
+.hero-t{font-family:var(--f-display);font-weight:800;font-size:clamp(30px,7vw,44px);line-height:1.1;margin:0;color:var(--ink)}
+.hero-s{margin:0;font-size:15px;color:var(--muted)}
+.now-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14px;background:var(--surface);color:var(--ink);border:2px solid var(--shu);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer}
+.now-chip .jp-flag{width:18px;height:12px}
+.now-chip .ch{color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.pick-bg{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,#000 55%,transparent);display:grid;place-items:center;padding:20px}
+.pick-box{background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 40px);overflow-y:auto}
+.pick-box h2{margin:0;font-family:var(--f-display);font-size:30px}
+.pick-lead{margin:0;font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--ink);line-height:1.3}
+.pick-step{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
+.pick{position:relative;display:flex;gap:14px;align-items:center;border:2px solid var(--line);border-radius:14px;padding:12px 14px;text-align:left;background:var(--paper);font:inherit;color:var(--ink);cursor:pointer}
+.pick .pk{width:38px;flex:none;text-align:center;font-family:var(--f-display);font-weight:800;font-size:18px;color:var(--shu)}
+.pick b{display:block;font-size:17px}.pick small{display:block;color:var(--muted);font-size:13px}
+.pick[aria-pressed="true"]{border-color:var(--shu);background:color-mix(in srgb,var(--shu) 8%,var(--surface))}
+.pick[aria-pressed="true"]::after{content:"✓";position:absolute;right:14px;font-weight:700}
+.pick-topics{display:flex;flex-wrap:wrap;gap:8px}
+.pick-topics .tab{font-size:14px;padding:7px 12px}
+.pick-go{margin-top:8px;font-size:17px;padding:12px 18px;border-radius:12px}
 </style>
 </head>
 <body>
+<div class="pick-bg" id="pickDlg" hidden role="dialog" aria-modal="true" aria-labelledby="pickT">
+  <div class="pick-box">
+    <h2 id="pickT" data-i18n="pickT">こんにちは! 👋</h2>
+    <p class="pick-lead" data-i18n="greet">Lernst du heute wieder ein bisschen Japanisch?</p>
+    <div class="pick-step" data-i18n="step1">1 · Welche Schrift?</div>
+    <button class="pick" type="button" data-pick="jp"><span class="pk">あ</span><span><b>日本語</b><small data-i18n="pkJp">Kana &amp; Kanji · きゅう</small></span></button>
+    <button class="pick" type="button" data-pick="both"><span class="pk">あ·a</span><span><b data-i18n="both">Beides</b><small data-i18n="pkBoth">Kana + Romaji · きゅう kyuu</small></span></button>
+    <button class="pick" type="button" data-pick="ro"><span class="pk">a</span><span><b>Romaji</b><small data-i18n="pkRo">Lateinische Buchstaben · kyuu</small></span></button>
+    <div class="pick-step" data-i18n="step2">2 · Was willst du heute lernen?</div>
+    <div class="pick-topics" id="pickTopics"></div>
+    <button class="btn pick-go" id="pickGo" type="button" data-i18n="go">Los geht's! 🎯</button>
+  </div>
+</div>
 <div class="wrap">
   <header>
-    <h1>Nihongo Dojo<small data-i18n="sub">Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
+    <h1><svg class="jp-flag" viewBox="0 0 30 20" aria-hidden="true"><rect width="30" height="20" fill="#fff"/><circle cx="15" cy="10" r="6" fill="#bc002d"/></svg>Nihongo Dojo<small data-i18n="sub">Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
     <div class="head-r">
       <div class="hanko" id="hanko" data-tip="練習 (renshuu) = Übung. Der rote Stempel steht für dein tägliches Üben." aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
       <button class="lang-btn" id="langBtn" type="button" data-tip="Switch to English" aria-label="Switch to English">EN</button>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten" data-tip="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
+  <div class="hero"><h2 class="hero-t" data-i18n="heroT">日本語を話そう！</h2><p class="hero-s" data-i18n="heroS">Lass uns Japanisch sprechen!</p></div>
+  <button class="now-chip" id="nowChip" type="button"></button>
 
   <div class="tabs" role="group" aria-label="Thema">
     <button class="tab" id="t-num" data-deck="num" data-tip-k="tip_num" aria-pressed="true">Zahlen 0–100</button>
@@ -716,6 +757,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
     noJa:["Keine japanische Stimme gefunden. Am Handy klappt es meist.","No Japanese voice found. It usually works on phones."],
     noSound:["Kein Ton auf diesem Gerät","No sound on this device"],soundNA:["Ton nicht verfügbar","Sound not available"],
     sayRough:["Sprich etwa:","Say roughly:"],bug:["🐞 Fehler bei dieser Karte melden","🐞 Report a mistake on this card"],
+    pickT:["こんにちは! 👋","こんにちは! 👋"],greet:["Lernst du heute wieder ein bisschen Japanisch?","Ready to learn a bit of Japanese today?"],step1:["1 · Welche Schrift?","1 · Which script?"],step2:["2 · Was willst du heute lernen?","2 · What do you want to learn today?"],go:["Los geht's! 🎯","Let's go! 🎯"],change:["ändern","change"],pkJp:["Kana &amp; Kanji · きゅう","Kana &amp; kanji · きゅう"],pkBoth:["Kana + Romaji · きゅう kyuu","Kana + romaji · きゅう kyuu"],pkRo:["Lateinische Buchstaben · kyuu","Latin letters · kyuu"],heroT:["日本語を話そう！","日本語を話そう！"],heroS:["Lass uns Japanisch sprechen!","Let's speak Japanese!"],
     sTopic:["Thema","Topic"],sSerie:["🔥 Serie","🔥 Streak"],sRekord:["Rekord","Record"],sHeute:["Heute","Today"],sBug:["⚑ Diese Karte melden","⚑ Report this card"],topicsN:["Themen {a}/{b} bestanden","Topics passed: {a}/{b}"],signJa:["🇯🇵 Japanisch","🇯🇵 Japanese"],signDe:["Deutsch","English"],
     qMean:["Was bedeutet das?","What does this mean?"],qJp:["Wie heißt das auf Japanisch?","How do you say this in Japanese?"],qPick:["Wähle das richtige Japanisch","Pick the right Japanese"],
     bonusTag:["⭐ Bonusfrage · ","⭐ Bonus question · "],
@@ -1223,7 +1265,25 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     const lb=$("#langBtn");lb.textContent=EN()?"DE":"EN";lb.dataset.tip=T("langTip");lb.setAttribute("aria-label",T("langTip"));
   }
   $("#langBtn").onclick=()=>{LANG=EN()?"de":"en";try{localStorage.setItem("nihongodojo-lang",LANG);}catch(e){}applyLang();setMsg(T("msgStart"));renderScore();renderDays();renderLife();renderHs();render();};
+  // ---- Start-Pop-up: Schrift + Thema wählen (einmal pro Besuch, wie im Wien / NÖ Dojo) ----
+  let showStart=false;try{showStart=!sessionStorage.getItem("nihongodojo-start");}catch(e){showStart=true;}
+  let pScript=script,pDeck=deck;
+  const SCRIPT_L=()=>({jp:"日本語",both:T("both").replace(/<[^>]*>/g,""),ro:"Romaji"});
+  function paintPick(){
+    document.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pick===pScript));
+    $("#pickTopics").innerHTML=[...CAMP,"all"].map(k=>`<button type="button" class="tab" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
+  }
+  function openStart(){pScript=script;pDeck=DECKS[deck]?deck:"num";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
+  function renderNow(){$("#nowChip").innerHTML=$(".jp-flag").outerHTML+`<span>${esc(SCRIPT_L()[script])}</span><span class="ch">${esc(T("change"))}</span>`;}
+  document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pScript=b.dataset.pick;paintPick();});
+  $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
+  $("#pickGo").onclick=()=>{try{sessionStorage.setItem("nihongodojo-start","1");}catch(e){}
+    $("#pickDlg").hidden=true;const sb=document.querySelector(`.mode[data-script="${pScript}"]`);if(sb)sb.click();const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);if(t&&pDeck!==deck)t.click();save();renderNow();window.scrollTo(0,0);};
+  $("#nowChip").onclick=openStart;
+  document.querySelectorAll(".mode[data-script]").forEach(m=>m.addEventListener("click",()=>setTimeout(renderNow,0)));
+  $("#langBtn").addEventListener("click",()=>setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0));
   load();if(!CAMP.find(k=>!done[k]))finale=true;applyLang();if(EN())setMsg(T("msgStart"));renderScore();renderDays();renderLife();render();loadHs();
+  renderNow();if(showStart)openStart();
 })();
 </script>
 </body>
