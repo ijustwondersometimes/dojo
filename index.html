@@ -122,6 +122,9 @@ h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;
 .pick-topics{display:flex;flex-wrap:wrap;gap:8px}
 .pick-topics .tab{font-size:14px;padding:7px 12px}
 .pick-go{margin-top:8px;font-size:17px;padding:12px 18px;background:var(--rot);border-color:var(--rot);color:#fff;border-radius:12px}
+.hero{display:flex;flex-direction:column;gap:2px;margin-bottom:-8px}
+.hero-t{font-family:var(--f-word);font-weight:700;font-size:clamp(30px,7vw,44px);line-height:1.1;margin:0;color:var(--ink)}
+.hero-s{margin:0;font-size:15px;color:var(--muted)}
 .now-chip{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14px;background:var(--surface);color:var(--ink);border:2px solid var(--line);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer}
 .now-chip svg{width:16px;height:20px}
 .now-chip .ch{color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px}
@@ -384,6 +387,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   </header>
 
 
+  <div class="hero"><h2 class="hero-t" id="heroT">Red wia a Weana!</h2><p class="hero-s" id="heroS">Rede wie ein Wiener</p></div>
   <button class="now-chip" id="nowChip" type="button"></button>
   <div class="dia-box" hidden>
   <span class="dia-q" data-i18n="diaQ">Welchen Dialekt willst du lernen?</span>
@@ -778,7 +782,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   "fbTxtF":["Was gefällt dir, was fehlt? (freiwillig)","What do you like, what's missing? (optional)"],"fbTxtB":["Was stimmt nicht an der Karte?","What's wrong with this card?"],"fbTxtV":["Eigener Vorschlag oder Kommentar (freiwillig)","Your own idea or a comment (optional)"],
   "fbCancel":["Abbrechen","Cancel"],"fbSend":["Senden","Send"],"fbThanks":["Danke! Is angekommen. 🙏","Thanks! It arrived. 🙏"],"fbEmpty":["Bitte Sterne vergeben oder was reinschreiben.","Please give stars or write something."],
   "fbFail":["Senden hat ned geklappt.","Sending didn't work."],"fbAlt":["Stattdessen das Formular öffnen ↗","Open the form instead ↗"],"fbRL":["Grad zu viel auf einmal. Probier's später nochmal.","Too much at once. Please try again later."]});
-  Object.assign(UI,{"greet":["Lernst heut wieder a bissl Weanerisch?","Ready to learn a bit of Viennese today?"],"step1":["1 · Welchen Dialekt?","1 · Which dialect?"],"step2":["2 · Was willst du heute lernen?","2 · What do you want to learn today?"],"go":["Los geht's! 🎯","Let's go! 🎯"],"change":["ändern","change"],"spLab":["📜 Spruch des Tages","📜 Saying of the day"],
+  Object.assign(UI,{"greet":["Lernst heut wieder a bissl Weanerisch?","Ready to learn a bit of Viennese today?"],"step1":["1 · Welchen Dialekt?","1 · Which dialect?"],"step2":["2 · Was willst du heute lernen?","2 · What do you want to learn today?"],"go":["Los geht's! 🎯","Let's go! 🎯"],"change":["ändern","change"],"heroWien":["Red wia a Weana!","Red wia a Weana!"],"heroWienS":["Rede wie ein Wiener","Talk like a Viennese"],"heroNoe":["Red wia a Niedaöstareicha!","Red wia a Niedaöstareicha!"],"heroNoeS":["Rede wie ein Niederösterreicher","Talk like a Lower Austrian"],"spLab":["📜 Spruch des Tages","📜 Saying of the day"],
   "diaQ":["Welchen Dialekt willst du lernen?","Which dialect do you want to learn?"],"diaHint":["Wien = Stadt Wien (haaß) · NÖ = Niederösterreich, das Land rund um Wien (hoaß)","Vienna = the city (haaß) · Lower Austria = the state around Vienna (hoaß)"],
   "wienName":["Wienerisch","Viennese"],"wienKurz":["Wien","Vienna"],"wienSub":["Stadt Wien · haaß, dahaam","City of Vienna · haaß, dahaam"],
   "noeName":["Niederösterreichisch","Lower Austrian"],"noeKurz":["NÖ","L. Austria"],"noeSub":["Land rund um Wien · hoaß, dahoam","State around Vienna · hoaß, dahoam"],
@@ -1261,7 +1265,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     $("#pickTopics").innerHTML=[...CAMP,"all"].map(k=>`<button type="button" class="tab" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
   }
   function openStart(){pDia=dia;pDeck=(deck==="schimpf")?deck:deck;if(!DECKS[pDeck]||pDeck==="schimpf")pDeck="greet";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
-  function renderNow(){const c=$("#nowChip");c.className="now-chip "+dia;c.innerHTML=document.querySelector((dia==="wien"?"#v-wien":"#v-noe")+" svg").outerHTML+`<span>${esc(T(dia==="wien"?"dWien":"dNoe"))}</span><span class="ch">${esc(T("change"))}</span>`;}
+  function renderNow(){$("#heroT").textContent=T(dia==="wien"?"heroWien":"heroNoe");$("#heroS").textContent=T(dia==="wien"?"heroWienS":"heroNoeS");const c=$("#nowChip");c.className="now-chip "+dia;c.innerHTML=document.querySelector((dia==="wien"?"#v-wien":"#v-noe")+" svg").outerHTML+`<span>${esc(T(dia==="wien"?"dWien":"dNoe"))}</span><span class="ch">${esc(T("change"))}</span>`;}
   document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pDia=b.dataset.pick;paintPick();});
   $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
   $("#pickGo").onclick=()=>{try{sessionStorage.setItem("weanerdojo-start","1");localStorage.setItem("weanerdojo-dia","1");}catch(e){}
