@@ -33,7 +33,7 @@ header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
 h1{font-family:var(--f-display);font-weight:800;font-size:clamp(28px,6vw,40px);margin:0;line-height:1.1;text-wrap:balance}
 h1 small{display:block;font-family:var(--f-body);font-weight:500;font-size:14px;color:var(--muted);letter-spacing:.04em;margin-top:6px}
 .head-r{display:flex;gap:10px;align-items:center}
-.hanko{font-family:var(--f-display);font-weight:800;color:var(--shu);border:2px solid var(--shu);border-radius:6px;padding:4px 8px;font-size:18px;line-height:1.1;letter-spacing:.1em;white-space:nowrap}
+.hanko{cursor:help;font-family:var(--f-display);font-weight:800;color:var(--shu);border:2px solid var(--shu);border-radius:6px;padding:4px 8px;font-size:18px;line-height:1.1;letter-spacing:.1em;white-space:nowrap}
 .theme-btn{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:18px;display:grid;place-items:center;padding:0}
 .theme-btn:hover{border-color:var(--shu)}
 .tabs,.modes{display:flex;gap:8px;flex-wrap:wrap}
@@ -179,7 +179,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
   <header>
     <h1>Nihongo Dojo<small>Zahlen · Wochentage · Alltag · Date · Lieblingssätze · Song-Vokabeln</small></h1>
     <div class="head-r">
-      <div class="hanko" aria-hidden="true">練習</div>
+      <div class="hanko" title="練習 (renshuu) = Übung" aria-label="練習, renshuu, Übung" role="img" tabindex="0">練習</div>
       <button class="theme-btn" id="themeBtn" type="button" aria-label="Hell oder dunkel umschalten">🌙</button>
     </div>
   </header>
