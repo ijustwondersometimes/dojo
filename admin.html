@@ -49,6 +49,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 <div class="wrap">
   <header>
     <h1>Dojo <span>Admin</span></h1>
+    <select id="dojo" aria-label="Welches Dojo"><option value="">Alle Dojos</option><option value="wien">Wien / NÖ</option><option value="nihongo">Nihongo</option></select>
     <nav role="tablist">
       <button role="tab" data-tab="stats" aria-selected="true">📊 Statistik</button>
       <button role="tab" data-tab="fb">💬 Feedback</button>
@@ -98,6 +99,12 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   const showErr=e=>{if(e===0)return;let b=document.getElementById("err");if(!b){b=document.createElement("div");b.id="err";b.className="msg";b.style.cssText="background:#fde8e8;color:#9b1c1c;padding:12px;border-radius:10px;margin:12px 0;font-family:monospace;font-size:13px";document.querySelector("main,body").prepend(b);}b.textContent="Fehler beim Laden: "+(e&&e.message||e);};
   const rowsTable=(el,rows,label)=>{el.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.k||"–")}</td><td class="n">${fmt(r.n)}</td></tr>`).join(""):`<tr><td class="muted">${label||"Noch keine Daten"}</td></tr>`;};
 
+  // Dojo-Filter (merkt sich die Wahl)
+  const DN={wien:"Wien / NÖ",nihongo:"Nihongo"};
+  try{$("#dojo").value=localStorage.getItem("dojo-admin-filter")||"";}catch(e){}
+  const D=()=>$("#dojo").value?"&dojo="+$("#dojo").value:"";
+  $("#dojo").onchange=()=>{try{localStorage.setItem("dojo-admin-filter",$("#dojo").value);}catch(e){}
+    const t=document.querySelector('nav button[aria-selected="true"]').dataset.tab;({stats:loadStats,fb:loadFb,hs:loadHs})[t]().catch(showErr);};
   // Tabs
   document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{
     document.querySelectorAll("nav button").forEach(x=>x.setAttribute("aria-selected",x===b));
@@ -106,7 +113,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   });
 
   async function loadStats(){
-    const s=await api("summary?days="+$("#days").value);const t=s.total||{};
+    const s=await api("summary?days="+$("#days").value+D());const t=s.total||{};
     const acc=(t.ok||0)+(t.no||0)?Math.round(100*t.ok/((t.ok||0)+(t.no||0)))+" %":"–";
     $("#kpis").innerHTML=[["Anwender",fmt(t.users)],["Besuche",fmt(t.visits)],["Antworten",fmt((t.ok||0)+(t.no||0))],["Trefferquote",acc],["Lernzeit",fmt(Math.round((t.min||0)/60))+" h"],["Längste Serie",fmt(t.best)],["Bestenliste",fmt(s.scores)]]
       .map(([l,v])=>`<div class="box kpi"><div class="l">${l}</div><div class="v">${v}</div></div>`).join("");
@@ -120,11 +127,11 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     rowsTable($("#dev"),s.devices||[]);rowsTable($("#geo"),s.geo||[]);rowsTable($("#set"),s.settings||[]);
   }
   $("#days").onchange=()=>loadStats().catch(showErr);
-  $("#csvStats").onclick=()=>location.href="/admin/api/export?table=stats";
-  $("#csvFb").onclick=()=>location.href="/admin/api/export?table=feedback";
+  $("#csvStats").onclick=()=>location.href="/admin/api/export?table=stats"+D();
+  $("#csvFb").onclick=()=>location.href="/admin/api/export?table=feedback"+D();
 
   let fbRows=[];
-  async function loadFb(){fbRows=(await api("feedback")).rows||[];renderFb();}
+  async function loadFb(){fbRows=(await api("feedback?x=1"+D())).rows||[];renderFb();}
   function renderFb(){
     const k=$("#fbKind").value,rows=fbRows.filter(r=>!k||r.kind===k);
     const tally={};fbRows.filter(r=>r.kind==="vote").forEach(r=>{const t=r.topic||"–";tally[t]=(tally[t]||0)+1;});
@@ -132,15 +139,15 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     $("#fbList").innerHTML=rows.length?`<tr><th>Wann</th><th>Art</th><th>Inhalt</th><th></th></tr>`+rows.map(r=>`<tr>
       <td class="n">${when(r.ts)}</td>
       <td><span class="tag ${esc(r.kind)}">${esc(r.kind)}</span></td>
-      <td>${r.rating?`<div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>`:""}${r.topic?`<b>${esc(r.topic)}</b><br>`:""}${r.card?`<div class="muted">Karte: ${esc(r.card)}</div>`:""}${esc(r.text)}<div class="muted" style="font-size:12px">${esc(r.lang||"")} · ${esc(r.vid||"")}</div></td>
+      <td>${r.rating?`<div class="stars">${"★".repeat(r.rating)}${"☆".repeat(5-r.rating)}</div>`:""}${r.topic?`<b>${esc(r.topic)}</b><br>`:""}${r.card?`<div class="muted">Karte: ${esc(r.card)}</div>`:""}${esc(r.text)}<div class="muted" style="font-size:12px">${esc(DN[r.dojo]||r.dojo||"")} · ${esc(r.lang||"")} · ${esc(r.vid||"")}</div></td>
       <td><button class="del" data-id="${r.id}" title="Löschen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch nichts eingegangen</td></tr>';
   }
   $("#fbKind").onchange=renderFb;
   $("#fbList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag löschen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"feedback",id:+b.dataset.id})});loadFb();};
 
   async function loadHs(){
-    const rows=(await api("scores")).rows||[];
-    $("#hsList").innerHTML=rows.length?`<tr><th>#</th><th>Name</th><th class="n">Serie</th><th>Wann</th><th>ID</th><th></th></tr>`+rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td class="n">${fmt(r.best)}</td><td>${when(r.ts)}</td><td class="muted">${esc(r.vid)}</td><td><button class="del" data-vid="${esc(r.vid)}" title="Entfernen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch keine Einträge</td></tr>';
+    const rows=(await api("scores?x=1"+D())).rows||[];
+    $("#hsList").innerHTML=rows.length?`<tr><th>#</th><th>Name</th><th>Dojo</th><th class="n">Serie</th><th>Wann</th><th>ID</th><th></th></tr>`+rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(DN[r.dojo]||r.dojo||"")}</td><td class="n">${fmt(r.best)}</td><td>${when(r.ts)}</td><td class="muted">${esc(r.vid)}</td><td><button class="del" data-vid="${esc(r.vid)}" title="Entfernen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch keine Einträge</td></tr>';
   }
   $("#hsList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag aus der Bestenliste entfernen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"scores",vid:b.dataset.vid})});loadHs();};
 

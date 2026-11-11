@@ -1,4 +1,4 @@
-// Wien / NÖ Dojo – Cloudflare Worker
+// Wien / NÖ Dojo + Nihongo Dojo – Cloudflare Worker (eine Datenbank, Feld "dojo")
 // Öffentlich:  POST /api/stats · POST /api/feedback · GET /api/highscore · POST /api/score
 // Nur Admin:   /admin (Seite) und /admin/api/* – geschützt durch ein Passwort (Worker-Secret ADMIN_PASSWORD)
 // Alles andere liefert die statischen Dateien (index.html usw.) aus.
@@ -17,8 +17,21 @@ let schemaReady = false;
 async function ensureSchema(env) {
   if (schemaReady) return;
   await env.DB.batch(SCHEMA.map((s) => env.DB.prepare(s)));
+  // Spalte "dojo" (wien | nihongo) nachrüsten; alte Einträge zählen als Wien
+  for (const t of ["stats", "feedback", "scores"]) {
+    const { results } = await env.DB.prepare(`PRAGMA table_info(${t})`).all();
+    if (!results.some((c) => c.name === "dojo")) {
+      try {
+        await env.DB.prepare(`ALTER TABLE ${t} ADD COLUMN dojo TEXT NOT NULL DEFAULT 'wien'`).run();
+      } catch (e) {} // schon da (paralleler Aufruf)
+    }
+  }
   schemaReady = true;
 }
+
+// Welche Dojos es gibt; alles Unbekannte zählt als Wien
+const DOJOS = ["wien", "nihongo"];
+const dojoOf = (v) => (DOJOS.includes(v) ? v : "wien");
 
 // Seiten, die die öffentliche API aufrufen dürfen (GitHub-Pages-Version + Cloudflare selbst)
 const ORIGINS = [
@@ -53,7 +66,7 @@ async function postStats(req, env) {
     for (const [k, x] of Object.entries(b.decks).slice(0, 30))
       decks[str(k, 40)] = { ok: int(x && x.ok, 10000), no: int(x && x.no, 10000) };
   await env.DB.prepare(
-    `INSERT INTO stats (ts,vid,kind,settings,topics,decks,ok,no,best,rec,min,dev,geo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`
+    `INSERT INTO stats (ts,vid,kind,settings,topics,decks,ok,no,best,rec,min,dev,geo,dojo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
   )
     .bind(
       Date.now(),
@@ -64,7 +77,8 @@ async function postStats(req, env) {
       JSON.stringify(decks),
       int(b.ok, 10000), int(b.no, 10000), int(b.best, 10000), int(b.rec, 1000), int(b.min, 1440),
       str(b.dev, 60),
-      str(b.geo, 80)
+      str(b.geo, 80),
+      dojoOf(b.dojo)
     )
     .run();
   return json({ ok: true });
@@ -83,14 +97,15 @@ async function postFeedback(req, env) {
     const r = await env.DB.prepare(`SELECT COUNT(*) n FROM feedback WHERE vid=? AND ts>?`).bind(vid, Date.now() - 3600e3).first();
     if (r && r.n >= 10) return json({ ok: false, error: "zu viele" }, 429);
   }
-  await env.DB.prepare(`INSERT INTO feedback (ts,kind,rating,topic,card,text,vid,lang) VALUES (?,?,?,?,?,?,?,?)`)
-    .bind(Date.now(), kind, rating, topic, kind === "bug" ? str(b.card, 200) : "", text, vid, str(b.lang, 5))
+  await env.DB.prepare(`INSERT INTO feedback (ts,kind,rating,topic,card,text,vid,lang,dojo) VALUES (?,?,?,?,?,?,?,?,?)`)
+    .bind(Date.now(), kind, rating, topic, kind === "bug" ? str(b.card, 200) : "", text, vid, str(b.lang, 5), dojoOf(b.dojo))
     .run();
   return json({ ok: true });
 }
 
-async function getHighscore(env) {
-  const { results } = await env.DB.prepare(`SELECT name,best,ts FROM scores ORDER BY best DESC, ts ASC LIMIT 10`).all();
+async function getHighscore(env, url) {
+  const dj = dojoOf(url.searchParams.get("dojo"));
+  const { results } = await env.DB.prepare(`SELECT name,best,ts FROM scores WHERE dojo=? ORDER BY best DESC, ts ASC LIMIT 10`).bind(dj).all();
   return json({ ok: true, top: results }, 200, { "cache-control": "max-age=30" });
 }
 
@@ -100,17 +115,18 @@ async function postScore(req, env) {
   const name = str(b.name, 20);
   const best = int(b.best, 5000);
   if (!name || best < 1) return json({ ok: false, error: "leer" }, 400);
+  const dj = dojoOf(b.dojo);
   // Pro Besucher ein Eintrag; der Rekord kann nur steigen, der Name darf sich ändern
   await env.DB.prepare(
-    `INSERT INTO scores (vid,name,best,ts) VALUES (?,?,?,?)
-     ON CONFLICT(vid) DO UPDATE SET name=excluded.name,
+    `INSERT INTO scores (vid,name,best,ts,dojo) VALUES (?,?,?,?,?)
+     ON CONFLICT(vid) DO UPDATE SET name=excluded.name, dojo=excluded.dojo,
        ts=CASE WHEN excluded.best>scores.best THEN excluded.ts ELSE scores.ts END,
        best=MAX(scores.best, excluded.best)`
   )
-    .bind(b.vid, name, best, Date.now())
+    .bind(b.vid, name, best, Date.now(), dj)
     .run();
   const me = await env.DB.prepare(`SELECT best FROM scores WHERE vid=?`).bind(b.vid).first();
-  const rank = await env.DB.prepare(`SELECT COUNT(*)+1 r FROM scores WHERE best>?`).bind(me.best).first();
+  const rank = await env.DB.prepare(`SELECT COUNT(*)+1 r FROM scores WHERE dojo=? AND best>?`).bind(dj, me.best).first();
   return json({ ok: true, best: me.best, rank: rank.r });
 }
 
@@ -159,18 +175,20 @@ function denyAdmin(path, why) {
 
 // ---------- Admin-API ----------
 const DAY = 86400e3;
-async function adminSummary(env, days) {
+async function adminSummary(env, days, dj) {
   const since = Date.now() - days * DAY;
   const db = env.DB;
+  // dj = "" → alle Dojos, sonst nur dieses (Bedingung steht an der Stelle /*D*/)
+  const q = (sql, ...a) => db.prepare(sql.replace("/*D*/", dj ? " AND dojo=?" : "")).bind(...a, ...(dj ? [dj] : []));
   const [tot, perDay, dev, geo, set, rows, fbn, sc] = await db.batch([
-    db.prepare(`SELECT COUNT(DISTINCT vid) users, SUM(kind='visit') visits, SUM(ok) ok, SUM(no) no, SUM(min) min, MAX(best) best FROM stats WHERE ts>?`).bind(since),
-    db.prepare(`SELECT date(ts/1000,'unixepoch') d, SUM(kind='visit') visits, COUNT(DISTINCT vid) users, SUM(ok) ok, SUM(no) no FROM stats WHERE ts>? GROUP BY d ORDER BY d`).bind(since),
-    db.prepare(`SELECT dev k, COUNT(DISTINCT vid) n FROM stats WHERE ts>? AND kind='visit' GROUP BY dev ORDER BY n DESC LIMIT 10`).bind(since),
-    db.prepare(`SELECT geo k, COUNT(DISTINCT vid) n FROM stats WHERE ts>? GROUP BY geo ORDER BY n DESC LIMIT 15`).bind(since),
-    db.prepare(`SELECT settings k, COUNT(*) n FROM stats WHERE ts>? AND kind='visit' GROUP BY settings ORDER BY n DESC LIMIT 10`).bind(since),
-    db.prepare(`SELECT decks FROM stats WHERE ts>? AND kind='progress'`).bind(since),
-    db.prepare(`SELECT kind k, COUNT(*) n FROM feedback WHERE ts>? GROUP BY kind`).bind(since),
-    db.prepare(`SELECT COUNT(*) n FROM scores`),
+    q(`SELECT COUNT(DISTINCT vid) users, SUM(kind='visit') visits, SUM(ok) ok, SUM(no) no, SUM(min) min, MAX(best) best FROM stats WHERE ts>? /*D*/`, since),
+    q(`SELECT date(ts/1000,'unixepoch') d, SUM(kind='visit') visits, COUNT(DISTINCT vid) users, SUM(ok) ok, SUM(no) no FROM stats WHERE ts>? /*D*/ GROUP BY d ORDER BY d`, since),
+    q(`SELECT dev k, COUNT(DISTINCT vid) n FROM stats WHERE ts>? AND kind='visit' /*D*/ GROUP BY dev ORDER BY n DESC LIMIT 10`, since),
+    q(`SELECT geo k, COUNT(DISTINCT vid) n FROM stats WHERE ts>? /*D*/ GROUP BY geo ORDER BY n DESC LIMIT 15`, since),
+    q(`SELECT settings k, COUNT(*) n FROM stats WHERE ts>? AND kind='visit' /*D*/ GROUP BY settings ORDER BY n DESC LIMIT 10`, since),
+    q(`SELECT decks FROM stats WHERE ts>? AND kind='progress' /*D*/`, since),
+    q(`SELECT kind k, COUNT(*) n FROM feedback WHERE ts>? /*D*/ GROUP BY kind`, since),
+    q(`SELECT COUNT(*) n FROM scores WHERE 1 /*D*/`),
   ]);
   const decks = {};
   for (const r of rows.results) {
@@ -197,14 +215,17 @@ function csv(rows) {
 
 async function adminApi(req, env, path, url) {
   const db = env.DB;
+  const dj = DOJOS.includes(url.searchParams.get("dojo")) ? url.searchParams.get("dojo") : "";
+  const W = dj ? " WHERE dojo=?" : "";
+  const B = dj ? [dj] : [];
   if (path === "/admin/api/me") return json({ ok: true });
-  if (path === "/admin/api/summary") return json(await adminSummary(env, Math.min(365, int(url.searchParams.get("days")) || 30)));
+  if (path === "/admin/api/summary") return json(await adminSummary(env, Math.min(365, int(url.searchParams.get("days")) || 30), dj));
   if (path === "/admin/api/feedback") {
-    const { results } = await db.prepare(`SELECT * FROM feedback ORDER BY id DESC LIMIT 300`).all();
+    const { results } = await db.prepare(`SELECT * FROM feedback${W} ORDER BY id DESC LIMIT 300`).bind(...B).all();
     return json({ rows: results });
   }
   if (path === "/admin/api/scores") {
-    const { results } = await db.prepare(`SELECT * FROM scores ORDER BY best DESC, ts ASC LIMIT 200`).all();
+    const { results } = await db.prepare(`SELECT * FROM scores${W} ORDER BY best DESC, ts ASC LIMIT 200`).bind(...B).all();
     return json({ rows: results });
   }
   if (path === "/admin/api/delete" && req.method === "POST") {
@@ -217,9 +238,9 @@ async function adminApi(req, env, path, url) {
   if (path === "/admin/api/export") {
     const t = url.searchParams.get("table");
     if (!["stats", "feedback", "scores"].includes(t)) return json({ ok: false }, 400);
-    const { results } = await db.prepare(`SELECT * FROM ${t} ORDER BY ts DESC LIMIT 50000`).all();
+    const { results } = await db.prepare(`SELECT * FROM ${t}${W} ORDER BY ts DESC LIMIT 50000`).bind(...B).all();
     return new Response(csv(results), {
-      headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="dojo-${t}.csv"` },
+      headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="dojo-${dj || "alle"}-${t}.csv"` },
     });
   }
   return json({ ok: false, error: "unbekannt" }, 404);
@@ -240,7 +261,7 @@ export default {
         let r;
         if (path === "/api/stats" && req.method === "POST") r = await postStats(req, env);
         else if (path === "/api/feedback" && req.method === "POST") r = await postFeedback(req, env);
-        else if (path === "/api/highscore" && req.method === "GET") r = await getHighscore(env);
+        else if (path === "/api/highscore" && req.method === "GET") r = await getHighscore(env, url);
         else if (path === "/api/score" && req.method === "POST") r = await postScore(req, env);
         else r = json({ ok: false, error: "unbekannt" }, 404);
         for (const [k, v] of Object.entries(h)) r.headers.set(k, v);

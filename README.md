@@ -42,4 +42,12 @@ Dei Lernstand bleibt nur bei dir im Browser. Nur ned hudln!
 
 ---
 
+## 日本語 Nihongo Dojo
+
+**Zum Nihongo Dojo:** https://ijustwondersometimes.github.io/dojo/nihongo/
+
+Japanisch lernen mit Quiz und Karteikarten: Zahlen 0–100, Wochentage, Begrüßen, Small Talk & Date, Höflich & Unterwegs und Song-Vokabeln. Schrift wählbar (日本語, Beides, Romaji), Vorlesen mit japanischer Stimme, Serie mit Joker und Bonusfrage, Tageshighscore, Bestenliste, Feedback und Hell-/Dunkelmodus. Läuft über denselben Worker und dieselbe Datenbank wie das Wien / NÖ Dojo (Feld `dojo`).
+
+---
+
 © 2026 miab

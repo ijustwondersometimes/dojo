@@ -1,4 +1,5 @@
--- Wien / NÖ Dojo – D1-Schema (legt der Worker beim ersten Aufruf auch selbst an)
+-- Wien / NÖ Dojo + Nihongo Dojo – D1-Schema (legt der Worker beim ersten Aufruf auch selbst an)
+-- Jede Tabelle hat zusätzlich die Spalte dojo TEXT NOT NULL DEFAULT 'wien' (wien | nihongo), die der Worker selbst nachrüstet.
 CREATE TABLE IF NOT EXISTS stats (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   ts INTEGER NOT NULL,          -- Zeitpunkt (ms)
