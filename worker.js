@@ -4,6 +4,7 @@
 // Alles andere liefert die statischen Dateien (index.html usw.) aus.
 
 import ADMIN_HTML from "./admin.html"; // wird von wrangler als Text eingebunden
+import NIHONGO_HTML from "./nihongo/index.html"; // Nihongo Dojo direkt im Worker, unabhängig vom Datei-Upload
 
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS stats (id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER NOT NULL, vid TEXT, kind TEXT, settings TEXT, topics TEXT, decks TEXT, ok INTEGER, no INTEGER, best INTEGER, rec INTEGER, min INTEGER, dev TEXT, geo TEXT)`,
@@ -284,6 +285,12 @@ export default {
       r.headers.set("cache-control", "no-store");
       r.headers.set("x-robots-tag", "noindex");
       return r;
+    }
+
+    // Nihongo Dojo: direkt aus dem Worker (der Ordner nihongo/ kam bei Cloudflare nicht mit an)
+    if (path === "/nihongo") return Response.redirect(new URL("/nihongo/", url), 301);
+    if (path === "/nihongo/" || path === "/nihongo/index.html") {
+      return new Response(NIHONGO_HTML, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "public, max-age=300" } });
     }
 
     return env.ASSETS.fetch(req);

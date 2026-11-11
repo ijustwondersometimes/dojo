@@ -8,7 +8,7 @@
     "directory": ".",
     "binding": "ASSETS",
     // Diese Pfade gehen zuerst durch den Worker (API + geschützte Admin-Seite)
-    "run_worker_first": ["/api/*", "/admin*"]
+    "run_worker_first": ["/api/*", "/admin*", "/nihongo*"]
   },
   "d1_databases": [
     {
