@@ -33,6 +33,9 @@ async function ensureSchema(env) {
 // Welche Dojos es gibt; alles Unbekannte zählt als Wien
 const DOJOS = ["wien", "nihongo"];
 const dojoOf = (v) => (DOJOS.includes(v) ? v : "wien");
+// Bestenlisten: "wien20" = Wien-Quiz mit 20 Fragen pro Runde (max. 20 Punkte); "wien" = alte Serien-Liste
+const BOARDS = ["wien", "wien20", "nihongo"];
+const boardOf = (v) => (BOARDS.includes(v) ? v : "wien");
 
 // Seiten, die die öffentliche API aufrufen dürfen (GitHub-Pages-Version + Cloudflare selbst)
 const ORIGINS = [
@@ -105,7 +108,7 @@ async function postFeedback(req, env) {
 }
 
 async function getHighscore(env, url) {
-  const dj = dojoOf(url.searchParams.get("dojo"));
+  const dj = boardOf(url.searchParams.get("dojo"));
   const { results } = await env.DB.prepare(`SELECT name,best,ts FROM scores WHERE dojo=? ORDER BY best DESC, ts ASC LIMIT 10`).bind(dj).all();
   return json({ ok: true, top: results }, 200, { "cache-control": "max-age=30" });
 }
@@ -114,15 +117,17 @@ async function postScore(req, env) {
   const b = await body(req);
   if (!vidOk(b.vid)) return json({ ok: false, error: "id" }, 400);
   const name = str(b.name, 20);
-  const best = int(b.best, 5000);
+  const dj = boardOf(b.dojo);
+  const best = int(b.best, dj === "wien20" ? 20 : 5000);
   if (!name || best < 1) return json({ ok: false, error: "leer" }, 400);
-  const dj = dojoOf(b.dojo);
-  // Pro Besucher ein Eintrag; der Rekord kann nur steigen, der Name darf sich ändern
+  // Pro Besucher ein Eintrag; der Rekord kann nur steigen, der Name darf sich ändern.
+  // Wechselt die Liste (z. B. alte Serie -> 20-Fragen-Quiz), zählt nur der neue Wert.
   await env.DB.prepare(
     `INSERT INTO scores (vid,name,best,ts,dojo) VALUES (?,?,?,?,?)
-     ON CONFLICT(vid) DO UPDATE SET name=excluded.name, dojo=excluded.dojo,
-       ts=CASE WHEN excluded.best>scores.best THEN excluded.ts ELSE scores.ts END,
-       best=MAX(scores.best, excluded.best)`
+     ON CONFLICT(vid) DO UPDATE SET name=excluded.name,
+       ts=CASE WHEN scores.dojo<>excluded.dojo OR excluded.best>scores.best THEN excluded.ts ELSE scores.ts END,
+       best=CASE WHEN scores.dojo<>excluded.dojo THEN excluded.best ELSE MAX(scores.best, excluded.best) END,
+       dojo=excluded.dojo`
   )
     .bind(b.vid, name, best, Date.now(), dj)
     .run();
@@ -226,7 +231,8 @@ async function adminApi(req, env, path, url) {
     return json({ rows: results });
   }
   if (path === "/admin/api/scores") {
-    const { results } = await db.prepare(`SELECT * FROM scores${W} ORDER BY best DESC, ts ASC LIMIT 200`).bind(...B).all();
+    const SW = dj === "wien" ? " WHERE dojo IN ('wien','wien20')" : W;
+    const { results } = await db.prepare(`SELECT * FROM scores${SW} ORDER BY best DESC, ts ASC LIMIT 200`).bind(...(dj === "wien" ? [] : B)).all();
     return json({ rows: results });
   }
   if (path === "/admin/api/delete" && req.method === "POST") {

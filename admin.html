@@ -100,7 +100,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   const rowsTable=(el,rows,label)=>{el.innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.k||"–")}</td><td class="n">${fmt(r.n)}</td></tr>`).join(""):`<tr><td class="muted">${label||"Noch keine Daten"}</td></tr>`;};
 
   // Dojo-Filter (merkt sich die Wahl)
-  const DN={wien:"Wien / NÖ",nihongo:"Nihongo"};
+  const DN={wien:"Wien / NÖ (alte Serie)",wien20:"Wien / NÖ (Quiz /20)",nihongo:"Nihongo"};
   try{$("#dojo").value=localStorage.getItem("dojo-admin-filter")||"";}catch(e){}
   const D=()=>$("#dojo").value?"&dojo="+$("#dojo").value:"";
   $("#dojo").onchange=()=>{try{localStorage.setItem("dojo-admin-filter",$("#dojo").value);}catch(e){}
@@ -147,7 +147,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 
   async function loadHs(){
     const rows=(await api("scores?x=1"+D())).rows||[];
-    $("#hsList").innerHTML=rows.length?`<tr><th>#</th><th>Name</th><th>Dojo</th><th class="n">Serie</th><th>Wann</th><th>ID</th><th></th></tr>`+rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(DN[r.dojo]||r.dojo||"")}</td><td class="n">${fmt(r.best)}</td><td>${when(r.ts)}</td><td class="muted">${esc(r.vid)}</td><td><button class="del" data-vid="${esc(r.vid)}" title="Entfernen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch keine Einträge</td></tr>';
+    $("#hsList").innerHTML=rows.length?`<tr><th>#</th><th>Name</th><th>Dojo</th><th class="n">Punkte</th><th>Wann</th><th>ID</th><th></th></tr>`+rows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.name)}</td><td>${esc(DN[r.dojo]||r.dojo||"")}</td><td class="n">${fmt(r.best)}</td><td>${when(r.ts)}</td><td class="muted">${esc(r.vid)}</td><td><button class="del" data-vid="${esc(r.vid)}" title="Entfernen">✕</button></td></tr>`).join(""):'<tr><td class="muted">Noch keine Einträge</td></tr>';
   }
   $("#hsList").onclick=async e=>{const b=e.target.closest(".del");if(!b||!confirm("Eintrag aus der Bestenliste entfernen?"))return;await api("delete",{method:"POST",body:JSON.stringify({table:"scores",vid:b.dataset.vid})});loadHs();};
 

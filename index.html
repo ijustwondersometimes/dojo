@@ -506,7 +506,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   </details>
   <section class="rate" id="hs" hidden>
     <h2 data-i18n="hsH">🏆 Bestenliste</h2>
-    <p class="hint" data-i18n="hsP">Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.</p>
+    <p class="hint" data-i18n="hsP">Die besten Quiz-Runden (richtige von 20) aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.</p>
     <ol class="hs-list" id="hsList"></ol>
     <div class="hs-form"><input id="hsName" maxlength="20" autocomplete="nickname" aria-label="Name" placeholder="Dein Name"><button class="btn" id="hsSend" type="button"></button></div>
     <div class="hint" id="hsMsg" aria-live="polite"></div>
@@ -834,9 +834,23 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   ].map(r=>({id:r[0],cat:r[1],t:r[2],hd:r[3]}));
   // ---- Sprache: Deutsch / Englisch ----
   const UI={"statLab": ["Anonyme Statistik senden", "Send anonymous stats"], "statTip": ["Hilft, das Dojo zu verbessern. Geschickt werden nur Themen, Punkte, Serie und Einstellungen, ohne Namen. Häkchen weg = nichts wird gesendet.", "Helps improve the Dojo. Only topics, points, streak and settings are sent, no names. Untick = nothing is sent."], "ansLab": ["Auf Hochdeutsch", "In Standard German"], "sub": ["Wienerisch &amp; Niederösterreichisch lernen", "Learn Viennese &amp; Lower Austrian dialect"], "witzTip": ["Deine Witze-Sammlung. Neue Witze gibt's für jeden gebrochenen Themen-Rekord.", "Your joke collection. Every topic record you break unlocks a new joke."], "spLab": ["📜 Wiener Spruch", "📜 Viennese saying"], "spTip": ["Klick für den nächsten Spruch", "Click for the next saying"], "tipWien": ["Wiener Dialekt: altes ei wird zu aa, z. B. haaß, dahaam, Staa.", "Viennese dialect: old “ei” becomes “aa”, e.g. haaß, dahaam, Staa."], "tipNoe": ["Niederösterreichisch: altes ei wird zu oa, z. B. hoaß, dahoam, Stoa. Wo es keinen Unterschied gibt, steht „wie in Wien“.", "Lower Austrian: old “ei” becomes “oa”, e.g. hoaß, dahoam, Stoa. Where there is no difference, it says “same as Vienna”."], "noeName": ["Niederösterreich", "Lower Austria"], "quiz": ["🎯 Quiz", "🎯 Quiz"], "card": ["🃏 Karteikarten", "🃏 Flashcards"], "tipDir": ["Was du siehst und was du suchst: Dialekt → Hochdeutsch, umgekehrt oder gemischt.", "What you see and what you look for: dialect → German, the other way round, or mixed."], "tipQuiz": ["Vier Antworten zur Auswahl, eine davon ist richtig.", "Four answers to choose from, one of them is right."], "tipCard": ["Karte umdrehen und selbst einschätzen, ob du es gewusst hast.", "Flip the card and judge for yourself whether you knew it."], "dirWi": ["Dialekt → Hd.", "Dialect → German"], "dirMix": ["Gemischt", "Mixed"], "dirHd": ["Hd. → Dialekt", "German → Dialect"], "tipDirWi": ["Du siehst das Dialekt-Wort und suchst das Hochdeutsche.", "You see the dialect word and look for the Standard German one."], "tipDirMix": ["Mal vom Dialekt ins Hochdeutsche, mal umgekehrt.", "Sometimes dialect → Standard German, sometimes the other way round."], "tipDirHd": ["Du siehst das Hochdeutsche und suchst das Dialekt-Wort.", "You see the Standard German word and look for the dialect one."], "sTopic": ["Thema", "Topic"], "sSerie": ["🔥 Serie", "🔥 Streak"], "sRekord": ["Rekord", "Record"], "sHeute": ["Heute", "Today"], "sBug": ["⚑ Diese Karte melden", "⚑ Report this card"], "bugHint": ["Karte kopiert. Im Formular bei „Welche Karte?“ einfügen.", "Card copied. Paste it into “Welche Karte?” in the form."], "msgStart": ["Schaff 20 in Folge im Thema, dann kommt a Bonusfrage aus allen Themen. Die 🔥 Serie läuft über alle Themen weiter, bis zum ersten Fehler. Bei 5, 10 und 15 kriagst an 🛡️ Joker.", "Get 20 in a row in a topic to unlock a bonus question from all topics. Your 🔥 streak continues across topics until your first mistake. At 5, 10 and 15 you get a 🛡️ joker."], "days": ["Tageshighscore", "Daily high score"], "wTitle": ["📖 Wissen zum Nachlesen", "📖 Background reading"], "wSub": ["Kleine Wiener Grammatik · Unterschiede Wien und Niederösterreich · Was man nur in Österreich sagt, Alt-Wienerisch und „derb“", "Mini Viennese grammar · Vienna vs. Lower Austria · Words only Austrians use, Old Viennese and “rude” words"], "fbH": ["⭐ Bewerten &amp; Feedback", "⭐ Rate &amp; give feedback"], "fbP": ["Wie gefällt dir das Dojo? Fehler gefunden, Wunsch für ein neues Thema? Sag's uns. Kein Konto nötig, dauert eine Minute.", "How do you like the Dojo? Found a mistake, want a new topic? Tell us. No account needed, takes a minute. (The form is in German.)"], "fbBtn": ["Bewertung &amp; Feedback abgeben ↗", "Rate &amp; send feedback ↗"], "voteH": ["🗳️ Mitbestimmen", "🗳️ Have your say"], "voteP": ["Welches Thema soll als Nächstes ins Dojo? Fußball, Heuriger, Arbeit, Liebe, Wienerlied, Mehlspeisen, Wetter oder dein eigener Vorschlag. Eine Stimme, kein Konto nötig.", "Which topic should come next? Football, wine taverns, work, love, Viennese songs, pastries, weather or your own idea. One vote, no account needed."], "voteBtn": ["Jetzt abstimmen ↗", "Vote now ↗"], "albumT": ["😂 Deine Witze-Sammlung", "😂 Your joke collection"], "albumX": ["Schließen", "Close"], "albumP": ["Für jeden gebrochenen <b>Themen-Rekord</b> (mindestens 5 richtig in Folge und mehr als dein bisheriger Bestwert in diesem Thema) gibt's einen Wiener Witz aus diesem Thema.", "Every <b>topic record</b> you break (at least 5 in a row and more than your previous best in that topic) unlocks a Viennese joke from that topic. The jokes stay in dialect, with a short English explanation."], "albumSrc": ["Witze: nacherzählte Volkswitze und eigene, im Wiener Stil. Sprüche oben: 1000things.at, Babbel Magazin, Vienna Würstelstand.", "Jokes: retold folk jokes and original ones in Viennese style. Sayings: 1000things.at, Babbel Magazine, Vienna Würstelstand."], "gateT": ["Nichts für Kinder", "Not for children"], "gateP": ["Das Deck „Schimpfen“ enthält ordinäre und derbe Ausdrücke. Es ist nur für Erwachsene.", "The “Swearing” deck contains vulgar and rude expressions. It is for adults only."], "gateYear": ["Geburtsjahr", "Year of birth"], "gateChk": ["Ich bestätige, dass ich mindestens 18 Jahre alt bin.", "I confirm that I am at least 18 years old."], "gateNo": ["Abbrechen", "Cancel"], "gateOk": ["Freischalten", "Unlock"], "langTip": ["Switch to English", "Auf Deutsch umschalten"], "hd": ["Hochdeutsch", "Standard German"], "dWien": ["Wienerisch", "Viennese"], "dNoe": ["Niederösterreichisch", "Lower Austrian"], "dJung": ["Jugendsprache", "Youth slang"], "qToHd": ["Was heißt das auf <b>Hochdeutsch</b>?", "What is this in <b>Standard German</b>?"], "qToDia": ["Wie sagt man das auf <b>{d}</b>?", "How do you say this in <b>{d}</b>?"], "bonus": ["⭐ Bonusfrage", "⭐ Bonus question"], "hintFront": ["Überleg dir die Antwort im Kopf, dann dreh die Karte um und schau, ob du richtig lagst.", "Think of the answer, then flip the card and see if you were right."], "flip": ["Karte umdrehen", "Flip card"], "knew": ["Hast du es gewusst?", "Did you know it?"], "no": ["✗ Nicht gewusst", "✗ Didn't know"], "yes": ["✓ Gewusst", "✓ Knew it"], "next": ["Weiter", "Next"], "listen": ["🔊 Anhören", "🔊 Listen"], "voiceNote": ["Die Computerstimme spricht Hochdeutsch, der Dialekt klingt nur ungefähr.", "The computer voice speaks Standard German, so the dialect only sounds roughly right."], "noSound": ["Kein Ton auf diesem Gerät", "No sound on this device"], "soundNA": ["Ton nicht verfügbar", "Sound not available"], "right": ["Richtig!", "Correct!"], "wrong": ["Leider falsch.", "Sorry, wrong."], "picked": ["Du hast gewählt:", "You picked:"], "inWien": ["In Wien:", "In Vienna:"], "inNoe": ["In NÖ:", "In Lower Austria:"], "sameNoe": ["In NÖ wie in Wien.", "Same in Lower Austria as in Vienna."], "score": ["Richtig {a} · Falsch {b}", "Right {a} · Wrong {b}"], "inTopic": ["Im Thema: {n}", "This topic: {n}"], "topicsDone": ["Themen {a}/{b} bestanden", "Topics passed: {a}/{b}"], "m5": ["Leiwand! 5 richtig in Folge.", "Leiwand (great)! 5 in a row."], "m10": ["Ur guat! 10er-Serie.", "Ur guat (really good)! A 10 streak."], "m15": ["Heast, nur no 5!", "Heast (hey), only 5 to go!"], "m20": ["Oida, 20 in Folge! Gratuliere. Der Themen-Balken startet neu, die 🔥 Serie läuft weiter.", "Oida, 20 in a row! Congratulations. The topic bar restarts, your 🔥 streak keeps going."], "lifeOn": ["🛡️ Joker bereit (zurück auf {n})", "🛡️ Joker ready (back to {n})"], "lifeUsed": ["Joker verbraucht", "Joker used"], "rec": ["😂 Neuer Rekord in {t} ({n})! Ein Witz ist freigeschaltet. Klick oben auf 😂.", "😂 New record in {t} ({n})! A joke is unlocked. Click 😂 at the top."], "albumCat": ["{t} · Rekord {n}", "{t} · record {n}"], "lockTxt": ["Brich deinen Rekord in „{t}“, um diesen Witz freizuschalten.", "Break your record in “{t}” to unlock this joke."], "bonusAll": ["🏆 Bonusfrage richtig! Alle Themen gschafft!", "🏆 Bonus question right! All topics done!"], "bonusOk": ["✅ Bonusfrage richtig, {a} bestanden! Weiter mit: {b}", "✅ Bonus question right, {a} passed! Next up: {b}"], "bonus20": ["🎉 20 gschafft! Jetzt kommt die ⭐ Bonusfrage aus allen Themen. Richtig heißt: Thema bestanden.", "🎉 20 done! Now comes the ⭐ bonus question from all topics. Get it right to pass the topic."], "checkpoint": [" 🛡️ Checkpoint {n}: Du hast an Joker.", " 🛡️ Checkpoint {n}: you have a joker."], "keepGoing": ["Weiter so! No {n} bis zum Ziel. 🔥 Serie {s}.", "Keep going! {n} more to the goal. 🔥 Streak {s}."], "serieLost": [" 🔥 Serie bei {n} gerissen.", " 🔥 Streak broken at {n}."], "cardNo": ["Nicht gewusst, kein Problem. Die Karte kommt später wieder.", "Didn't know it, no problem. The card will come back later."], "falsch": ["Falsch.", "Wrong."], "bonusMissed": ["Bonusfrage verpasst. ", "Bonus question missed. "], "jokerBack": ["🛡️ Joker: Thema zurück auf {n}.", "🛡️ Joker: topic back to {n}."], "bonusNoJoker": ["Bonusfrage verpasst, ka Joker mehr. Thema {t} zurück auf 0.", "Bonus question missed, no joker left. {t} back to 0."], "topicZero": ["Thema zurück auf 0. Geh bitte!", "Topic back to 0. Geh bitte (oh come on)!"], "finaleLab": ["🏆 Alle {n} Themen gschafft · Gratuliere!", "🏆 All {n} topics done · Congratulations!"], "finaleHint": ["A Wiener Weisheit für di. Du bist jetzt offiziell Stammgast in diesem Dojo.", "A bit of Viennese wisdom for you. You're now officially a regular in this Dojo."], "other": ["Anderer Spruch", "Another saying"], "restart": ["Alle Themen neu starten", "Restart all topics"], "newRound": ["Neue Runde! Schaff 20 in Folge pro Thema.", "New round! Get 20 in a row per topic."], "tOk": ["Richtig heute", "Right today"], "tBest": ["Beste Serie heute", "Best streak today"], "tTopics": ["Themen heute", "Topics today"], "tNo": ["Fehler heute", "Mistakes today"], "bestDay": ["Bester Tag: {d} mit Serie {s} und {n} richtigen Antworten", "Best day: {d} with a streak of {s} and {n} right answers"], "noEntry": ["No ka Eintrag. Leg los!", "No entries yet. Let's go!"], "gate18": ["🔞 Ab 18", "🔞 18+"], "swear": ["Schimpfen auf Wienerisch", "Swearing in Viennese"], "gateLocked": ["Dieses Deck ist gesperrt, bis du bestätigst, dass du mindestens 18 bist.", "This deck is locked until you confirm you are at least 18."], "gateOpen": ["Altersabfrage öffnen", "Open age check"], "gErrChk": ["Bitte bestätige, dass du mindestens 18 bist.", "Please confirm that you are at least 18."], "gErrYear": ["Bitte ein gültiges Geburtsjahr eingeben.", "Please enter a valid year of birth."], "gErrAge": ["Dieses Deck ist erst ab 18. Probier ein anderes Thema!", "This deck is 18+ only. Try another topic!"], "askL": ["☕ Frag den Wiener", "☕ Ask the Viennese"], "askPh": ["z. B. Woher kommt Oida?", "e.g. Where does “Oida” come from?"], "askBtn": ["Fragen", "Ask"], "thinking": ["Denkt nach…", "Thinking…"], "noSensei": ["Der Wiener ist hier nicht da. Öffne die Seite auf claude.ai.", "The Viennese isn't available here. Open the page on claude.ai."], "errNG": ["Du hast dem Dojo nicht erlaubt, Claude zu fragen.", "You didn't allow the Dojo to ask Claude."], "errRL": ["Grad zu viele Fragen. Probier's gleich nochmal.", "Too many questions right now. Try again in a moment."], "errSD": ["Claude ist für diesen Account nicht verfügbar.", "Claude isn't available for this account."], "errSE": ["Bitte melde dich neu an.", "Please sign in again."], "errRF": ["Darauf kann der Wiener nicht antworten.", "The Viennese can't answer that."], "errGen": ["Das hat nicht geklappt. Probier's nochmal.", "That didn't work. Please try again."]};
-  Object.assign(UI,{"hsH":["🏆 Bestenliste","🏆 Leaderboard"],"hsP":["Die längsten 🔥 Serien aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.","The longest 🔥 streaks of all Dojo guests. No account: enter a name and submit your record."],
-  "hsBtn":["Rekord eintragen ({n})","Submit record ({n})"],"hsPh":["Dein Name","Your name"],"hsNone":["No ka Eintrag. Sei der Erste!","No entries yet. Be the first!"],"hsNeed":["Erst a Serie spielen, dann eintragen.","Play a streak first, then submit."],"hsName":["Bitte an Namen eingeben.","Please enter a name."],
-  "hsOk":["Eingetragen! Platz {r} mit Serie {n}.","Submitted! Rank {r} with a streak of {n}."],"hsErr":["Hat ned geklappt. Probier's später nochmal.","That didn't work. Please try again later."],
+  Object.assign(UI,{
+  "qStart":["🎯 {n} Fragen pro Runde. Fehler setzen nix zurück, am Schluss siehst, wie viele du richtig hast. Ab {p} richtigen ist das Thema bestanden.","🎯 {n} questions per round. Mistakes don't reset anything, at the end you see how many you got right. {p} or more passes the topic."],
+  "qRight":["Richtig! {k} von {q}. No {n} Fragen.","Correct! {k} of {q}. {n} questions left."],
+  "qWrong":["Leider falsch. {k} von {q} richtig. No {n} Fragen.","Wrong. {k} of {q} right. {n} questions left."],
+  "qEnd":["Runde vorbei: {k} von {n} richtig.","Round over: {k} of {n} right."],
+  "qPerfect":["Oida, alles richtig! 🏆","Oida, all correct! 🏆"],
+  "qGood":["Leiwand!","Leiwand (great)!"],
+  "qOkay":["Ned schlecht, da geht no mehr.","Not bad, you can do better."],
+  "qLow":["Geh bitte, nochmal!","Oh come on, try again!"],
+  "qJoke":["😂 Neuer Themen-Rekord, ein Witz ist freigeschaltet.","😂 New topic record, a joke is unlocked."],
+  "qPassed":["✓ {t} bestanden.","✓ {t} passed."],
+  "qNext":["Nächste Antwort startet a neue Runde.","Your next answer starts a new round."],
+  "qOkLab":["✓ Richtig","✓ Correct"],
+  "qRingTip":["Fragen in dieser Runde","Questions this round"]});
+  Object.assign(UI,{"hsH":["🏆 Bestenliste","🏆 Leaderboard"],"hsP":["Die besten Quiz-Runden (richtige von 20) aller Dojo-Gäste. Ohne Anmeldung: Namen eingeben und deinen Rekord eintragen.","The best quiz rounds (right out of 20) of all Dojo guests. No account: enter a name and submit your record."],
+  "hsBtn":["Rekord eintragen ({n})","Submit record ({n})"],"hsPh":["Dein Name","Your name"],"hsNone":["No ka Eintrag. Sei der Erste!","No entries yet. Be the first!"],"hsNeed":["Erst a Quiz-Runde (20 Fragen) spielen, dann eintragen.","Play a quiz round (20 questions) first, then submit."],"hsName":["Bitte an Namen eingeben.","Please enter a name."],
+  "hsOk":["Eingetragen! Platz {r} mit {n}/20.","Submitted! Rank {r} with {n}/20."],"hsErr":["Hat ned geklappt. Probier's später nochmal.","That didn't work. Please try again later."],
   "fbTF":["⭐ Bewerten & Feedback","⭐ Rate & give feedback"],"fbTB":["⚑ Karte melden","⚑ Report card"],"fbTV":["🗳️ Mitbestimmen","🗳️ Have your say"],
   "fbCardL":["Gemeldete Karte","Reported card"],"fbStarL":["Wie gefällt dir das Dojo?","How do you like the Dojo?"],"fbVoteL":["Welches Thema als Nächstes?","Which topic next?"],
   "fbTxtF":["Was gefällt dir, was fehlt? (freiwillig)","What do you like, what's missing? (optional)"],"fbTxtB":["Was stimmt nicht an der Karte?","What's wrong with this card?"],"fbTxtV":["Eigener Vorschlag oder Kommentar (freiwillig)","Your own idea or a comment (optional)"],
@@ -871,8 +885,11 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   let score={ok:0,no:0,streak:0};
   let run=0, best=0, goals=0, pendingReset=false, done={}, bonus=false, finale=false, hist={};
   let tBest={}, unlocked=[], tRun=0, tAwarded=false;
-  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;tBest=s.tBest||{};unlocked=(s.unlocked||[]).filter(x=>/^w/.test(x));}}catch(e){}}
-  function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak,tBest,unlocked}))}catch(e){}}
+  // Quiz: 20 Fragen pro Runde, Fehler setzen nichts zurück. Ergebnis = richtige von 20.
+  const QN=20, PASS=15;
+  let qRun=0, qOk=0, qBest=0, qDone=false, qTBest={};
+  function load(){try{const s=JSON.parse(localStorage.getItem("weanerdojo")||"null");if(s){deck=DECKS[s.deck]?s.deck:deck;mode=s.mode||mode;dir=s.dir||dir;dia=s.dia||dia;best=s.best||0;goals=s.goals||0;done=s.done||{};hist=s.hist||{};score.streak=s.serie||0;tBest=s.tBest||{};unlocked=(s.unlocked||[]).filter(x=>/^w/.test(x));qBest=s.qBest||0;qTBest=s.qTBest||{};}}catch(e){}}
+  function save(){try{localStorage.setItem("weanerdojo",JSON.stringify({deck,mode,dir,dia,best,goals,done,hist,serie:score.streak,tBest,unlocked,qBest,qTBest}))}catch(e){}}
   const pad=n=>String(n).padStart(2,"0");
   const keyOf=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
   function dayRec(){const k=keyOf(new Date());return hist[k]||(hist[k]={ok:0,no:0,best:0,topics:0});}
@@ -921,8 +938,20 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     return bags[key].pop();
   }
   const doneCount=()=>CAMP.filter(k=>done[k]).length;
+  const Q=()=>mode==="quiz";
   function renderScore(){
     $("#score").textContent=T("score",{a:score.ok,b:score.no});
+    if(Q()){
+      {const hb=document.getElementById("hsSend");if(hb)hb.textContent=T("hsBtn",{n:qBest+"/"+QN});}
+      $("#stNum").textContent=qRun;
+      $("#stRing").style.setProperty("--p",qRun/QN*100);
+      $("#stRing").title=T("qRingTip");
+      const se=$("#stSerie");se.querySelector(".lab").textContent=T("qOkLab");se.querySelector("b").textContent=qOk;se.classList.toggle("hot",qRun>0&&qOk===qRun);se.title="";
+      $("#stMeta").innerHTML=`${qBest}/${QN}<div class="sub">${T("inTopic",{n:deck==="all"?"–":(qTBest[deck]||0)+"/"+QN})}</div><div class="sub">${T("topicsDone",{a:doneCount(),b:CAMP.length})}</div>`;
+      $("#stTopic").textContent=NAMES[deck];
+      return;
+    }
+    $("#stRing").title="Fortschritt im Thema";$("#stSerie").querySelector(".lab").textContent=T("sSerie");
     {const hb=document.getElementById("hsSend");if(hb)hb.textContent=T("hsBtn",{n:best});}
     const s=run;
     $("#stNum").textContent=bonus?"⭐":s;
@@ -997,7 +1026,37 @@ section.notes{display:flex;flex-direction:column;gap:12px}
   setTimeout(()=>{try{if(sessionStorage.getItem("weanerdojo-visit"))return;sessionStorage.setItem("weanerdojo-visit","1");}catch(e){}sendStats(true);},1500);
   if(API_ON){const o=$("#statOpt"),c=$("#statChk");o.hidden=false;c.checked=statOn();c.onchange=()=>{try{localStorage.setItem("weanerdojo-stats",c.checked?"on":"off");}catch(e){}};}
   function bumpBest(d){if(score.streak>best)best=score.streak;if(score.streak>d.best)d.best=score.streak;}
+  // Ein Quiz-Ergebnis zählen; nach 20 Fragen ist die Runde vorbei
+  function qAnswer(ok){
+    const d=dayRec();
+    if(qDone){qRun=0;qOk=0;qDone=false;}
+    stat(ok);
+    if(ok){score.ok++;d.ok++;qOk++;}else{score.no++;d.no++;}
+    qRun++;
+    if(qRun<QN){
+      setMsg(ok?T("qRight",{n:QN-qRun,k:qOk,q:qRun}):T("qWrong",{n:QN-qRun,k:qOk,q:qRun}),ok?"":"bad");
+      save();renderScore();renderDays();renderLife();return;
+    }
+    // Runde vorbei
+    qDone=true;
+    if(qOk>qBest)qBest=qOk;
+    if(qOk>d.best)d.best=qOk;
+    let msg=T("qEnd",{k:qOk,n:QN})+" "+(qOk===QN?T("qPerfect"):qOk>=PASS?T("qGood"):qOk>=10?T("qOkay"):T("qLow"));
+    if(deck!=="all"){
+      const prev=qTBest[deck]||0;
+      if(qOk>prev){qTBest[deck]=qOk;
+        if(qOk>=PASS){const w=WITZE.find(x=>x.cat===deck&&!unlocked.includes(x.id));
+          if(w){unlocked.push(w.id);renderSpruch();const wb=$("#witzBtn");wb.classList.remove("neu");void wb.offsetWidth;wb.classList.add("neu");msg+=" "+T("qJoke");ST.rec++;}}
+      }
+      if(CAMP.includes(deck)&&qOk>=PASS&&!done[deck]){done[deck]=true;d.topics++;goals++;msg+=" "+T("qPassed",{t:NAMES[deck]});
+        if(!CAMP.find(k=>!done[k]))finale=true;}
+    }
+    if(qOk>ST.best)ST.best=qOk;
+    setMsg(msg+" "+T("qNext"),qOk>=PASS?"good":"");flash(qOk>=PASS?"win":"lost");
+    renderTabs();save();renderScore();renderDays();renderLife();
+  }
   function hit(){
+    if(Q()){qAnswer(true);return;}
     const d=dayRec();
     if(bonus){
       bonus=false;score.ok++;d.ok++;score.streak++;bumpBest(d);stat(true);run=0;resetCP();
@@ -1022,6 +1081,7 @@ section.notes{display:flex;flex-direction:column;gap:12px}
     save();renderScore();renderDays();renderLife();
   }
   function miss(){
+    if(Q()){qAnswer(false);return;}
     stat(false);const d=dayRec();d.no++;score.no++;topicReset();
     const wasBonus=bonus;bonus=false;
     const lostSerie=score.streak;score.streak=0;
@@ -1093,7 +1153,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
       <div class="hint">${T("finaleHint")}</div>
       <div class="actions"><button class="btn ghost" id="other">${T("other")}</button><button class="btn" id="restart">${T("restart")}</button></div>`;
     $("#other").onclick=showFinale;
-    $("#restart").onclick=()=>{done={};finale=false;bonus=false;run=0;resetCP();renderLife();deck="greet";setMsg(T("newRound"));save();renderScore();renderTabs();render();};
+    $("#restart").onclick=()=>{done={};finale=false;bonus=false;run=0;qRun=0;qOk=0;qDone=false;resetCP();renderLife();deck="greet";setMsg(T("newRound"));save();renderScore();renderTabs();render();};
   }
 
   // ---- Tageshighscore ----
@@ -1236,8 +1296,8 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     $("#gate").addEventListener("keydown",e=>{if(e.key==="Escape")$("#ageNo").click();});
   })();
 
-  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(t.dataset.deck==="schimpf"&&!adult()){openGate();return;}if(t.dataset.deck!==deck){run=0;resetCP();renderLife();topicReset();}deck=t.dataset.deck;bonus=false;cur=null;renderTabs();save();renderScore();render();});
-  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;save();render();});
+  document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{if(t.dataset.deck==="schimpf"&&!adult()){openGate();return;}if(t.dataset.deck!==deck){run=0;resetCP();renderLife();topicReset();qRun=0;qOk=0;qDone=false;}deck=t.dataset.deck;bonus=false;cur=null;renderTabs();save();renderScore();render();});
+  document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(mode!==b.dataset.mode){mode=b.dataset.mode;run=0;resetCP();renderLife();topicReset();qRun=0;qOk=0;qDone=false;bonus=false;setMsg(T(Q()?"qStart":"msgStart",{n:QN,p:PASS}));}save();renderScore();render();});
   $("#dirSel").onchange=e=>{dir=e.target.value;save();render();};
   document.querySelectorAll("[data-dia]").forEach(b=>b.onclick=()=>{dia=b.dataset.dia;save();render();});
 
@@ -1286,18 +1346,18 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   function renderHs(){
     if(!API_ON)return;
     const me=hsMyName();
-    $("#hsList").innerHTML=hsTop.length?hsTop.map(r=>`<li${r.name===me?' class="me"':""}><span class="nm">${esc(r.name)}</span><span class="sc">🔥 ${r.best}</span></li>`).join(""):`<li class="hint" style="counter-increment:none">${esc(T("hsNone"))}</li>`;
-    $("#hsSend").textContent=T("hsBtn",{n:best});$("#hsName").placeholder=T("hsPh");
+    $("#hsList").innerHTML=hsTop.length?hsTop.map(r=>`<li${r.name===me?' class="me"':""}><span class="nm">${esc(r.name)}</span><span class="sc">✓ ${r.best}/${QN}</span></li>`).join(""):`<li class="hint" style="counter-increment:none">${esc(T("hsNone"))}</li>`;
+    $("#hsSend").textContent=T("hsBtn",{n:qBest+"/"+QN});$("#hsName").placeholder=T("hsPh");
     if(!$("#hsName").value)$("#hsName").value=me;
   }
-  async function loadHs(){try{const r=await fetch(API+"/api/highscore");const j=await r.json();if(!j.ok)return;hsTop=j.top||[];$("#hs").hidden=false;renderHs();}catch(e){}}
+  async function loadHs(){try{const r=await fetch(API+"/api/highscore?dojo=wien20");const j=await r.json();if(!j.ok)return;hsTop=j.top||[];$("#hs").hidden=false;renderHs();}catch(e){}}
   $("#hsSend").onclick=async()=>{
     const name=$("#hsName").value.trim(),m=$("#hsMsg");
-    if(!best){m.textContent=T("hsNeed");return;}
+    if(!qBest){m.textContent=T("hsNeed");return;}
     if(!name){m.textContent=T("hsName");$("#hsName").focus();return;}
     try{localStorage.setItem("weanerdojo-name",name);}catch(e){}
     $("#hsSend").disabled=true;
-    try{const r=await apiPost("/api/score",{vid:vid(),name,best});const j=await r.json();if(!j.ok)throw 0;m.textContent=T("hsOk",{r:j.rank,n:j.best});await loadHs();}
+    try{const r=await apiPost("/api/score",{vid:vid(),name,best:qBest,dojo:"wien20"});const j=await r.json();if(!j.ok)throw 0;m.textContent=T("hsOk",{r:j.rank,n:j.best});await loadHs();}
     catch(e){m.textContent=T("hsErr");}
     $("#hsSend").disabled=false;
   };
@@ -1310,7 +1370,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
     $("#langBtn").textContent=EN()?"DE":"EN";
     $("#langBtn").setAttribute("aria-label",EN()?"Auf Deutsch umschalten":"Switch to English");
   }
-  $("#langBtn").onclick=()=>{setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0);LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(T("msgStart"));render();renderHs();};
+  $("#langBtn").onclick=()=>{setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0);LANG=EN()?"de":"en";try{localStorage.setItem("weanerdojo-lang",LANG);}catch(e){}applyLang();renderTabs();renderScore();renderDays();renderLife();renderSpruch();showSpruch();setMsg(Q()?T("qStart",{n:QN,p:PASS}):T("msgStart"));render();renderHs();};
   $("#spruch").onclick=nextSpruch;
   $("#witzBtn").onclick=openAlbum;
   $("#albumX").onclick=()=>{$("#album").hidden=true;$("#spruch").focus();};
@@ -1339,7 +1399,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   function renderNews(){$("#newsAll").innerHTML=newsHtml(NEWS);}
   $("#langBtn").addEventListener("click",()=>setTimeout(renderNews,0));
   $("#nowChip").onclick=openStart;
-  load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();render();loadHs();
+  load();if(deck==="schimpf"&&!adult())deck="greet";applyLang();nextSpruch();renderSpruch();renderTabs();renderScore();renderDays();renderLife();if(Q())setMsg(T("qStart",{n:QN,p:PASS}));render();loadHs();
   renderNow();document.querySelectorAll("#newsBox [data-i18n]").forEach(el=>{el.innerHTML=T(el.dataset.i18n);});renderNews();if(showStart)openStart();
 })();
 </script>
