@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="de">
 <head>
@@ -260,7 +261,7 @@ h1 small{display:none}
 .now-chip .jp-flag{width:18px;height:12px}
 .now-chip .ch{color:var(--muted);font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .pick-bg{position:fixed;inset:0;z-index:60;background:color-mix(in srgb,#000 55%,transparent);display:grid;place-items:center;padding:20px}
-.pick-box{background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 40px);overflow-y:auto}
+.pick-box{background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;width:100%;max-width:440px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;padding-bottom:0}
 .pick-box h2{margin:0;font-family:var(--f-display);font-size:30px}
 .pick-lead{margin:0;font-family:var(--f-display);font-weight:700;font-size:20px;color:var(--ink);line-height:1.3}
 .pick-step{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:6px}
@@ -271,7 +272,12 @@ h1 small{display:none}
 .pick[aria-pressed="true"]::after{content:"✓";position:absolute;right:14px;font-weight:700}
 .pick-topics{display:flex;flex-wrap:wrap;gap:8px}
 .pick-topics .tab{font-size:14px;padding:7px 12px}
-.pick-go{margin-top:8px;font-size:17px;padding:12px 18px;border-radius:12px}
+.pick-head h2{white-space:nowrap;font-size:clamp(24px,7vw,30px)}
+.pick-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pick-lang{display:flex;flex:none;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px}
+.pick-lang button{border:0;background:none;border-radius:999px;padding:6px 12px;font-weight:700;font-size:14px;color:var(--muted)}
+.pick-lang button[aria-pressed="true"]{background:var(--shu);color:#fff}
+.pick-go{margin-top:8px;font-size:17px;padding:12px 18px;border-radius:12px;position:sticky;bottom:16px;z-index:2;flex:none;margin-bottom:16px;box-shadow:0 0 0 16px var(--surface),0 -18px 18px 6px var(--surface)}
 
 /* ---- Was ist neu? ---- */
 .news-list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
@@ -283,7 +289,7 @@ h1 small{display:none}
 <body>
 <div class="pick-bg" id="pickDlg" hidden role="dialog" aria-modal="true" aria-labelledby="pickT">
   <div class="pick-box">
-    <h2 id="pickT" data-i18n="pickT">こんにちは! 👋</h2>
+    <div class="pick-head"><h2 id="pickT" data-i18n="pickT">こんにちは! 👋</h2><div class="pick-lang" role="group" aria-label="Sprache / Language"><button type="button" data-plang="de">DE</button><button type="button" data-plang="en">EN</button></div></div>
     <p class="pick-lead" data-i18n="greet">Lernst du heute wieder ein bisschen Japanisch?</p>
     <div class="pick-step" data-i18n="step1">1 · Welche Schrift?</div>
     <button class="pick" type="button" data-pick="jp"><span class="pk">あ</span><span><b>日本語</b><small data-i18n="pkJp">Kana &amp; Kanji · きゅう</small></span></button>
@@ -1305,7 +1311,10 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     document.querySelectorAll("[data-pick]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pick===pScript));
     $("#pickTopics").innerHTML=[...CAMP,"all"].map(k=>`<button type="button" class="tab" data-pdeck="${k}" aria-pressed="${k===pDeck}">${esc(NAMES[k])}</button>`).join("");
   }
-  function openStart(){pScript=script;pDeck=DECKS[deck]?deck:"num";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
+  const paintPLang=()=>document.querySelectorAll("[data-plang]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.plang===LANG)));
+  document.querySelector(".pick-lang").onclick=ev=>{const b=ev.target.closest("[data-plang]");if(!b||b.dataset.plang===LANG)return;$("#langBtn").click();setTimeout(paintPLang,0);};
+  paintPLang();
+  function openStart(){paintPLang();pScript=script;pDeck=DECKS[deck]?deck:"num";paintPick();$("#pickDlg").hidden=false;$("#pickGo").focus();}
   function renderNow(){$("#nowChip").innerHTML=$(".jp-flag").outerHTML+`<span>${esc(SCRIPT_L()[script])}</span><span class="ch">${esc(T("change"))}</span>`;}
   document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>{pScript=b.dataset.pick;paintPick();});
   $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
