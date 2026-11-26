@@ -345,7 +345,7 @@ h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;letter-s
 .sign .w{font-family:var(--f-word);font-weight:700;font-size:clamp(40px,9vw,62px);line-height:1.12;color:var(--ink);overflow-wrap:anywhere;text-wrap:balance}
 .sign .w.l2{font-size:clamp(30px,6.5vw,44px)}
 .sign .w.l3{font-size:clamp(24px,5vw,32px)}
-.sign .to{margin-top:8px;padding-top:8px;border-top:1px solid var(--signline);font-size:14px;color:var(--muted);line-height:1.5}
+.sign .to{margin:6px auto 10px;padding-bottom:8px;border-bottom:1px solid var(--signline);font-size:16px;font-weight:600;color:var(--ink);line-height:1.5}
 .sign .to .crest{display:inline-block;vertical-align:-5px;margin-right:6px}
 .sign .to b{color:var(--ink);font-weight:600}
 .crest{width:18px;height:22px;flex:none}
@@ -1223,7 +1223,7 @@ Kontext, die aktuelle Lernkarte: ${dia==="noe"?"Niederösterreichisch":"Wieneris
   function signHtml(text,f,withQ=true,trc=""){
     const isJ=cur&&JUNGSET.has(cur);const lab=f==="wi"?`${isJ?"":crest()}${DIALEKT()}`:T("hd");
     const q=f==="wi"?T("qToHd"):`${isJ?"":crest()}${T("qToDia",{d:DIALEKT()})}`;
-    return `${bonus?`<span class="bonus-pill">${T("bonus")}</span>`:""}<div class="sign"><div class="lab">${lab}</div><div class="w${lenCls(text)}">${esc(text)}</div>${trc?`<div class="tr">🇬🇧 ${esc(trc)}</div>`:""}${withQ?`<div class="to">${q}</div>`:""}</div>`;
+    return `${bonus?`<span class="bonus-pill">${T("bonus")}</span>`:""}<div class="sign"><div class="lab">${lab}</div>${withQ?`<div class="to">${q}</div>`:""}<div class="w${lenCls(text)}">${esc(text)}</div>${trc?`<div class="tr">🇬🇧 ${esc(trc)}</div>`:""}</div>`;
   }
 
   function showCard(){

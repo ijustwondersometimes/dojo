@@ -235,7 +235,7 @@ th{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute
 .sign .slab{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
 .sign .big{font-size:clamp(40px,9vw,62px);line-height:1.15}
 .sign .big.ro{font-size:clamp(28px,6.5vw,42px)}
-.sign .to{margin-top:8px;padding-top:8px;border-top:1px solid var(--signline);font-size:14px;color:var(--muted)}
+.sign .to{margin:6px auto 10px;padding-bottom:8px;border-bottom:1px solid var(--signline);font-size:16px;font-weight:600;color:var(--ink)}
 .sign .to b{color:var(--ink);font-weight:600}
 .choices{grid-template-columns:1fr;max-width:560px}
 .choice{display:flex;align-items:center;gap:14px;text-align:left;background:var(--sign2);padding:12px 16px}
@@ -1194,11 +1194,10 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
     cur=pick();flipped=false;
     const front=Math.random()<.5?"jp":"de";
     card.dataset.front=front;
-    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${front==="jp"?T("signJa"):T("signDe")}</div>
+    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${front==="jp"?T("signJa"):T("signDe")}</div><div class="to">${front==="jp"?T("qMean"):T("qJp")}</div>
       <div class="big ${front==="de"&&cur.deck==="num"?"num":""} ${front==="jp"&&script==="ro"?"ro":""}">${esc(front==="jp"?jpText(cur):M(cur))}</div>
       ${front==="jp"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
-      ${front==="jp"&&cur.kanji&&script!=="ro"?`<div class="sub">${esc(cur.kanji)}</div>`:""}
-      <div class="to">${front==="jp"?T("qMean"):T("qJp")}</div></div>
+      ${front==="jp"&&cur.kanji&&script!=="ro"?`<div class="sub">${esc(cur.kanji)}</div>`:""}</div>
       ${front==="jp"?sayHtml(cur):""}
       <div class="actions"><button class="btn" id="flip">${T("flip")}</button></div>`;
     $("#flip").onclick=()=>{card.innerHTML=backHtml(cur)+`<div class="actions"><button class="btn ghost" id="again">${T("again")}</button><button class="btn" id="next">${T("knew")}</button></div>`+askHtml();wireAsk(cur);
@@ -1217,11 +1216,10 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
         const promptTxt=dir==="jp2de"?jpText(cur):M(cur);
     const showHint=dir==="jp2de"&&script==="jp";
     const choiceHtml=o=>dir==="jp2de"?esc(M(o)):(script==="ro"?esc(o.romaji):script==="both"?`${esc(o.jp)}<span class="cr">${esc(o.romaji)}</span>`:esc(o.jp));
-    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${dir==="jp2de"?T("signJa"):T("signDe")}</div>
+    card.innerHTML=`<div class="sign"><div class="slab">${bonusTag()}${dir==="jp2de"?T("signJa"):T("signDe")}</div><div class="to">${dir==="jp2de"?T("qMean"):T("qPick")}</div>
       <div class="big ${dir==="de2jp"&&cur.deck==="num"?"num":""} ${dir==="jp2de"&&script==="ro"?"ro":""}">${esc(promptTxt)}</div>
       ${dir==="jp2de"&&script==="both"?`<div class="romaji">${esc(cur.romaji)}</div>`:""}
-      ${showHint?`<div class="romaji" id="rhint" hidden>${esc(cur.romaji)}</div>`:""}
-      <div class="to">${dir==="jp2de"?T("qMean"):T("qPick")}</div></div>
+      ${showHint?`<div class="romaji" id="rhint" hidden>${esc(cur.romaji)}</div>`:""}</div>
       ${dir==="jp2de"?sayHtml(cur):""}
       <div class="choices">${opts.map((o,i)=>`<button class="choice" id="c${i}" data-id="${o.id}"><span class="k">${"ABCD"[i]}</span><span class="t">${choiceHtml(o)}</span></button>`).join("")}</div>
       <div class="feedback" id="fb"></div>
