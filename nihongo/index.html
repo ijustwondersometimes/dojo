@@ -1359,8 +1359,23 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   $("#pickTopics").onclick=e=>{const t=e.target.closest("[data-pdeck]");if(!t)return;pDeck=t.dataset.pdeck;paintPick();};
   $("#pickGo").onclick=()=>{try{sessionStorage.setItem("nihongodojo-start","1");}catch(e){}
     $("#pickDlg").hidden=true;const sb=document.querySelector(`.mode[data-script="${pScript}"]`);if(sb)sb.click();const t=document.querySelector(`.tab[data-deck="${pDeck}"]`);if(t&&pDeck!==deck)t.click();save();renderNow();window.scrollTo(0,0);};
+  // ---- Intro-Video: nur beim allerersten Aufruf, vor dem Start-Pop-up ----
+  function introThen(cb){
+    let seen=true;try{seen=!!localStorage.getItem("nihongodojo-intro");}catch(e){}
+    if(seen){cb();return;}
+    const o=document.createElement("div");
+    o.setAttribute("role","dialog");o.setAttribute("aria-label","Intro");
+    o.style.cssText="position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center";
+    o.innerHTML='<video src="../intro-nihongo.mp4" muted autoplay playsinline preload="auto" style="max-width:100%;max-height:100%;width:min(100vw,100vh);height:auto"></video>'
+      +'<button type="button" style="position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));padding:10px 18px;border-radius:999px;border:1px solid #fff8;background:#0008;color:#fff;font:600 16px system-ui,sans-serif;cursor:pointer">'+(EN()?"Skip ›":"Überspringen ›")+'</button>';
+    document.body.appendChild(o);
+    let done=false;const end=()=>{if(done)return;done=true;try{localStorage.setItem("nihongodojo-intro","1");}catch(e){}o.remove();cb();};
+    const v=o.querySelector("video");v.onended=end;v.onerror=end;o.querySelector("button").onclick=end;o.querySelector("button").focus();
+    const p=v.play();if(p&&p.catch)p.catch(()=>{});
+    setTimeout(end,30000);
+  }
   // ---- Was ist neu? (Changelog) ----
-  const NEWS=[{"d": "2026-11-16", "i": [["<b>Beispielsätze</b>: jedes Wort jetzt auch im ganzen Satz, mit Romaji, Übersetzung und zum Anhören.", "<b>Example sentences</b>: every word now also in a full sentence, with romaji, translation and audio."], ["Neues Thema <b>💬 Ganze Sätze</b>: ganze Alltagssätze statt einzelner Wörter.", "New topic <b>💬 Whole sentences</b>: full everyday sentences instead of single words."], ["<b>Dunkelmodus</b> ist jetzt Standard. Hell geht weiter über den ☀️-Knopf.", "<b>Dark mode</b> is now the default. Light mode is still one tap on ☀️."]]}, {"d": "2026-11-11", "i": [["<b>Aufgeräumt</b>: Themen am Handy als ein Knopf, Songs als eigene Gruppe, Schrift nur noch oben wählen.", "<b>Tidier</b>: one topic button on mobile, songs grouped, script chosen at the top."], ["<b>Neues Design</b> wie im Wien / NÖ Dojo: Seitenleiste mit Fortschritt, Frage als Schild, Antworten A–D.", "<b>New design</b> like the Vienna Dojo: progress sidebar, question sign, answers A–D."], ["<b>Start-Pop-up</b>: Schrift (日本語, Beides, Romaji) und Thema gleich zu Beginn wählen.", "<b>Start pop-up</b>: choose script (日本語, both, romaji) and topic right away."]]}, {"d": "2026-11-10", "i": [["<b>🏆 Bestenliste</b>: deine längste Serie eintragen, ohne Anmeldung.", "<b>🏆 Leaderboard</b>: submit your longest streak, no account needed."], ["Bewerten, Karte melden und Mitbestimmen jetzt direkt im Dojo.", "Rate, report cards and vote right inside the Dojo."]]}];
+  const NEWS=[{"d": "2026-11-26", "i": [["<b>Intro-Video</b>: beim ersten Besuch zeigt ein kurzer Clip, was das Dojo kann (ohne Ton, überspringbar).", "<b>Intro video</b>: on your first visit a short clip shows what the Dojo can do (no sound, skippable)."]]}, {"d": "2026-11-16", "i": [["<b>Beispielsätze</b>: jedes Wort jetzt auch im ganzen Satz, mit Romaji, Übersetzung und zum Anhören.", "<b>Example sentences</b>: every word now also in a full sentence, with romaji, translation and audio."], ["Neues Thema <b>💬 Ganze Sätze</b>: ganze Alltagssätze statt einzelner Wörter.", "New topic <b>💬 Whole sentences</b>: full everyday sentences instead of single words."], ["<b>Dunkelmodus</b> ist jetzt Standard. Hell geht weiter über den ☀️-Knopf.", "<b>Dark mode</b> is now the default. Light mode is still one tap on ☀️."]]}, {"d": "2026-11-11", "i": [["<b>Aufgeräumt</b>: Themen am Handy als ein Knopf, Songs als eigene Gruppe, Schrift nur noch oben wählen.", "<b>Tidier</b>: one topic button on mobile, songs grouped, script chosen at the top."], ["<b>Neues Design</b> wie im Wien / NÖ Dojo: Seitenleiste mit Fortschritt, Frage als Schild, Antworten A–D.", "<b>New design</b> like the Vienna Dojo: progress sidebar, question sign, answers A–D."], ["<b>Start-Pop-up</b>: Schrift (日本語, Beides, Romaji) und Thema gleich zu Beginn wählen.", "<b>Start pop-up</b>: choose script (日本語, both, romaji) and topic right away."]]}, {"d": "2026-11-10", "i": [["<b>🏆 Bestenliste</b>: deine längste Serie eintragen, ohne Anmeldung.", "<b>🏆 Leaderboard</b>: submit your longest streak, no account needed."], ["Bewerten, Karte melden und Mitbestimmen jetzt direkt im Dojo.", "Rate, report cards and vote right inside the Dojo."]]}];
   Object.assign(UI,{newsT:["🆕 Neu im Dojo","🆕 New in the Dojo"],newsP:["Seit deinem letzten Besuch ist dazugekommen:","New since your last visit:"],newsOk:["Super, weiter! 👍","Great, let's go! 👍"],newsH:["🆕 Was ist neu?","🆕 What's new?"],newsS:["Alle Neuerungen im Dojo, die neuesten zuerst","Every Dojo update, newest first"]});
   const fmtD=d=>d.split("-").reverse().join(".");
   const newsHtml=list=>list.map(n=>`<div class="news-day">${fmtD(n.d)}</div><ul class="news-list">${n.i.map(x=>`<li>${EN()?x[1]:x[0]}</li>`).join("")}</ul>`).join("");
@@ -1370,7 +1385,7 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   document.querySelectorAll(".mode[data-script]").forEach(m=>m.addEventListener("click",()=>setTimeout(renderNow,0)));
   $("#langBtn").addEventListener("click",()=>setTimeout(()=>{renderNow();if(!$("#pickDlg").hidden)paintPick();},0));
   load();if(!CAMP.find(k=>!done[k]))finale=true;applyLang();if(EN())setMsg(T("msgStart"));renderScore();renderDays();renderLife();render();loadHs();
-  renderNow();document.querySelectorAll("#newsBox [data-i18n]").forEach(el=>{el.innerHTML=T(el.dataset.i18n);});renderNews();if(showStart)openStart();
+  renderNow();document.querySelectorAll("#newsBox [data-i18n]").forEach(el=>{el.innerHTML=T(el.dataset.i18n);});renderNews();introThen(()=>{if(showStart)openStart();});
 })();
 </script>
 <script>
