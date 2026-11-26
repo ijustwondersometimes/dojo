@@ -1363,7 +1363,7 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
   function introThen(cb){
     let seen=true;try{seen=!!localStorage.getItem("nihongodojo-intro");}catch(e){}
     if(seen){cb();return;}
-    const SRC={de:"../intro-nihongo-de.mp4",en:"../intro-nihongo.mp4"};
+    const SRC={de:"https://ijustwondersometimes.github.io/dojo/intro-nihongo-de.mp4",en:"https://ijustwondersometimes.github.io/dojo/intro-nihongo.mp4"};
     const btn="padding:8px 14px;border-radius:999px;border:1px solid #fff8;color:#fff;font:600 15px system-ui,sans-serif;cursor:pointer";
     const o=document.createElement("div");
     o.setAttribute("role","dialog");o.setAttribute("aria-label","Intro");
@@ -1374,12 +1374,12 @@ Kontext, die aktuelle Lernkarte: ${c.jp}${c.kana?" ("+c.kana+")":""}, Romaji: ${
       +'<button type="button" data-skip style="position:absolute;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));'+btn+';padding:10px 18px;font-size:16px;background:#0008"></button>';
     document.body.appendChild(o);
     const v=o.querySelector("video"),sk=o.querySelector("[data-skip]");
-    let done=false,timer=0;const end=()=>{if(done)return;done=true;clearTimeout(timer);try{localStorage.setItem("nihongodojo-intro","1");}catch(e){}o.remove();cb();};
+    let done=false,timer=0;const end=ok=>{if(done)return;done=true;clearTimeout(timer);if(ok!==false)try{localStorage.setItem("nihongodojo-intro","1");}catch(e){}o.remove();cb();};
     const show=()=>{const l=EN()?"en":"de";sk.textContent=EN()?"Skip ›":"Überspringen ›";
       o.querySelectorAll("[data-il]").forEach(b=>{const on=b.dataset.il===l;b.setAttribute("aria-pressed",String(on));b.style.background=on?"#c8102e":"#0008";});
       v.src=SRC[l];const p=v.play();if(p&&p.catch)p.catch(()=>{});clearTimeout(timer);timer=setTimeout(end,30000);};
     o.querySelectorAll("[data-il]").forEach(b=>b.onclick=()=>{if((b.dataset.il==="en")!==EN())$("#langBtn").click();show();});
-    v.onended=end;v.onerror=end;sk.onclick=end;
+    v.onended=end;v.onerror=()=>end(false);sk.onclick=end;
     show();sk.focus();
   }
   // ---- Was ist neu? (Changelog) ----
